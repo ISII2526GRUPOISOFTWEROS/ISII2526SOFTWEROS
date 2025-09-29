@@ -8,6 +8,9 @@
         public int PurchaseId { get; set; }
         [Precision(18, 2)] public decimal Price { get; set; }
 
+        //Reference 
+        public Purchase Purchase { get; set; }
+
 
     }
 }
