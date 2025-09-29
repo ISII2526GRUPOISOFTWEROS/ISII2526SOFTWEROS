@@ -4,5 +4,8 @@
     {
         public int Id { get; set; }
         public string Name { get; set; }
+
+        //Reference 
+        public IList<Item> Items { get; set; }
     }
 }

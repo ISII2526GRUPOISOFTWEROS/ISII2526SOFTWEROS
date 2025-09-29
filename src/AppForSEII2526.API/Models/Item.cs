@@ -1,5 +1,6 @@
 ﻿namespace AppForSEII2526.API.Models
 {
+    [PrimaryKey(nameof(Id))]
     public class Item
     {
         public int Id { get; set; }
@@ -14,5 +15,8 @@
 
         //Reference
         public IList<PurchaseItem> PurchaseItems { get; set; }
+
+        public ItemType ItemType { get; set; }
+        public Brand Brand { get; set; }
     }
 }
