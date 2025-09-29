@@ -11,5 +11,6 @@
         public String Name { get; set; }
         public Decimal Totalprice { get; set; }
         public DateTime CreatedDate { get; set; }
+        public IList<PlanItem> PlanItem { get; set; }
     }
 }
