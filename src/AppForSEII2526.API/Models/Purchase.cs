@@ -12,7 +12,8 @@
         public string Description { get; set; }
         public string Street { get; set; }
         //Decimal
-        [Precision(18, 2)] public decimal Total_prices { get; set; }
+        [Precision(10, 2)] 
+        public decimal Total_prices { get; set; }
 
         //Reference
         public IList<PurchaseItem> PurchaseItems { get; set; }
