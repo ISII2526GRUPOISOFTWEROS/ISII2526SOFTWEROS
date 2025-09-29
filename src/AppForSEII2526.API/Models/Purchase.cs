@@ -12,6 +12,6 @@
         public string Description { get; set; }
         public string Street { get; set; }
         //Decimal
-        public decimal Total_prices { get; set; }
+        [Precision(18, 2)] public decimal Total_prices { get; set; }
     }
 }
