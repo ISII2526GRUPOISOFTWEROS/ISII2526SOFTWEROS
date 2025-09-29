@@ -12,5 +12,7 @@
         [Precision(10, 2)] 
         public decimal PurchasePrice { get; set; }
 
+        //Reference
+        public IList<PurchaseItem> PurchaseItems { get; set; }
     }
 }

@@ -11,7 +11,7 @@
 
         //Reference 
         public Purchase Purchase { get; set; }
-
+        public Item Item { get; set; }
 
     }
 }
