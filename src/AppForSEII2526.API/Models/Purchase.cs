@@ -1,4 +1,6 @@
-﻿namespace AppForSEII2526.API.Models
+﻿using Microsoft.Identity.Client;
+
+namespace AppForSEII2526.API.Models
 {
     public class Purchase
     {
@@ -17,5 +19,6 @@
 
         //Reference
         public IList<PurchaseItem> PurchaseItems { get; set; }
+        public PaymentMethod PaymentMethod { get; set; }
     }
 }
