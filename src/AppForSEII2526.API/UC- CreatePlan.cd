@@ -1,24 +1,50 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="NameAndType">
   <Class Name="AppForSEII2526.API.Models.Plan">
-    <Position X="2.25" Y="1.25" Width="1.5" />
+    <Position X="1" Y="0.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAACgAAAAAAgAAAAAAAAAAQAAAAAQAACAgAAAAAAAAE=</HashCode>
       <FileName>Models\Plan.cs</FileName>
     </TypeIdentifier>
     <ShowAsCollectionAssociation>
-      <Property Name="PlanItem" />
+      <Property Name="PlanItems" />
     </ShowAsCollectionAssociation>
   </Class>
   <Class Name="AppForSEII2526.API.Models.PlanItem">
-    <Position X="6.75" Y="1.25" Width="1.5" />
+    <Position X="5.5" Y="0.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AQAAAAAgAQAAAAAAAAAQAAAAAAAAAAABAAAAAAAAAAA=</HashCode>
+      <HashCode>AQAAAAAgAQAAAAAAAAIQAAAAAAAAAAABAAAAAAAAAAA=</HashCode>
       <FileName>Models\PlanItem.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
       <Property Name="Plan" />
+      <Property Name="Class" />
     </ShowAsAssociation>
+  </Class>
+  <Class Name="AppForSEII2526.API.Models.Class">
+    <Position X="8.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACgAAAAQAAAAAAAAAAAAQCAAAAAAABAAIAAAAAAAA=</HashCode>
+      <FileName>Models\Class.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsCollectionAssociation>
+      <Property Name="TypeItems" />
+      <Property Name="PlanItems" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Class Name="AppForSEII2526.API.Models.TypeItem">
+    <Position X="8.75" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\TypeItem.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="AppForSEII2526.API.Models.ApplicationUser">
+    <Position X="4.75" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAQABAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\ApplicationUser.cs</FileName>
+    </TypeIdentifier>
   </Class>
   <Font Name="Segoe UI" Size="9" />
 </ClassDiagram>
