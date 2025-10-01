@@ -10,7 +10,7 @@
         public String Description { get; set; }
         public String Name { get; set; }
         [Precision (10,2)]
-        public Decimal Totalprice { get; set; }
+        public decimal Totalprice { get; set; }
         public DateTime CreatedDate { get; set; }
         public IList<PlanItem> PlanItems { get; set; }
     }
