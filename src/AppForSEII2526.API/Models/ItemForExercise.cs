@@ -2,6 +2,7 @@
 {
     public class ItemForExercise
     {
+        [Key]
         public string Location { get; set; }
 
         //Reference
