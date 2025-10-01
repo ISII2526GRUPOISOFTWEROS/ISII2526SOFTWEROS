@@ -16,5 +16,5 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<Item> Items { get; set; }
     public DbSet<PurchaseItem> PurchaseItems { get; set; }
 
-
+>>>>>>> origin/development
 }
