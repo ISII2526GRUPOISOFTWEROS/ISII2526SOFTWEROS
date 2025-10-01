@@ -1,20 +1,20 @@
 project:
-  name: 'ISII-2526-GrupoI-SOFTWEROS'
-  owner: 'GrupoI'
-  teamId: 'Team'
+  name: ISII-2526-GrupoI-SOFTWEROS
+  owner: GrupoI
+  teamId: Team
   identities: {}
   notifications:
-    email: 'Adrian.Sevilla@alu.uclm.es,MarcosAlejandro.Labrador@alu.uclm.es,Lidia.Lopez13@alu.uclm.es'
+    email: Adrian.Sevilla@alu.uclm.es,MarcosAlejandro.Labrador@alu.uclm.es,Lidia.Lopez13@alu.uclm.es
   members:
     member1:
-      name: 'Adrián'
-      surname: 'Sevilla'
-      githubUsername: 'Adrian615'
+      name: Adrián
+      surname: Sevilla
+      githubUsername: Adrian615
     member2:
-      name: 'Marcos Alejandro'
-      surname: 'Labrador
-      githubUsername: 'MarcosL07'
+      name: Marcos Alejandro
+      surname: Labrador
+      githubUsername: MarcosL07
     member3:
-      name: 'Lidia
-      surname: 'lopez
-      githubUsername: 'LidiaLpzPlz13'
+      name: Lidia
+      surname: Lopez-Pelaez
+      githubUsername: LidiaLpzPlz13
