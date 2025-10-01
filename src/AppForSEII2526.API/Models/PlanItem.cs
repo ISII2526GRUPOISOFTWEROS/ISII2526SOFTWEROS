@@ -3,8 +3,8 @@
     [Keyless]
     public class PlanItem
     {
-        public int Classld { get; set; }
-        public int Planld { get; set; }
+        public int ClassId { get; set; }
+        public int PlanId { get; set; }
         public String Goal { get; set; }
         [Precision(10, 2)]
         public Decimal Price { get; set; }
