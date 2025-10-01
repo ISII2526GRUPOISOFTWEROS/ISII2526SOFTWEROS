@@ -8,13 +8,13 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<Plan> Plans { get; set; }
     public DbSet<PlanItem> PlanItems { get; set; }
 
-<<<<<<< HEAD
+
     public DbSet<Restock> Restock { get; set; }
     public DbSet<RestockItem> RestockItem { get; set; }
-=======
+
     public DbSet<Purchase> Purchases { get; set; }
     public DbSet<Item> Items { get; set; }
     public DbSet<PurchaseItem> PurchaseItems { get; set; }
 
->>>>>>> origin/development
+
 }
