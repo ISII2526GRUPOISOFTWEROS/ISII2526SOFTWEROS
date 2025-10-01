@@ -2,6 +2,7 @@
 {
     public class RestockItem
     {
+        [Key]
         public int ItemId { get; set; }
         public int Quantity { get; set; }
         public int RestockId { get; set; }
