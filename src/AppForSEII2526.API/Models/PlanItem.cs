@@ -1,5 +1,6 @@
 ﻿namespace AppForSEII2526.API.Models
 {
+    [Keyless]
     public class PlanItem
     {
         public int Classld { get; set; }
