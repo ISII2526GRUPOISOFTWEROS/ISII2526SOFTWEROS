@@ -9,6 +9,9 @@
 
         [Precision(5, 2)]
         public Decimal RestockPrice { get; set; }
-        public Restock restock { get; set; }
+        //References
+        public Restock Restock { get; set; }
+        public Item Item { get; set; }
+
     }
 }

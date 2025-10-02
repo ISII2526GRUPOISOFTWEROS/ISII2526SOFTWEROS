@@ -9,4 +9,5 @@ public class ApplicationUser : IdentityUser {
 
     //Reference
     public IList<PaymentMethod> PaymentMethods { get; set; }
+    public IList<Restock> Restocks { get; set; }
 }
