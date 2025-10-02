@@ -14,5 +14,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<Item> Items { get; set; }
     public DbSet<PurchaseItem> PurchaseItems { get; set; }
 
-
-}
+    public DbSet<Bizum> Bizums { get; set; }
+    public DbSet<CreditCard> CreditCards { get; set; }
+    public DbSet<PayPal> PayPals { get; set; }
+    }
