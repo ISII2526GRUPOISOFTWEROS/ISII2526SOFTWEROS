@@ -15,6 +15,7 @@
 
         //Reference
         public IList<PurchaseItem> PurchaseItems { get; set; }
+        public IList<RestockItem> RestockItems { get; set; }
 
         public ItemType ItemType { get; set; }
         public Brand Brand { get; set; }

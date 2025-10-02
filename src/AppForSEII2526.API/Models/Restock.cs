@@ -16,7 +16,10 @@ namespace AppForSEII2526.API.Models
         public string Title { get; set; }
         [Precision(5, 2)]
         public Decimal TotalPrice { get; set; }
+
+        //References
         public IList<RestockItem> RestockItems { get; set; }
+        public ApplicationUser RestockResponsible { get; set; }
 
 
     }
