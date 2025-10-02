@@ -1,8 +1,12 @@
-﻿namespace AppForSEII2526.API.Models
+﻿using System.Numerics;
+
+namespace AppForSEII2526.API.Models
 {
+    [PrimaryKey(nameof(ItemId),
+ nameof(RestockId))]
     public class RestockItem
     {
-        [Key]
+        
         public int ItemId { get; set; }
         public int Quantity { get; set; }
         public int RestockId { get; set; }
