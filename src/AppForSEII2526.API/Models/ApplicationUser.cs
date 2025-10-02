@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.Identity.Client;
 
 namespace AppForSEII2526.API.Models;
 
@@ -9,4 +10,5 @@ public class ApplicationUser : IdentityUser {
 
     //Reference
     public IList<PaymentMethod> PaymentMethods { get; set; }
+    public IList<Incident> Incidents { get; set; }
 }
