@@ -15,6 +15,9 @@ namespace AppForSEII2526.API.Models
         //References
         public Restock Restock { get; set; }
         public Item Item { get; set; }
+        public DbSet<Bizum> Bizums { get; set; }
+        public DbSet<CreditCard> CreditCards { get; set; }
+        public DbSet<PayPal> PayPals { get; set; }
 
     }
 }

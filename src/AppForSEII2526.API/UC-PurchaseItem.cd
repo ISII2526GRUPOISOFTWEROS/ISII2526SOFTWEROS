@@ -13,16 +13,8 @@
   </Class>
   <Class Name="AppForSEII2526.API.Models.Item">
     <Position X="2" Y="1.5" Width="1.5" />
-    <AssociationLine Name="ItemType" Type="AppForSEII2526.API.Models.ItemType" FixedFromPoint="true" FixedToPoint="true">
-      <Path>
-        <Point X="2.125" Y="3.757" />
-        <Point X="2.125" Y="4.132" />
-        <Point X="1.625" Y="4.132" />
-        <Point X="1.625" Y="5.5" />
-      </Path>
-    </AssociationLine>
     <TypeIdentifier>
-      <HashCode>AAACAAAACARgAAAAAABAAAQAAAAAABAAAAAAAAABAgA=</HashCode>
+      <HashCode>AAACAAAACARgAAAAAABAAAQAAAAAABAAEAAAAAABAgA=</HashCode>
       <FileName>Models\Item.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
@@ -81,7 +73,7 @@
   <Class Name="AppForSEII2526.API.Models.ApplicationUser">
     <Position X="10.75" Y="1.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAACAAAAAAAAAAAAAAAQABAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAACQAAAAQAAAAAAAAAQABAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Models\ApplicationUser.cs</FileName>
     </TypeIdentifier>
     <ShowAsCollectionAssociation>
@@ -96,7 +88,7 @@
     </TypeIdentifier>
   </Class>
   <Class Name="AppForSEII2526.API.Models.PayPal">
-    <Position X="10" Y="7.25" Width="1.5" />
+    <Position X="10.25" Y="7.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Models\PayPal.cs</FileName>
