@@ -11,7 +11,7 @@ namespace AppForSEII2526.API.Models
         public string City { get; set; }
         public string Country { get; set; }
         public DateTime Date { get; set; }
-        public string Description { get; set; }
+        public string? Description { get; set; }
         public string Street { get; set; }
         //Decimal
         [Precision(10, 2)] 
