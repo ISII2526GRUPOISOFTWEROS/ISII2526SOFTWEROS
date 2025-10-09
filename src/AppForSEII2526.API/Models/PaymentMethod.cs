@@ -3,6 +3,7 @@
     public abstract class PaymentMethod
     {
         public int Id { get; set; }
+        public ApplicationUser User { get; set; }
 
 
     
