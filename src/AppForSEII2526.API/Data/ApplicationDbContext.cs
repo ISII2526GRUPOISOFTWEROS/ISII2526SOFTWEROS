@@ -8,6 +8,8 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 {
     public DbSet<Plan> Plans { get; set; }
     public DbSet<PlanItem> PlanItems { get; set; }
+    public DbSet<Class> Classes { get; set; }
+  
 
 
     public DbSet<Restock> Restock { get; set; }
@@ -17,6 +19,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<Item> Items { get; set; }
     public DbSet<PurchaseItem> PurchaseItems { get; set; }
     public DbSet<Bizum> Bizums { get; set; }
+    public DbSet<Brand> Brands { get; set; }
     public DbSet<CreditCard> CreditCards { get; set; }
     public DbSet<PayPal> PayPals { get; set; }
 }
