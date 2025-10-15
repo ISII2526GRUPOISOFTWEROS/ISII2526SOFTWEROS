@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using AppForSEII2526.API.DTOs.ItemDTOs;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Identity.Client;
 
@@ -31,11 +32,30 @@ namespace AppForSEII2526.API.Controllers
         //        _logger.LogError(DateTime.Now+error);
         //        return BadRequest(error);
         //    }
-                
+
         //    decimal result = op1 / op2;
         //    return Ok(result);
         //}
 
+        [HttpGet]
+        [Route("[action]")]
+        [ProducesResponseType(typeof(IList<ItemForRestockDTO>), (int) HttpStatusCode.OK)]
+            
+        public async Task<ActionResult> GetItemsForRestock(string? itemName, int? quantityForRestock)
+        {
+            IList<ItemForRestockDTO> itemsDTOs = await _context.Items
+                .Where(Item => Item.Name.Contains(itemName) 
+                            || Item.QuantityForRestock > quantityForRestock)
+
+                .OrderBy(Item => Item.Name)
+
+                .Select(Item => new ItemForRestockDTO(Item.Id, Item.Name, Item.Brand.Name))
+
+                .ToListAsync();
+
+            return Ok(itemsDTOs);
+
+        }
 
     }
 }
