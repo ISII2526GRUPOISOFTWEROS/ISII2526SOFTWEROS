@@ -34,14 +34,18 @@ namespace AppForSEII2526.API.Controllers
         //}
         [HttpGet]
         [Route("action")]
-        [ProducesResponseType(typeof(IList<Item>),(int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(IList<ItemForPurchaseDTO>),(int)HttpStatusCode.OK)]
         public async Task<ActionResult> GetItemsForPurchase(string? itemName)
         {
             IList<ItemForPurchaseDTO> itemsDTOS = await _context.Items
                 .Include(i=>i.Brand)
+                .Include(i=>i.ItemType)
+                .Include(i=>i.Description)
+                .Include(PurchaseItem=>PurchaseItem.PurchasePrice)
+                .Include(i=>i.QuantityAvailableForPurchase)
                 .Where(i=> i.Name.Contains(itemName) || (itemName==null))
                 .OrderBy(i=>i.Name)
-                .Select(i=>new ItemForPurchaseDTO(i.Id, i.Name, i.Brand.Name))
+                .Select(item=>new ItemForPurchaseDTO(item.Id, item.Name, item.Brand.Name, item.Description, item.PurchasePrice, item.QuantityAvailableForPurchase))
                 .ToListAsync();
             return Ok(itemsDTOS);
         }
