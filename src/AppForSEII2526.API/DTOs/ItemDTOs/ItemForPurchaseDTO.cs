@@ -21,5 +21,15 @@
         public decimal Price { get; set; }
         public int QuantityAvailbableForPurchase { get; set; }
 
+        public override bool Equals(object? obj)
+        {
+            return obj is ItemForPurchaseDTO dTO &&
+                   Id == dTO.Id &&
+                   Name == dTO.Name &&
+                   Brand == dTO.Brand &&
+                   Description == dTO.Description &&
+                   Price == dTO.Price &&
+                   QuantityAvailbableForPurchase == dTO.QuantityAvailbableForPurchase;
+        }
     }
 }
