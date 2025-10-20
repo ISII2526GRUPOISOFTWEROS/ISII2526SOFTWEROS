@@ -2,18 +2,20 @@
 {
     public class ItemForRestockDTO
     {
-        public ItemForRestockDTO(int id, string brand, string name)
+        public ItemForRestockDTO(int id, string brand, string name, int quantityavailablerestock, decimal restockprice)
         {
             Id = id;
             Brand = brand;
             Name = name;
-            
+            QuantityAvailableForRestock = quantityavailablerestock;
+            RestockPrice = restockprice;
+
         }
 
         public int Id { get; set; }
         public string? Name { get; set; }
         public string Brand { get; set; }
-        public int QuantityAvailableForPurchase { get; set; }
+        public int QuantityAvailableForRestock { get; set; }
 
         [Precision(10, 2)]
         public decimal RestockPrice { get; set; }

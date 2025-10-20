@@ -40,6 +40,7 @@ namespace AppForSEII2526.API.Controllers
         [HttpGet]
         [Route("[action]")]
         [ProducesResponseType(typeof(IList<ItemForRestockDTO>), (int) HttpStatusCode.OK)]
+        //[ProducesResponseType((int)HttpStatusCode.NotFound)]
             
         public async Task<ActionResult> GetItemsForRestock(string? itemName, int? quantityForRestock)
         {
@@ -49,7 +50,11 @@ namespace AppForSEII2526.API.Controllers
 
                 .OrderBy(Item => Item.Name)
 
-                .Select(Item => new ItemForRestockDTO(Item.Id, Item.Name, Item.Brand.Name))
+                .Select(Item => new ItemForRestockDTO(Item.Id, 
+                                                    Item.Name, 
+                                                    Item.Brand.Name, 
+                                                    Item.QuantityAvailableForPurchase,
+                                                    Item.QuantityForRestock))
 
                 .ToListAsync();
 
