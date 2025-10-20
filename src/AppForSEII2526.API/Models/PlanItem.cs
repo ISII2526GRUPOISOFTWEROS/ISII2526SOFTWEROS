@@ -6,7 +6,7 @@ nameof(PlanId))]
     {
         public int ClassId { get; set; }
         public int PlanId { get; set; }
-        public String Goal { get; set; }
+        public string? Goal { get; set; }
         [Precision(10, 2)]
         public decimal Price { get; set; }
 

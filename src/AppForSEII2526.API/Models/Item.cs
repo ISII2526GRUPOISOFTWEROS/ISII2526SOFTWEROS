@@ -1,11 +1,12 @@
 ﻿namespace AppForSEII2526.API.Models
 {
+    [Index(nameof(Name), IsUnique = true)]
     [PrimaryKey(nameof(Id))]
     public class Item
     {
         public int Id { get; set; }
-        public string Description { get; set; }
-        public string Name { get; set; }
+        public string? Description  { get; set; }
+        public string? Name { get; set; }
         public int QuantityAvailableForPurchase { get; set; }
         public int QuantityForRestock { get; set; }
         [Precision(10, 2)] 

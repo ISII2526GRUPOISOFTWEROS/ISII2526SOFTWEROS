@@ -6,9 +6,9 @@
         
         public int Id { get; set; }
         public int Weeks { get; set; }
-        public String HealthIssues { get; set; }
-        public String Description { get; set; }
-        public String Name { get; set; }
+        public string? HealthIssues { get; set; }
+        public string? Description { get; set; }
+        public string? Name { get; set; }
         [Precision (10,2)]
         public decimal Totalprice { get; set; }
         public DateTime CreatedDate { get; set; }
