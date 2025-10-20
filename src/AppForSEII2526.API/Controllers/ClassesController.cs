@@ -1,6 +1,9 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+<<<<<<< HEAD
 using AppForSEII2526.API.DTOs.ClassesDTOs;
+=======
+>>>>>>> 7bf82e7d75ddc39812ab5fde3873899cd3e30541
 
 namespace AppForSEII2526.API.Controllers
 {
@@ -32,6 +35,7 @@ namespace AppForSEII2526.API.Controllers
         //    decimal result = op1 / op2;
         //    return Ok(result);
         //}
+<<<<<<< HEAD
         [HttpGet]
         [Route("action")]
         [ProducesResponseType(typeof(IList<ClassForPlanDTO>), (int)HttpStatusCode.OK)]
@@ -52,5 +56,8 @@ namespace AppForSEII2526.API.Controllers
 
 
         }
+=======
+
+>>>>>>> 7bf82e7d75ddc39812ab5fde3873899cd3e30541
     }
 }
