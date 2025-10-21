@@ -9,17 +9,17 @@
             Brand = brand;
             Description = description;
             Price = price;
-            QuantityAvailbableForPurchase = quantityavailbableforpurchase;
+            QuantityAvailabableForPurchase = quantityavailbableforpurchase;
 
         }
 
         public int Id { get; set; }
 
-        public string? Name { get; set; }
-        public string? Brand { get; set; }
-        public string? Description { get; set; }
+        public string? Name { get; set; } 
+        public string? Brand { get; set; } 
+        public string? Description { get; set; } 
         public decimal Price { get; set; }
-        public int QuantityAvailbableForPurchase { get; set; }
+        public int QuantityAvailabableForPurchase { get; set; }
 
         public override bool Equals(object? obj)
         {
@@ -29,7 +29,13 @@
                    Brand == dTO.Brand &&
                    Description == dTO.Description &&
                    Price == dTO.Price &&
-                   QuantityAvailbableForPurchase == dTO.QuantityAvailbableForPurchase;
+                   QuantityAvailabableForPurchase == dTO.QuantityAvailabableForPurchase;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Id, Name, Brand, Description, Price, QuantityAvailabableForPurchase);
         }
     }
+
 }
