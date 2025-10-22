@@ -34,40 +34,61 @@ namespace AppForSEII2526.API.Controllers
         //    decimal result = op1 / op2;
         //    return Ok(result);
         //}
-
         [HttpGet]
-        [Route("action")]
+        [Route("[action]")]
         [ProducesResponseType(typeof(IList<ClassForPlanDTO>), (int)HttpStatusCode.OK)]
-        //public async Task<ActionResult> GetClassesForPlan(IList<string> itemType, DateTime? date, DateTime? fromDate, DateTime? toDate)
-        //{
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.BadRequest)]
+        public async Task<ActionResult> GetClassesForPlan(
+          [FromQuery] IList<string>? itemTypes,DateTime? date,DateTime? fromDate, DateTime? toDate){
+            try
+            {
+                // fechas
+                if (date.HasValue && date.Value.Date < DateTime.Today){
+                    string error = "Cannot be before today";
+                    _logger.LogWarning(DateTime.Now + " " + error);
+                    return BadRequest(error);
+                }
 
-        //    if (fromDate != null && toDate != null && fromDate > toDate)
-        //    {
-               
-        //        ModelState.AddModelError("fromDate&toDate", "fromDate must be earlier than toDate");
-        //        _logger.LogError($"{DateTime.Now} Error: fromDate must be earlier than toDate");
-        //        return BadRequest(new ValidationProblemDetails(ModelState));
-        //    }
-        //{
-        //    fromDate = fromDate == null ? DateTime.Today.AddDays(1) : fromDate;
-        //    toDate = toDate == null ? DateTime.Today.AddDays(2) : toDate;
+                if (fromDate.HasValue && fromDate.Value.Date < DateTime.Today){
+                    string error = "Cannot be before today";
+                    _logger.LogWarning(DateTime.Now + " " + error);
+                    return BadRequest(error);
+                }
 
-        //        IList<ClassForPlanDTO> classes = await _context.Classes
-        ////.Where(i => (i.TypeItems.Where(idate => idate..DateFrom <= toDate
-        //                                   //&& idate..DateTo >= fromDate).Count()))
-        ////.OrderBy(i => i.TypeItems.Select(itemtype => itemtype.Name))
-        //.Select(i => new ClassForPlanDTO(i.Id, i.Price, i.Date, i.Name, i.TypeItems.Select(itemtype => itemtype.Name)
-        //    .ToList()))
-        //.ToListAsync();
-
-
-
-
-
+                if (toDate.HasValue && toDate.Value.Date < DateTime.Today){
+                    string error = "Cannot be before today";
+                    _logger.LogWarning(DateTime.Now + " " + error);
+                    return BadRequest(error);
+                }
+                // built query
+                var query = _context.Classes
+                    .Include(c => c.TypeItems)
+                    .AsQueryable();
+                // Filters
+                if (itemTypes != null && itemTypes.Count > 0){
+                    query = query.Where(c => c.TypeItems.Any(t => itemTypes.Contains(t.Name)));
+                }
+                if (date.HasValue){
+                    query = query.Where(c => c.Date.Date == date.Value.Date);
+                }
+                else if (fromDate.HasValue && toDate.HasValue){
+                    query = query.Where(c => c.Date.Date >= fromDate.Value.Date && c.Date.Date <= toDate.Value.Date);
+                }
+                var classes = await query
+                    .OrderBy(i => i.Date)
+                    .Select(i => new ClassForPlanDTO(i.Id,i.Price,i.Date,i.Name,i.TypeItems.Select(itemtype => itemtype.Name).ToList() ))
+                    .ToListAsync();
+                if (classes.Count == 0){
+                    string error = "No classes available";
+                    _logger.LogWarning(DateTime.Now + " " + error);
+                    return BadRequest(error);
+                }
                 return Ok(classes);
-
-
+            }
+            catch (Exception ex){
+                _logger.LogError(ex, "Error");
+                return BadRequest("Error");
+            }
         }
-
     }
 }
