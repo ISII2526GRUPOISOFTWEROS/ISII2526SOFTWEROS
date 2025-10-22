@@ -2,7 +2,7 @@
 {
     public class ClassForPlanDTO
     {
-        public ClassForPlanDTO(int id, decimal price, DateTime date, string name, IList<string?> itemType)
+        public ClassForPlanDTO(int id, decimal price, DateTime? date, string name, IList<string?> itemType)
         {
             Id = id;
             price = price;
