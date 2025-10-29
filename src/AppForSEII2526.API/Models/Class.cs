@@ -1,7 +1,13 @@
-﻿namespace AppForSEII2526.API.Models
+﻿using Humanizer.Localisation;
+
+namespace AppForSEII2526.API.Models
 {
     public class Class
     {
+      
+
+        public Class(string name, int Capacity, DateTime Date, IList<ItemType> TypeItems, decimal price, IList<PlanItem> PlanItems)
+        { }
         public int Id { get; set; }
         public int Capacity { get; set; }
         public string Name { get; set; }
@@ -13,5 +19,5 @@
 
         public IList<ItemType> TypeItems { get; set; } 
 
-    }
-}
+    
+}}
