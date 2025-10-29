@@ -60,74 +60,97 @@ namespace AppForSEII2526.API.Controllers
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.Conflict)]
         public async Task<ActionResult> CreateItemForPurchase(ItemForCreateDTO itemForCreate)
         {
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ValidationProblem(ModelState));
+            }
+
+
             var user = _context.ApplicationUser.FirstOrDefault(au => au.UserName == itemForCreate.CustomerUserName);
 
             if (user == null)
             {
                 ModelState.AddModelError("UserNotFound", $"Error! Username is not registred");
+                return BadRequest(ValidationProblem(ModelState));
             }
-            if(user!= null && !user.PaymentMethods.Any(pm => pm.Id == itemForCreate.PaymentMethodId))
+            var checkPM = await _context.Set<PaymentMethod>()
+                .AnyAsync(pm => pm.Id == itemForCreate.PaymentMethodId && pm.User.Id == user.Id);
+
+          
+            if (!checkPM)
             {
                 ModelState.AddModelError("PaymentMethod", "Error! The selected payment method is not registered for this user.");
+                return BadRequest(ValidationProblem(ModelState));
+
             }
-            
-            if (ModelState.ErrorCount > 0)
+
+            var paymentMethod = await _context.Set<PaymentMethod>().FirstOrDefaultAsync(pm => pm.Id == itemForCreate.PaymentMethodId);
+
+            if(paymentMethod == null || paymentMethod.User.Id != user.Id)
             {
+                ModelState.AddModelError("PaymentMethod", "ERROR! The selected payment method is not registered for this user.");
                 return BadRequest(ValidationProblem(ModelState));
             }
-       
-            var reqiestedItemsIds = itemForCreate.PurchaseItems.Select(pi => pi.Id).ToList();
+
+            var requestedItemsIds = itemForCreate.PurchaseItems.Select(pi => pi.Id).ToList();
+
             var dbItems = await _context.Items
-                .Where(i => reqiestedItemsIds.Contains(i.Id))
-                .ToDictionaryAsync(i=>i.Id);
+                .Where(i => requestedItemsIds.Contains(i.Id))
+                .ToDictionaryAsync(i => i.Id);
 
             decimal totalCost = 0;
+            var purchaseItems = new List<PurchaseItem>();
 
-            foreach(var purchaseItem in itemForCreate.PurchaseItems)
+            foreach(var pi in itemForCreate.PurchaseItems)
             {
-                if(!dbItems.TryGetValue(purchaseItem.Id, out var dbItem))
+                if (!dbItems.TryGetValue(pi.Id, out var dbItem))
                 {
-                    ModelState.AddModelError("ItemNotFound", $"Error! Item with Id {purchaseItem.Id} not found.");
+                    ModelState.AddModelError("ItemNotFound", $"Error! Item with Id {pi.Id} not found.");
                     continue;
                 }
-                var quantityToPurchase = purchaseItem.QuantityAvailableForPurchase;
-                if (quantityToPurchase <= 0) {
-                    ModelState.AddModelError("InvalidQuantity", $"Error! Item {dbItem.Name} has invalid quantity {quantityToPurchase}. Quantity must be greater than zero.");
+                if (pi.QuantityAvailableForPurchase <= 0) {
+                    ModelState.AddModelError("InvalidQuantity", $"Error! Item {dbItem.Name} has invalid quantity {pi.QuantityAvailableForPurchase}. Quantity must be greater than zero.");
                     continue;
                 }
 
-                if (quantityToPurchase > purchaseItem.QuantityAvailableForPurchase)
+                if (pi.QuantityAvailableForPurchase > dbItem.QuantityAvailableForPurchase)
                 {
-                    ModelState.AddModelError("InsufficientStock", $"Error! Item {dbItem.Name} does not have enough stock. Available: {dbItem.QuantityAvailableForPurchase}, Requested: {purchaseItem.QuantityAvailableForPurchase}");
+                    ModelState.AddModelError("InsufficientStock", $"Error! Item {dbItem.Name} does not have enough stock. Available: {dbItem.QuantityAvailableForPurchase}, Requested: {pi.QuantityAvailableForPurchase}");
                     continue;
                 }
-                totalCost += dbItem.PurchasePrice * quantityToPurchase;
+                purchaseItems.Add(new PurchaseItem
+                {
+                    ItemId = dbItem.Id,
+                    Amount_bought = pi.QuantityAvailableForPurchase,
+                    Price = dbItem.PurchasePrice
+                });
+
+                totalCost += dbItem.PurchasePrice * pi.QuantityAvailableForPurchase;
+                dbItem.QuantityAvailableForPurchase -= pi.QuantityAvailableForPurchase;
+                _context.Items.Update(dbItem);
             }
 
             if (ModelState.ErrorCount > 0)
             {
                 return BadRequest(ValidationProblem(ModelState));
             }
-            var itemforcreate = new ItemForCreateDTO
+
+
+            var purchase = new Purchase
             {
-                CustomerUserName = itemForCreate.CustomerUserName,
-                PaymentMethodId = itemForCreate.PaymentMethodId,
                 Street = itemForCreate.Street,
                 City = itemForCreate.City,
                 Country = itemForCreate.Country,
                 Description = itemForCreate.Description,
-                PurchaseItems = itemForCreate.PurchaseItems,
-                TotalPrice = totalCost
+                Total_prices = totalCost,
+                Date = DateTime.UtcNow,
+                PurchaseItems = purchaseItems,
+                PaymentMethod = paymentMethod
             };
-            foreach(var purchaseItem in itemForCreate.PurchaseItems)
-            {
-                var dbItem = dbItems[purchaseItem.Id];
-                dbItem.QuantityAvailableForPurchase -= purchaseItem.QuantityAvailableForPurchase;
-                _context.Items.Update(dbItem);
 
-            }
 
-            _context.Items.Add(itemforcreate);
+            _context.Purchases.Add(purchase);
             try
             {
                 await _context.SaveChangesAsync();
@@ -138,7 +161,19 @@ namespace AppForSEII2526.API.Controllers
                 return Conflict("Error" + ex.Message);
             }
 
-            return CreatedAtAction("GetItem", new {id= .Id},);
+          
+
+            return CreatedAtAction("GetItemsForPurchase", new {id= purchase.Id }, new
+            {
+                purchase.Id,
+                purchase.Total_prices,
+                Items = purchaseItems.Select(pi => new
+                {
+                    pi.ItemId,
+                    pi.Amount_bought,
+                    pi.Price
+                })
+            });
         }
     }   
 }
