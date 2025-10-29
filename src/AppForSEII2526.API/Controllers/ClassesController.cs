@@ -48,13 +48,11 @@ namespace AppForSEII2526.API.Controllers
                     _logger.LogWarning(DateTime.Now + " " + error);
                     return BadRequest(error);
                 }
-
                 if (fromDate.HasValue && fromDate.Value.Date < DateTime.Today){
                     string error = "Cannot be before today";
                     _logger.LogWarning(DateTime.Now + " " + error);
                     return BadRequest(error);
                 }
-
                 if (toDate.HasValue && toDate.Value.Date < DateTime.Today){
                     string error = "Cannot be before today";
                     _logger.LogWarning(DateTime.Now + " " + error);
