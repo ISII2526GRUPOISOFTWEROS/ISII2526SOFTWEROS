@@ -8,7 +8,7 @@ namespace AppForSEII2526.API.Controllers
     [Route("api/[controller]")]
     [ApiController]
     public class ItemsController : ControllerBase
-    {
+    {  
 
         private ApplicationDbContext _context; //Access to the db
         private ILogger<ItemsController> _logger;
