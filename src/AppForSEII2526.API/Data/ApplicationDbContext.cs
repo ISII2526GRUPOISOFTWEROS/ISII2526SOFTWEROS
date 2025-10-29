@@ -22,4 +22,5 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<IncidentItem> IncidentItems { get; set; }
     public DbSet<ItemForExercise> ItemForExercises { get; set; }
     public DbSet<ItemType> ItemTypes { get; set; }
-}
+    public DbSet<ApplicationUser> ApplicationUser { get; set; }
+    }
