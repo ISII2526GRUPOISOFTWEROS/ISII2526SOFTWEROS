@@ -4,6 +4,19 @@ namespace AppForSEII2526.API.Models
 {
     public class Purchase
     {
+        public Purchase()
+        {
+        }
+        public Purchase(int id, string city, string country, DateTime date, string? description, string street, decimal total_prices)
+        {
+            Id = id;
+            City = city;
+            Country = country;
+            Date = date;
+            Description = description;
+            Street = street;
+            Total_prices = total_prices;
+        }
         //Primary key 
         public int Id { get; set; } 
 

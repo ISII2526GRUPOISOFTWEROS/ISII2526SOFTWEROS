@@ -4,6 +4,23 @@
     [PrimaryKey(nameof(Id))]
     public class Item
     {
+        public Item()
+        {
+        }
+
+        public Item(int id, string? description, string? name, int quantityAvailableForPurchase, int quantityForRestock, decimal restockPrice, decimal purchasePrice, ItemType itemType, Brand brand)
+        {
+            Id = id;
+            Description = description;
+            Name = name;
+            QuantityAvailableForPurchase = quantityAvailableForPurchase;
+            QuantityForRestock = quantityForRestock;
+            RestockPrice = restockPrice;
+            PurchasePrice = purchasePrice;
+            ItemType = itemType;
+            Brand = brand;
+        }
+
         public int Id { get; set; }
         public string? Description  { get; set; }
         public string? Name { get; set; }
