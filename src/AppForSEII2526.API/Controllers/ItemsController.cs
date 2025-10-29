@@ -1,7 +1,10 @@
 ﻿using AppForSEII2526.API.DTOs.ItemDTOs;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+<<<<<<< HEAD
 using Microsoft.Identity.Client;
+=======
+>>>>>>> origin/development
 
 namespace AppForSEII2526.API.Controllers
 {
@@ -9,8 +12,12 @@ namespace AppForSEII2526.API.Controllers
     [ApiController]
     public class ItemsController : ControllerBase
     {
+<<<<<<< HEAD
 
         private ApplicationDbContext _context;
+=======
+        private ApplicationDbContext _context; //Access to the db
+>>>>>>> origin/development
         private ILogger<ItemsController> _logger;
 
         public ItemsController(ApplicationDbContext context, ILogger<ItemsController> logger)
@@ -21,6 +28,7 @@ namespace AppForSEII2526.API.Controllers
 
         //[HttpGet]
         //[Route("[action]")]
+<<<<<<< HEAD
         //[ProducesResponseType(typeof(decimal), (int)HttpStatusCode.OK)]
         //[ProducesResponseType(typeof(string), (int)HttpStatusCode.BadRequest)]
 
@@ -64,3 +72,41 @@ namespace AppForSEII2526.API.Controllers
 
     }
 }
+=======
+        //[ProducesResponseType(typeof(decimal),(int)HttpStatusCode.OK)]//Successful return
+        //[ProducesResponseType(typeof(string),(int)HttpStatusCode.BadRequest)]//Bad return
+        //public async Task<ActionResult> ComputeDivision(decimal op1, decimal op2)
+        //{
+        //    if(op2== 0)
+        //    {
+        //        string error ="Division by zero is not allowed.";
+        //       //_logger.LogError(DateTime.Now+   error);
+        //        return BadRequest(error);
+        //    }
+        //    decimal result = op1/ op2;
+        //    return Ok(result);
+        //}
+        [HttpGet]
+        [Route("[action]")]
+        [ProducesResponseType(typeof(IList<ItemForPurchaseDTO>),(int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.BadRequest)]
+        public async Task<ActionResult> GetItemsForPurchase(string? itemName, string? itemBrand)
+        {
+            IList<ItemForPurchaseDTO> itemsDTOS = await _context.Items
+                .Include(i=>i.Brand)
+                .Where(i=>  (itemName==null || i.Name.Contains(itemName)) && (itemBrand == null || i.Brand.Name.Contains(itemBrand)) )
+                .OrderBy(i=>i.Name)
+                .Select(item=>new ItemForPurchaseDTO(item.Id, item.Name ?? string.Empty, item.Brand.Name ?? string.Empty, item.Description ?? string.Empty, item.PurchasePrice, item.QuantityAvailableForPurchase))
+                .ToListAsync();
+
+            if(itemsDTOS.Count == 0)
+            {
+                string error = "No items found for the given criteria.";
+                _logger.LogWarning(DateTime.Now + " " + error);
+                return BadRequest(error);
+            }
+            return Ok(itemsDTOS);
+        }
+    }   
+}
+>>>>>>> origin/development
