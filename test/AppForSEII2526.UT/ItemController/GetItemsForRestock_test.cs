@@ -1,16 +1,20 @@
-﻿using System;
+﻿using AppForMovies.UT;
+using AppForSEII2526.API.Controllers;
+using AppForSEII2526.API.DTOs.ItemDTOs;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using AppForSEII2526.API.Controllers;
 //using AppForSEII2526.DTOs
 
 namespace AppForSEII2526.UT.ItemController
 {
-    public class GetItemsForRestock_test : AppForSEII25264SqliteUT
+    public class GetItemsForRestock_test :  AppForMovies4SqliteUT
     {
-        public GetItemsForRestock_test() //constructor
+        private ILogger<ItemsController> _logger;
+
+        public GetItemsForRestock_test() //constructor  
         {
             var items = new List<Item>()
             {   

@@ -24,7 +24,7 @@ namespace AppForSEII2526.API.Controllers
         [HttpGet]
         [Route("[action]")]
         [ProducesResponseType(typeof(IList<ItemForRestockDTO>), (int) HttpStatusCode.OK)]
-        //[ProducesResponseType((int)HttpStatusCode.NotFound)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
             
         public async Task<ActionResult> GetItemsForRestock(string? itemName, int? quantityForRestock)
         {

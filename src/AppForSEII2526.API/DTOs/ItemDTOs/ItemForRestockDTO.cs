@@ -20,5 +20,15 @@
 
         [Precision(10, 2)]
         public decimal RestockPrice { get; set; }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is ItemForRestockDTO dTO &&
+                   Id == dTO.Id &&
+                   Name == dTO.Name &&
+                   Brand == dTO.Brand &&
+                   QuantityAvailableForRestock == dTO.QuantityAvailableForRestock &&
+                   RestockPrice == dTO.RestockPrice;
+        }
     }
 }
