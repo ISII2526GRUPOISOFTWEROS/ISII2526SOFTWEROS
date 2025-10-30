@@ -14,22 +14,31 @@ namespace AppForSEII2526.UT.ItemForPurchase_test
         {
             var brands = new List<Brand>()
             {
-                new Brand(){ Id=1, Name="Nike"},
-                new Brand(){ Id=2, Name="Joma"},
+                new Brand(){ Name="Nike"},
+                new Brand(){ Name="Domyos"},
 
-                // PONER EXCEPCIONES PARA QUE NO SALGA RESULTADO (WHERE)
             };
+         
+            var itemTypes = new List<ItemType>()
+            {
+                new ItemType(){ Name="Strength Equipment"},
+                new ItemType(){ Name="Cardio Equipment"},
+            };
+
+            _context.Brands.AddRange(brands);
+            _context.ItemTypes.AddRange(itemTypes);
+            _context.SaveChanges();
+
             var items = new List<Item>()
             {
-                new Item(){ Id=1, Name="Foam Roller", Brand=brands[0], Description="Description1", PurchasePrice=10.0m, QuantityAvailableForPurchase=100},
-                new Item(){ Id=2, Name="Bands", Brand=brands[1], Description="Description2", PurchasePrice=20.0m, QuantityAvailableForPurchase=200},
-                new Item(){ Id=3, Name="Kettlebell", Brand=brands[0], Description="Description3", PurchasePrice=30.0m, QuantityAvailableForPurchase=300},
+                new Item(){Name="Foam Roller", Brand=brands[0], Description="Description1", PurchasePrice=10.0m, QuantityAvailableForPurchase=100,ItemType = itemTypes[1]},
+                new Item(){ Name="Bands", Brand=brands[1], Description="Description2", PurchasePrice=20.0m, QuantityAvailableForPurchase=200,ItemType = itemTypes[0]},
+                new Item(){ Name="Kettlebell", Brand=brands[0], Description="Description3", PurchasePrice=30.0m, QuantityAvailableForPurchase=300,ItemType = itemTypes[0]},
                 
-                // PONER EXCEPCIONES PARA QUE NO SALGA RESULTADO (WHERE)
 
             };
-   
-            _context.Brands.AddRange(brands);
+         
+
             _context.Items.AddRange(items);
             _context.SaveChanges();
 
@@ -39,12 +48,13 @@ namespace AppForSEII2526.UT.ItemForPurchase_test
         [Trait("GetItemForPurchase", "Unit Testing")]
         public async Task GetItemForPurchaseNull4ItemBrand_test()
         {
-            List<ItemForPurchaseDTO> expectedItems = new List<ItemForPurchaseDTO>()
+            var expectedItems = new List<ItemForPurchaseDTO>()
             {
                 new ItemForPurchaseDTO(1, "Foam Roller", "Nike", "Description1", 10.0m, 100),
-                new ItemForPurchaseDTO(2, "Bands", "Joma", "Description2", 20.0m, 200),
+                new ItemForPurchaseDTO(2, "Bands", "Domyos", "Description2", 20.0m, 200),
                 new ItemForPurchaseDTO(3, "Kettlebell", "Nike", "Description3", 30.0m, 300),
             };
+
             var mock = new Mock<ILogger<ItemsController>>();
             ILogger<ItemsController> logger = mock.Object;
             ItemsController controller = new ItemsController(_context, null);
@@ -55,7 +65,11 @@ namespace AppForSEII2526.UT.ItemForPurchase_test
             //assert
             var okResult = Assert.IsType<OkObjectResult>(result);
             var itemactualresult = Assert.IsType<List<ItemForPurchaseDTO>>(okResult.Value);
-            Assert.Equal(expectedItems, itemactualresult);
+            
+            var expetedItemsSorted = expectedItems.OrderBy(i => i.Name).ToList();
+            var itemactualresultSorted = itemactualresult.OrderBy(i => i.Name).ToList();
+
+            Assert.Equal(expetedItemsSorted, itemactualresultSorted);
         }
 
     }
