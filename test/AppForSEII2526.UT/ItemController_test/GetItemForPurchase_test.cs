@@ -36,6 +36,7 @@ namespace AppForSEII2526.UT.ItemForPurchase_test
         }
 
         [Fact]
+        [Trait("GetItemForPurchase", "Unit Testing")]
         public async Task GetItemForPurchaseNull4ItemBrand_test()
         {
             List<ItemForPurchaseDTO> expectedItems = new List<ItemForPurchaseDTO>()
@@ -56,5 +57,6 @@ namespace AppForSEII2526.UT.ItemForPurchase_test
             var itemactualresult = Assert.IsType<List<ItemForPurchaseDTO>>(okResult.Value);
             Assert.Equal(expectedItems, itemactualresult);
         }
+
     }
 }
