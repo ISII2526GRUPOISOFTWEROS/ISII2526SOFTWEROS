@@ -32,13 +32,6 @@
       <Property Name="TypeItems" />
     </ShowAsCollectionAssociation>
   </Class>
-  <Class Name="AppForSEII2526.API.Models.TypeItem">
-    <Position X="9" Y="3.75" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAACAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>Models\TypeItem.cs</FileName>
-    </TypeIdentifier>
-  </Class>
   <Class Name="AppForSEII2526.API.Models.ApplicationUser">
     <Position X="5.75" Y="2.75" Width="1.5" />
     <TypeIdentifier>
@@ -59,7 +52,7 @@
   <Class Name="AppForSEII2526.API.Models.Bizum">
     <Position X="0.5" Y="4.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Models\Bizum.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -75,6 +68,13 @@
     <TypeIdentifier>
       <HashCode>gAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Models\CreditCard.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="AppForSEII2526.API.Models.ItemType">
+    <Position X="9.25" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAACAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\ItemType.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Font Name="Segoe UI" Size="9" />
