@@ -1,89 +1,50 @@
-﻿namespace AppForSEII2526.API.DTOs.ClassesDTOs
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace AppForSEII2526.API.DTOs.PlanningDTOs
 {
-    public class PlanForCreateDTO
+
+    public class ClassForPlanDTO
     {
-        public PlanForCreateDTO(string name, string? description, int weeks, string? healthIssues, string? goals, PaymentMethod paymentMethod, IList<ClassForPlanDTO> SelectedClasses)
-        {
-            name = name ?? throw new ArgumentNullException(nameof(name));
-            description = description;
-            weeks = weeks;
-            healthIssues = healthIssues;
-            goals = goals;
-            paymentMethod = paymentMethod;
-            SelectedClasses = SelectedClasses ?? throw new ArgumentNullException(nameof(SelectedClasses));
+        public int ClassId { get; set; }     
+        public string Name { get; set; }      
+        public string Type { get; set; }      
+        public decimal Price { get; set; }   
+        public string Day { get; set; }      
+        public string Time { get; set; }      
+        public string? Goal { get; set; }  
+    }
+    public class PlanForCreateDTO{
+       public PlanForCreateDTO(string planningName, string? description, int weeks, string? healthIssues,IList<ClassForPlanDTO> selectedClasses,PaymentMethod paymentMethod){
+            Name = planningName;
+            Description = description;
+            Weeks = weeks;
+            HealthIssues = healthIssues;
+            SelectedClasses = selectedClasses;
+            PaymentMethod = paymentMethod;
         }
-        public PlanForCreateDTO()
-        {
-            SelectedClasses = new List<ClassForPlanDTO>();
-        }
-        [DataType(System.ComponentModel.DataAnnotations.DataType.MultilineText)]
-        [Required(AllowEmptyStrings = false, ErrorMessage = "Please, provide a name for your planning")]
-        [StringLength(50, MinimumLength = 3, ErrorMessage = "Planning name must have at least 3 characters")]
-        [Display(Name = "Planning Name")]
-        public string PlanningName { get; set; }
-
-        [StringLength(200, ErrorMessage = "Description cannot exceed 200 characters")]
+        [Required]
+        [StringLength(60, MinimumLength = 3, ErrorMessage = "Plan name must have at least 3 characters")]
+        public string Name { get; set; }
+        [StringLength(100, ErrorMessage = "Description cannot exceed 100 characters")]
         public string? Description { get; set; }
-
-        [Required(ErrorMessage = "Please, specify how many weeks you plan to attend")]
-        [Range(1, 52, ErrorMessage = "Number of weeks must be between 1 and 52")]
-        [Display(Name = "Number of Weeks")]
-        public int NumberOfWeeks { get; set; }
-
-        [Display(Name = "Health Issues (optional)")]
+        [Required]
+        [Range(1, 52, ErrorMessage = "Weeks must be between 1 and 52")]
+        public int Weeks { get; set; }
+        [StringLength(100, ErrorMessage = "Health issues cannot exceed 100 characters")]
         public string? HealthIssues { get; set; }
-
-        [Display(Name = "Goals (optional)")]
-        public string? Goals { get; set; }
-
-        [Required(ErrorMessage = "Please, select at least one payment method")]
-        [Display(Name = "Payment Method")]
-        public PaymentMethod PaymentMethod { get; set; }
-
-        [Required(ErrorMessage = "Please, select at least one class to plan")]
+        [Required]
         public IList<ClassForPlanDTO> SelectedClasses { get; set; }
-
-        [Display(Name = "Total Price")]
-        [JsonPropertyName("TotalPrice")]
-        public double TotalPrice
-        {
-            get; set;
-        }
-
-        public class ClassForPlanDTO
-        {
-            [Required]
-            public string ClassName { get; set; }
-
-            [Required]
-            public string ClassType { get; set; }
-
-            [Required]
-            public double PricePerClass { get; set; }
-
-            [Required]
-            public string Day { get; set; }
-
-            [Required]
-            public string Time { get; set; }
-        }
-
+        [Required]
+        public PaymentMethod PaymentMethod { get; set; }
         public override bool Equals(object? obj)
         {
-            return obj is PlanForCreateDTO dTO &&
-                   PlanningName == dTO.PlanningName &&
-                   Description == dTO.Description &&
-                   NumberOfWeeks == dTO.NumberOfWeeks &&
-                   HealthIssues == dTO.HealthIssues &&
-                   Goals == dTO.Goals &&
-                   EqualityComparer<PaymentMethod>.Default.Equals(PaymentMethod, dTO.PaymentMethod) &&
-                   EqualityComparer<IList<ClassForPlanDTO>>.Default.Equals(SelectedClasses, dTO.SelectedClasses) &&
-                   TotalPrice == dTO.TotalPrice;
-        }
-
-        public override int GetHashCode()
-        {
-            return HashCode.Combine(PlanningName, Description, NumberOfWeeks, HealthIssues, Goals, PaymentMethod, SelectedClasses, TotalPrice);
+            return obj is PlanForCreateDTO dto &&
+                   Name == dto.Name &&
+                   Description == dto.Description &&
+                   Weeks == dto.Weeks &&
+                   HealthIssues == dto.HealthIssues &&
+                   SelectedClasses.SequenceEqual(dto.SelectedClasses) &&
+                   PaymentMethod == dto.PaymentMethod;
         }
     }
 }
