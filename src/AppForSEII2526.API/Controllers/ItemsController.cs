@@ -34,18 +34,44 @@ namespace AppForSEII2526.API.Controllers
         //}
         [HttpGet]
         [Route("[action]")]
-        [ProducesResponseType(typeof(IList<ItemForPurchaseDTO>),(int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(IList<ItemForRestockDTO>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+
+        public async Task<ActionResult> GetItemsForRestock(string? itemName, int? quantityForRestock)
+        {
+            IList<ItemForRestockDTO> itemsDTOs = await _context.Items
+                .Where(Item => Item.Name.Contains(itemName)
+                            || Item.QuantityForRestock > quantityForRestock)
+
+                .OrderBy(Item => Item.Name)
+
+                .Select(Item => new ItemForRestockDTO(Item.Id,
+                                                    Item.Name,
+                                                    Item.Brand.Name,
+                                                    Item.QuantityAvailableForPurchase,
+                                                    Item.QuantityForRestock))
+
+                .ToListAsync();
+
+            return Ok(itemsDTOs);
+
+        }
+
+
+        [HttpGet]
+        [Route("[action]")]
+        [ProducesResponseType(typeof(IList<ItemForPurchaseDTO>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.BadRequest)]
         public async Task<ActionResult> GetItemsForPurchase(string? itemName, string? itemBrand)
         {
             IList<ItemForPurchaseDTO> itemsDTOS = await _context.Items
-                .Include(i=>i.Brand)
-                .Where(i=>  (itemName==null || i.Name.Contains(itemName)) && (itemBrand == null || i.Brand.Name.Contains(itemBrand)) )
-                .OrderBy(i=>i.Name)
-                .Select(item=>new ItemForPurchaseDTO(item.Id, item.Name ?? string.Empty, item.Brand.Name ?? string.Empty, item.Description ?? string.Empty, item.PurchasePrice, item.QuantityAvailableForPurchase))
+                .Include(i => i.Brand)
+                .Where(i => (itemName == null || i.Name.Contains(itemName)) && (itemBrand == null || i.Brand.Name.Contains(itemBrand)))
+                .OrderBy(i => i.Name)
+                .Select(item => new ItemForPurchaseDTO(item.Id, item.Name ?? string.Empty, item.Brand.Name ?? string.Empty, item.Description ?? string.Empty, item.PurchasePrice, item.QuantityAvailableForPurchase))
                 .ToListAsync();
 
-            if(itemsDTOS.Count == 0)
+            if (itemsDTOS.Count == 0)
             {
                 string error = "No items found for the given criteria.";
                 _logger.LogWarning(DateTime.Now + " " + error);
@@ -53,6 +79,10 @@ namespace AppForSEII2526.API.Controllers
             }
             return Ok(itemsDTOS);
         }
+
+
+
+
         [HttpPost]
         [Route("[action]")]
         [ProducesResponseType(typeof(ItemForPurchaseDTO), (int)HttpStatusCode.Created)]
@@ -77,7 +107,7 @@ namespace AppForSEII2526.API.Controllers
             var checkPM = await _context.Set<PaymentMethod>()
                 .AnyAsync(pm => pm.Id == itemForCreate.PaymentMethodId && pm.User.Id == user.Id);
 
-          
+
             if (!checkPM)
             {
                 ModelState.AddModelError("PaymentMethod", "Error! The selected payment method is not registered for this user.");
@@ -87,7 +117,7 @@ namespace AppForSEII2526.API.Controllers
 
             var paymentMethod = await _context.Set<PaymentMethod>().FirstOrDefaultAsync(pm => pm.Id == itemForCreate.PaymentMethodId);
 
-            if(paymentMethod == null || paymentMethod.User.Id != user.Id)
+            if (paymentMethod == null || paymentMethod.User.Id != user.Id)
             {
                 ModelState.AddModelError("PaymentMethod", "ERROR! The selected payment method is not registered for this user.");
                 return BadRequest(ValidationProblem(ModelState));
@@ -102,14 +132,15 @@ namespace AppForSEII2526.API.Controllers
             decimal totalCost = 0;
             var purchaseItems = new List<PurchaseItem>();
 
-            foreach(var pi in itemForCreate.PurchaseItems)
+            foreach (var pi in itemForCreate.PurchaseItems)
             {
                 if (!dbItems.TryGetValue(pi.Id, out var dbItem))
                 {
                     ModelState.AddModelError("ItemNotFound", $"Error! Item with Id {pi.Id} not found.");
                     continue;
                 }
-                if (pi.QuantityAvailableForPurchase <= 0) {
+                if (pi.QuantityAvailableForPurchase <= 0)
+                {
                     ModelState.AddModelError("InvalidQuantity", $"Error! Item {dbItem.Name} has invalid quantity {pi.QuantityAvailableForPurchase}. Quantity must be greater than zero.");
                     continue;
                 }
@@ -155,15 +186,17 @@ namespace AppForSEII2526.API.Controllers
             {
                 await _context.SaveChangesAsync();
 
-            } catch(Exception ex) {
+            }
+            catch (Exception ex)
+            {
                 _logger.LogError(DateTime.Now + " " + ex.Message);
                 ModelState.AddModelError("Item", $"Error! There was an error while saving your item, plese, try again later");
                 return Conflict("Error" + ex.Message);
             }
 
-          
 
-            return CreatedAtAction("GetItemsForPurchase", new {id= purchase.Id }, new
+
+            return CreatedAtAction("GetItemsForPurchase", new { id = purchase.Id }, new
             {
                 purchase.Id,
                 purchase.Total_prices,
@@ -175,5 +208,5 @@ namespace AppForSEII2526.API.Controllers
                 })
             });
         }
-    }   
+    }
 }
