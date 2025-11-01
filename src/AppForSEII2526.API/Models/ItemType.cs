@@ -6,6 +6,11 @@
         public ItemType()
         {
         }
+        public ItemType(int id, string? name)
+        {
+            Id = id;
+            Name = name;
+        }
 
         public ItemType(int id, string? name, IList<Item> items)
         {
