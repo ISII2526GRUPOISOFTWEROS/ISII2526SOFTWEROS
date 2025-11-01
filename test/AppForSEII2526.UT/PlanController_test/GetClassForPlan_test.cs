@@ -57,7 +57,7 @@ namespace AppForSEII2526.UT.PlanController_test
                 new ClassForPlanDTO(3,10,new DateTime(2007, 04, 04),"Stretch & Flex", new List<string>{ "Resistance Bands" })
             };
 
-            var tc1 = new List<ClassForPlanDTO>() { ClassesDTOs[0], ClassesDTOs[1], classDTOs[2] };
+            var tc1 = new List<ClassForPlanDTO>() { ClassesDTOs[0], ClassesDTOs[1], ClassesDTOs[2] };
             var tc2 = new List<ClassForPlanDTO>() { ClassesDTOs[1] };
             var tc3 = new List<ClassForPlanDTO>() { ClassesDTOs[0], ClassesDTOs[1] };
 
@@ -71,13 +71,13 @@ namespace AppForSEII2526.UT.PlanController_test
         }
 
         [Theory]
-        [MemberData(nameof(TestCasesFor_GetClassesForPlan_OK))]
+        [MemberData(nameof(TestCasesFor_GetClassForPlan_OK))]
         [Trait("Database", "WithoutFixture")]
         [Trait("LevelTesting", "Unit Testing")]
-        public async Task GetClassesForPlan_OK_test(IList<string>? itemTypes, DateTime? date, DateTime? fromDate, DateTime? toDate, IList<ClassForPlanDTO> expectedClasses)
+        public async Task GetClassForPlan_OK_test(IList<string>? itemTypes, DateTime? date, DateTime? fromDate, DateTime? toDate, IList<ClassForPlanDTO> expectedClasses)
         {
             var controller = new ClassesController(_context, null);
-            var result = await controller.GetClassesForPlan(itemTypes, date, fromDate, toDate);
+            var result = await controller.GetClassForPlan(itemTypes, date, fromDate, toDate);
             var okResult = Assert.IsType<OkObjectResult>(result);
             var actual = Assert.IsType<List<ClassForPlanDTO>>(okResult.Value);
             Assert.Equal(expectedClasses, actual);
@@ -86,12 +86,12 @@ namespace AppForSEII2526.UT.PlanController_test
         [Fact]
         [Trait("LevelTesting", "Unit Testing")]
         [Trait("Database", "WithoutFixture")]
-        public async Task GetClassesForPlan_BadRequest_test()
+        public async Task GetClassForPlan_BadRequest_test()
         { 
             var mock = new Mock<ILogger<ClassesController>>();
             ILogger<ClassesController> logger = mock.Object;
             var controller = new ClassesController(_context, logger);
-            var result = await controller.GetClassesForPlan(null, null, DateTime.Today.AddDays(5), DateTime.Today.AddDays(1));
+            var result = await controller.GetClassForPlan(null, null, DateTime.Today.AddDays(5), DateTime.Today.AddDays(1));
             var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
             var problemDetails = Assert.IsType<ValidationProblemDetails>(badRequestResult.Value);
             var problem = problemDetails.Errors.First().Value[0];
