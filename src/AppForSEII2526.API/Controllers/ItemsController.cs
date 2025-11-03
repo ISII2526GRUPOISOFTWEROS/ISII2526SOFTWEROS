@@ -214,7 +214,7 @@ namespace AppForSEII2526.API.Controllers
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public async Task<ActionResult> GetPurchaseDetails(int id)
         {
-            if(_context .Purchases == null)
+            if(_context.Purchases == null)
             {
                _logger.LogError(DateTime.Now + " Purchases table does not exist.");
                 return NotFound();
@@ -244,7 +244,7 @@ namespace AppForSEII2526.API.Controllers
                     p.Total_prices))
                 .ToListAsync();
 
-            if (purchaseDetails == null)
+            if (purchaseDetails == null || !purchaseDetails.Any())
             {
                 _logger.LogError(DateTime.Now + $" Rental with id {id} dot not exist.");
                 return NotFound();
