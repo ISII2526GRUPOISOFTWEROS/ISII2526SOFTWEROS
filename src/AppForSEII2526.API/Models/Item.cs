@@ -8,6 +8,20 @@
         {
         }
 
+        public Item(int id, string? description, string? name, int quantityAvailableForPurchase, int quantityForRestock, decimal restockPrice, decimal purchasePrice, ItemType itemType, Brand brand)
+        {
+            Id = id;
+            Description = description;
+            Name = name;
+            QuantityAvailableForPurchase = quantityAvailableForPurchase;
+            QuantityForRestock = quantityForRestock;
+            RestockPrice = restockPrice;
+            PurchasePrice = purchasePrice;
+            ItemType = itemType;
+            Brand = brand;
+        }
+
+
         public Item(int id, string? description, string? name, IList<PurchaseItem> purchaseItems, int quantityAvailableForPurchase, int quantityForRestock, decimal restockPrice, decimal purchasePrice, IList<RestockItem> restockItems, ItemType itemType, Brand brand)
         {
             Id = id;
