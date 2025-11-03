@@ -5,8 +5,9 @@ namespace AppForSEII2526.API.DTOs.ItemDTOs
     public class PurchaseDetailDTO : ItemForCreateDTO
     {
 
-        public PurchaseDetailDTO(string customerUserName, int paymentMethodId, string street, string city, string country, string description, IList<ItemForPurchaseDTO> purchaseItems, decimal totalPrice) : base(customerUserName, paymentMethodId, street, city, country, description, purchaseItems, totalPrice)
+        public PurchaseDetailDTO(int id,string customerUserName, int paymentMethodId, string street, string city, string country, string description, IList<ItemForPurchaseDTO> purchaseItems, decimal totalPrice) : base(customerUserName, paymentMethodId, street, city, country, description, purchaseItems, totalPrice)
         {
+            Id = id;
         }
 
         public override bool Equals(object? obj)
@@ -23,6 +24,7 @@ namespace AppForSEII2526.API.DTOs.ItemDTOs
                    TotalPrice == dTO.TotalPrice;
         }
 
+        public int Id { get; set; }
         public override int GetHashCode()
         {
             return HashCode.Combine(CustomerUserName, PaymentMethodId, Street, City, Country, Description, PurchaseItems, TotalPrice);
