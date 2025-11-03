@@ -1,0 +1,192 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using AppForSEII2526.API.DTOs.ItemDTOs;
+using AppForSEII2526.API.Controllers;
+
+namespace AppForSEII2526.UT.ItemForPurchase_test 
+{
+    public class GetItemForPurchase_test : AppForSEII25264SqliteUT
+    {
+        public GetItemForPurchase_test()
+        {
+            var brands = new List<Brand>()
+            {
+                new Brand(){ Name="Nike"},
+                new Brand(){ Name="Domyos"},
+
+            };
+         
+            var itemTypes = new List<ItemType>()
+            {
+                new ItemType(){ Name="Strength Equipment"},
+                new ItemType(){ Name="Cardio Equipment"},
+            };
+
+            _context.Brands.AddRange(brands);
+            _context.ItemTypes.AddRange(itemTypes);
+            _context.SaveChanges();
+
+            var items = new List<Item>()
+            {
+                new Item(){Name="Foam Roller", Brand=brands[0], Description="Description1", PurchasePrice=10.0m, QuantityAvailableForPurchase=100,ItemType = itemTypes[1]},
+                new Item(){ Name="Bands", Brand=brands[1], Description="Description2", PurchasePrice=20.0m, QuantityAvailableForPurchase=200,ItemType = itemTypes[0]},
+                new Item(){ Name="Kettlebell", Brand=brands[0], Description="Description3", PurchasePrice=30.0m, QuantityAvailableForPurchase=300,ItemType = itemTypes[0]},
+                
+
+            };
+         
+
+            _context.Items.AddRange(items);
+            _context.SaveChanges();
+
+        }
+
+        [Fact]
+        [Trait("GetItemForPurchase", "Unit Testing")]
+        public async Task GetItemForPurchaseNull4ItemBrand_test()
+        {
+            var expectedItems = new List<ItemForPurchaseDTO>()
+            {
+                new ItemForPurchaseDTO(1, "Foam Roller", "Nike", "Description1", 10.0m, 100),
+                new ItemForPurchaseDTO(2, "Bands", "Domyos", "Description2", 20.0m, 200),
+                new ItemForPurchaseDTO(3, "Kettlebell", "Nike", "Description3", 30.0m, 300),
+            };
+
+            var mock = new Mock<ILogger<ItemsController>>();
+            ILogger<ItemsController> logger = mock.Object;
+            ItemsController controller = new ItemsController(_context, null);
+
+            //act
+            var result = await controller.GetItemsForPurchase(null, null);
+
+            //assert
+            var okResult = Assert.IsType<OkObjectResult>(result);
+            var itemactualresult = Assert.IsType<List<ItemForPurchaseDTO>>(okResult.Value);
+            
+            var expetedItemsSorted = expectedItems.OrderBy(i => i.Name).ToList();
+            var itemactualresultSorted = itemactualresult.OrderBy(i => i.Name).ToList();
+
+            Assert.Equal(expetedItemsSorted, itemactualresultSorted);
+        }
+        [Fact]
+        [Trait("GetItemForPurchase", "Unit Testing")]
+        public async Task GetItemForPurchaseItemNameFilter__test()
+        {
+            var expectedItems = new List<ItemForPurchaseDTO>()
+            {
+                 new ItemForPurchaseDTO(1, "Foam Roller", "Nike", "Description1", 10.0m, 100),
+                new ItemForPurchaseDTO(3, "Kettlebell", "Nike", "Description3", 30.0m, 300),
+            };
+            var mock = new Mock<ILogger<ItemsController>>();
+            ILogger<ItemsController> logger = mock.Object;
+            ItemsController controller = new ItemsController(_context, logger);
+
+            var result = await controller.GetItemsForPurchase("l", null);
+
+            var okResult = Assert.IsType<OkObjectResult>(result);
+            var itemactualresult = Assert.IsType<List<ItemForPurchaseDTO>>(okResult.Value);
+
+            var expetedItemsSorted = expectedItems.OrderBy(i => i.Name).ToList();
+            var itemactualresultSorted = itemactualresult.OrderBy(i => i.Name).ToList();
+
+            Assert.Equal(expetedItemsSorted, itemactualresultSorted);
+        }
+
+        [Fact]
+        [Trait("GetItemForPurchase", "Unit Testing")]
+        public async Task GetItemForPurchaseBrandNameFilter__test()
+        {
+            var expectedItems = new List<ItemForPurchaseDTO>()
+            {
+                new ItemForPurchaseDTO(2, "Bands", "Domyos", "Description2", 20.0m, 200),
+
+            };
+            var mock = new Mock<ILogger<ItemsController>>();
+            ILogger<ItemsController> logger = mock.Object;
+            ItemsController controller = new ItemsController(_context, logger);
+
+            var result = await controller.GetItemsForPurchase(null, "D");
+
+            var okResult = Assert.IsType<OkObjectResult>(result);
+            var itemactualresult = Assert.IsType<List<ItemForPurchaseDTO>>(okResult.Value);
+
+            var expetedItemsSorted = expectedItems.OrderBy(i => i.Name).ToList();
+            var itemactualresultSorted = itemactualresult.OrderBy(i => i.Name).ToList();
+
+            Assert.Equal(expetedItemsSorted, itemactualresultSorted);
+        }
+
+        [Fact]
+        [Trait("GetItemForPurchase", "Unit Testing")]
+        public async Task GetItemForPurchaseBrandAndNameNameFilter__test()
+        {
+            var expectedItems = new List<ItemForPurchaseDTO>()
+            {
+                new ItemForPurchaseDTO(2, "Bands", "Domyos", "Description2", 20.0m, 200),
+
+            };
+            var mock = new Mock<ILogger<ItemsController>>();
+            ILogger<ItemsController> logger = mock.Object;
+            ItemsController controller = new ItemsController(_context, logger);
+
+            var result = await controller.GetItemsForPurchase("B", "D");
+
+            var okResult = Assert.IsType<OkObjectResult>(result);
+            var itemactualresult = Assert.IsType<List<ItemForPurchaseDTO>>(okResult.Value);
+
+            var expetedItemsSorted = expectedItems.OrderBy(i => i.Name).ToList();
+            var itemactualresultSorted = itemactualresult.OrderBy(i => i.Name).ToList();
+
+            Assert.Equal(expetedItemsSorted, itemactualresultSorted);
+        }
+
+        [Fact]
+        [Trait("GetItemForPurchase", "Unit Testing")]
+        public async Task GetItemForPurchaseBadRequest__test()
+        {
+            var expectedItems = new List<ItemForPurchaseDTO>()
+            {
+                new ItemForPurchaseDTO(2, "Bands", "Domyos", "Description2", 20.0m, 200),
+
+            };
+            var mock = new Mock<ILogger<ItemsController>>();
+            ILogger<ItemsController> logger = mock.Object;
+            ItemsController controller = new ItemsController(_context, logger);
+
+            var result = await controller.GetItemsForPurchase("W", "Z");
+
+            var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
+            var itemactualresult = Assert.IsType<string>(badRequestResult.Value);
+
+
+            Assert.Equal("No items found for the given criteria.", itemactualresult);
+        }
+
+        [Fact]
+        [Trait("GetItemForPurchase", "Unit Testing")]
+        public async Task GetItemForPurchaseCaseSensitive__test()
+        {
+                var expectedItems = new List<ItemForPurchaseDTO>()
+            {
+                new ItemForPurchaseDTO(3, "Kettlebell", "Nike", "Description3", 30.0m, 300),
+
+            };
+                var mock = new Mock<ILogger<ItemsController>>();
+                ILogger<ItemsController> logger = mock.Object;
+                ItemsController controller = new ItemsController(_context, logger);
+
+                var result = await controller.GetItemsForPurchase("b", null);
+
+                var okResult = Assert.IsType<OkObjectResult>(result);
+                var itemactualresult = Assert.IsType<List<ItemForPurchaseDTO>>(okResult.Value);
+
+                var expetedItemsSorted = expectedItems.OrderBy(i => i.Name).ToList();
+                var itemactualresultSorted = itemactualresult.OrderBy(i => i.Name).ToList();
+
+                Assert.Equal(expetedItemsSorted, itemactualresultSorted);
+            }
+        }
+}
