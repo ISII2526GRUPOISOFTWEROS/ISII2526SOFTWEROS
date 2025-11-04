@@ -1,7 +1,6 @@
 ﻿using AppForSEII2526.API.DTOs.ItemDTOs;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Identity.Client;
 
 namespace AppForSEII2526.API.Controllers
 {
@@ -9,7 +8,6 @@ namespace AppForSEII2526.API.Controllers
     [ApiController]
     public class ItemsController : ControllerBase
     {
-
         private ApplicationDbContext _context; //Access to the db
         private ILogger<ItemsController> _logger;
 
@@ -19,24 +17,37 @@ namespace AppForSEII2526.API.Controllers
             _logger = logger;
         }
 
-        
-
+        //[HttpGet]
+        //[Route("[action]")]
+        //[ProducesResponseType(typeof(decimal),(int)HttpStatusCode.OK)]//Successful return
+        //[ProducesResponseType(typeof(string),(int)HttpStatusCode.BadRequest)]//Bad return
+        //public async Task<ActionResult> ComputeDivision(decimal op1, decimal op2)
+        //{
+        //    if(op2== 0)
+        //    {
+        //        string error ="Division by zero is not allowed.";
+        //       //_logger.LogError(DateTime.Now+   error);
+        //        return BadRequest(error);
+        //    }
+        //    decimal result = op1/ op2;
+        //    return Ok(result);
+        //}
         [HttpGet]
         [Route("[action]")]
-        [ProducesResponseType(typeof(IList<ItemForRestockDTO>), (int) HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(IList<ItemForRestockDTO>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
-            
+
         public async Task<ActionResult> GetItemsForRestock(string? itemName, int? quantityForRestock)
         {
             IList<ItemForRestockDTO> itemsDTOs = await _context.Items
-                .Where(Item => Item.Name.Contains(itemName) 
+                .Where(Item => Item.Name.Contains(itemName)
                             || Item.QuantityForRestock > quantityForRestock)
 
                 .OrderBy(Item => Item.Name)
 
-                .Select(Item => new ItemForRestockDTO(Item.Id, 
-                                                    Item.Name, 
-                                                    Item.Brand.Name, 
+                .Select(Item => new ItemForRestockDTO(Item.Id,
+                                                    Item.Name,
+                                                    Item.Brand.Name,
                                                     Item.QuantityAvailableForPurchase,
                                                     Item.QuantityForRestock))
 
@@ -45,6 +56,7 @@ namespace AppForSEII2526.API.Controllers
             return Ok(itemsDTOs);
 
         }
+
 
         [HttpGet]
         [Route("[action]")]
@@ -67,6 +79,10 @@ namespace AppForSEII2526.API.Controllers
             }
             return Ok(itemsDTOS);
         }
+
+
+
+
         [HttpPost]
         [Route("[action]")]
         [ProducesResponseType(typeof(ItemForPurchaseDTO), (int)HttpStatusCode.Created)]
@@ -91,7 +107,7 @@ namespace AppForSEII2526.API.Controllers
             var checkPM = await _context.Set<PaymentMethod>()
                 .AnyAsync(pm => pm.Id == itemForCreate.PaymentMethodId && pm.User.Id == user.Id);
 
-          
+
             if (!checkPM)
             {
                 ModelState.AddModelError("PaymentMethod", "Error! The selected payment method is not registered for this user.");
@@ -101,7 +117,7 @@ namespace AppForSEII2526.API.Controllers
 
             var paymentMethod = await _context.Set<PaymentMethod>().FirstOrDefaultAsync(pm => pm.Id == itemForCreate.PaymentMethodId);
 
-            if(paymentMethod == null || paymentMethod.User.Id != user.Id)
+            if (paymentMethod == null || paymentMethod.User.Id != user.Id)
             {
                 ModelState.AddModelError("PaymentMethod", "ERROR! The selected payment method is not registered for this user.");
                 return BadRequest(ValidationProblem(ModelState));
@@ -116,14 +132,15 @@ namespace AppForSEII2526.API.Controllers
             decimal totalCost = 0;
             var purchaseItems = new List<PurchaseItem>();
 
-            foreach(var pi in itemForCreate.PurchaseItems)
+            foreach (var pi in itemForCreate.PurchaseItems)
             {
                 if (!dbItems.TryGetValue(pi.Id, out var dbItem))
                 {
                     ModelState.AddModelError("ItemNotFound", $"Error! Item with Id {pi.Id} not found.");
                     continue;
                 }
-                if (pi.QuantityAvailableForPurchase <= 0) {
+                if (pi.QuantityAvailableForPurchase <= 0)
+                {
                     ModelState.AddModelError("InvalidQuantity", $"Error! Item {dbItem.Name} has invalid quantity {pi.QuantityAvailableForPurchase}. Quantity must be greater than zero.");
                     continue;
                 }
@@ -169,10 +186,17 @@ namespace AppForSEII2526.API.Controllers
             {
                 await _context.SaveChangesAsync();
 
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(DateTime.Now + " " + ex.Message);
+                ModelState.AddModelError("Item", $"Error! There was an error while saving your item, plese, try again later");
+                return Conflict("Error" + ex.Message);
+            }
 
-          
 
-            return CreatedAtAction("GetItemsForPurchase", new {id= purchase.Id }, new
+
+            return CreatedAtAction("GetItemsForPurchase", new { id = purchase.Id }, new
             {
                 purchase.Id,
                 purchase.Total_prices,
@@ -184,5 +208,5 @@ namespace AppForSEII2526.API.Controllers
                 })
             });
         }
-    }   
+    }
 }
