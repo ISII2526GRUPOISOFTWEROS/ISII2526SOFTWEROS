@@ -9,11 +9,11 @@ public class ApplicationUser : IdentityUser {
     public ApplicationUser()
     {
     }
-<<<<<<< HEAD
+
     public ApplicationUser(string name, string surname)
     {
     }
-=======
+
 
     public ApplicationUser(string? name, string surname, IList<PaymentMethod> paymentMethods, IList<Incident> incidents, IList<Restock> restocks)
     {
@@ -24,7 +24,6 @@ public class ApplicationUser : IdentityUser {
         Restocks = restocks;
     }
 
->>>>>>> development
     public string? Name { get; set; }
     public string Surname { get; set; }
 
