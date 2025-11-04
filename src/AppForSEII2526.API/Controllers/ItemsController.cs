@@ -208,19 +208,20 @@ namespace AppForSEII2526.API.Controllers
                 })
             });
         }
+
         [HttpGet]
         [Route("[action]")]
         [ProducesResponseType(typeof(IList<PurchaseDetailDTO>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public async Task<ActionResult> GetPurchaseDetails(int id)
         {
-            if(_context.Purchases == null)
+            if (_context.Purchases == null)
             {
-               _logger.LogError(DateTime.Now + " Purchases table does not exist.");
+                _logger.LogError(DateTime.Now + " Purchases table does not exist.");
                 return NotFound();
             }
 
-            IList<PurchaseDetailDTO> purchaseDetails= await _context.Purchases
+            IList<PurchaseDetailDTO> purchaseDetails = await _context.Purchases
                 .Where(p => p.Id == id)
                 .Include(p => p.PaymentMethod)
                 .ThenInclude(pm => pm.User)
