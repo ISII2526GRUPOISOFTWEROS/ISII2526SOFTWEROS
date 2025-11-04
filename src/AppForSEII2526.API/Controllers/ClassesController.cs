@@ -97,16 +97,14 @@ namespace AppForSEII2526.API.Controllers
                 return BadRequest("Error");
             }
         }
-        [HttpGet]
+        [HttpPost]
         [Route("[action]")]
         [ProducesResponseType(typeof(IList<ClassForPlanDTO>), (int)HttpStatusCode.OK)]
-        public async Task<ActionResult> PostClassForPlan(string? className,string? classType)
+        public async Task<ActionResult> CreateClassForPlan(string? className,string? classType)
         {
             IList<ClassForPlanDTO> selectedClasses = await _context.Classes
                 .Include(c => c.TypeItems)
-                .Where(c =>
-                    (className == null || c.Name.Contains(className)) &&            // por nombre
-                    (classType == null || c.TypeItems.Any(t => t.Name == classType)))//por tipo
+                .Where(c =>(className == null || c.Name.Contains(className)) && (classType == null || c.TypeItems.Any(t => t.Name == classType)))//por tipo
                 .OrderBy(c => c.Date)
                 .Select(c => new ClassForPlanDTO( c.Id, c.Price,  c.Date,c.Name, c.TypeItems.Select(t => t.Name).ToList()))
                 .ToListAsync();
