@@ -1,14 +1,14 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace TodoApi.Logging;
+namespace AppForSEII2526.API.Logging;
 
 [ProviderAlias("RabbitMQ")]
 public class RabbitMQLoggerProvider : ILoggerProvider
 {
     private readonly RabbitMQLoggerConfiguration _config;
     private readonly Dictionary<string, RabbitMQLogger> _loggers = new();
-    private readonly Lock _lock = new Lock();
+    private readonly object _lock = new object();
 
     public RabbitMQLoggerProvider(IOptions<RabbitMQLoggerConfiguration> config)
     {
