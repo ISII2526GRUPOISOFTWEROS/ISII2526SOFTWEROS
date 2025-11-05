@@ -57,7 +57,7 @@ namespace AppForSEII2526.UT.ItemForPurchase_test
 
             var mock = new Mock<ILogger<ItemsController>>();
             ILogger<ItemsController> logger = mock.Object;
-            ItemsController controller = new ItemsController(_context, null);
+            ItemsController controller = new ItemsController(_context, logger);
 
             //act
             var result = await controller.GetItemsForPurchase(null, null);

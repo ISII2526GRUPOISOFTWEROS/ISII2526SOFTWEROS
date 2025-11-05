@@ -24,9 +24,21 @@ public class ApplicationUser : IdentityUser {
         Name = name;
         Surname = surname;
     }
+    public ApplicationUser(string id, string? name, string surname,string userName,string address)
+    {
+        Id = id;
+        Name = name;
+        Surname = surname;
+        UserName = userName;
+        Email = userName;
+        Address = address;
+    }
 
     public string? Name { get; set; }
     public string Surname { get; set; }
+
+    [Required]
+    public string Address { get; set; }
 
     //Reference
     public IList<PaymentMethod> PaymentMethods { get; set; }
