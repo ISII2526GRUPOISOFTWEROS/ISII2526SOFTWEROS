@@ -131,7 +131,7 @@ namespace AppForSEII2526.API.Controllers
 
 
 
-            return CreatedAtAction("GetItemsForPurchase", new { id = purchase.Id }, new
+            return CreatedAtAction(nameof(ItemsController.GetItemsForPurchase),"Items", new { id = purchase.Id }, new
             {
                 purchase.Id,
                 purchase.Total_prices,
