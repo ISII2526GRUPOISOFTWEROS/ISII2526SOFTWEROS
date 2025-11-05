@@ -1,4 +1,5 @@
 ﻿using AppForSEII2526.API.DTOs.ClassesDTOs;
+using AppForSEII2526.API.DTOs.PlanDTOs;
 using Microsoft.EntityFrameworkCore;
 
 namespace AppForSEII2526.API.Controllers
@@ -55,7 +56,7 @@ namespace AppForSEII2526.API.Controllers
                 }
                 // precio por clase
                 totalCost += dbClass.Price * planForCreate.Weeks;
-                planItems.Add(new PlanItem(dbClass.Price)
+                planItems.Add(new PlanItem
                 {
                     ClassId = dbClass.Id,
                     Price = dbClass.Price,

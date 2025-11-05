@@ -12,8 +12,8 @@ namespace AppForSEII2526.UT.Plan_test
     {
         public CreatePlan_test()
         {
-            var pm = new PaymentMethod() { Name = "Credit Card" };
-            _context.PaymentMethods.Add(pm);
+            var pm = new TestPaymentMethod() { Name = "Credit Card" };
+           
             _context.SaveChanges();
 
             var type = new ItemType() { Name = "Cardio" };
@@ -40,18 +40,18 @@ namespace AppForSEII2526.UT.Plan_test
             var mockLogger = new Mock<ILogger<PlanController>>();
             var controller = new PlanController(_context, mockLogger.Object);
 
-            var dto = new PlanForCreateDTO
-            {
-                Name = "Basic Plan",
-                Description = "For beginners",
-                Weeks = 4,
-                HealthIssues = "None",
-                PaymentMethod = new PaymentMethod { Id = 1, Name = "Credit Card" }, // ← aquí el cambio
-                SelectedClasses = new List<ClassForPlanDTO>
+            // Reemplaza la inicialización de PlanForCreateDTO usando el constructor requerido
+            var dto = new PlanForCreateDTO(
+                "Basic Plan", // Name
+                "For beginners", // Description
+                4, // Weeks
+                "None", // HealthIssues
+                new List<ClassForPlanDTO>
                 {
                     new ClassForPlanDTO(1, 15, DateTime.Today.AddDays(2), "Morning Yoga", 10, new List<string>{"Cardio"})
-                }
-            };
+                },
+                new TestPaymentMethod { Id = 1, Name = "Credit Card" } // PaymentMethod
+            );
 
             var result = await controller.CreatePlan(dto);
 
@@ -66,14 +66,15 @@ namespace AppForSEII2526.UT.Plan_test
             var mockLogger = new Mock<ILogger<PlanController>>();
             var controller = new PlanController(_context, mockLogger.Object);
 
-            var dto = new PlanForCreateDTO
-            {
-                Name = "Empty Plan",
-                Description = "No classes",
-                Weeks = 2,
-                PaymentMethod = new PaymentMethod { Id = 1, Name = "Credit Card" }, // ← también corregido
-                SelectedClasses = new List<ClassForPlanDTO>()
-            };
+            // Reemplaza la inicialización de PlanForCreateDTO usando el constructor requerido
+            var dto = new PlanForCreateDTO(
+                "Empty Plan", // Name
+                "No classes", // Description
+                2, // Weeks
+                null, // HealthIssues
+                new List<ClassForPlanDTO>(),
+                new TestPaymentMethod { Id = 1, Name = "Credit Card" } // PaymentMethod
+            );
 
             var result = await controller.CreatePlan(dto);
 
@@ -88,12 +89,27 @@ namespace AppForSEII2526.UT.Plan_test
             var mockLogger = new Mock<ILogger<PlanController>>();
             var controller = new PlanController(_context, mockLogger.Object);
 
-            var dto = new PlanForCreateDTO
-            {
-                Name = "Invalid PM Plan",
-                Description = "Bad payment method",
-                Weeks = 2,
-                PaymentMethod = new PaymentMethod { Id = 999, Name = "Fake" }, // no existe en BD
-                SelectedClasses = new List<ClassForPlanDTO>
+            var dto = new PlanForCreateDTO(
+                "Invalid PM Plan", // Name
+                "Bad payment method", // Description
+                2, // Weeks
+                null, // HealthIssues
+                new List<ClassForPlanDTO>
                 {
-                    new ClassForPlanDTO(1, 15, DateTime.Today.AddDays(2), "Morning Yoga", 10, new List<string>{"C
+                    new ClassForPlanDTO(1, 15, DateTime.Today.AddDays(2), "Morning Yoga", 10, new List<string>{"Cardio"})
+                },
+                new TestPaymentMethod { Id = 999, Name = "Fake" } // PaymentMethod
+            );
+
+            var result = await controller.CreatePlan(dto);
+
+            var bad = Assert.IsType<BadRequestObjectResult>(result);
+            Assert.Contains("The selected payment method is not valid", bad.Value.ToString());
+        }
+    }
+
+    public class TestPaymentMethod : PaymentMethod
+    {
+        public string Name { get; set; }
+    }
+}
