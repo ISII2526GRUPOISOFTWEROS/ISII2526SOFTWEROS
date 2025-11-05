@@ -113,67 +113,67 @@ namespace AppForSEII2526.API.Controllers
                 .ToListAsync();
             return Ok(selectedClasses);
         }
-    } 
-            //details
+    
+    //details
 
-            //[HttpGet]
-            //[Route("[action]")]
-            //[ProducesResponseType(typeof(IList<PlanDetailDTO>), (int)HttpStatusCode.OK)]
-            //[ProducesResponseType((int)HttpStatusCode.NotFound)]
-            //public async Task<ActionResult> GetPlanDetails(int id)
-            //{
-            //    if (_context.Plans == null)
-            //    {
-            //        _logger.LogError(DateTime.Now + " Plans table does not exist.");
-            //        return NotFound();
-            //    }
+    [HttpGet]
+        [Route("[action]")]
+        [ProducesResponseType(typeof(IList<PlanDetailDTO>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        public async Task<ActionResult> GetPlanDetails(int id)
+        {
+            if (_context.Plans == null)
+            {
+                _logger.LogError(DateTime.Now + " Plans table does not exist.");
+                return NotFound();
+            }
 
-            //IList<PlanDetailDTO> planDetails = await _context.Plans
-            //    .Where(p => p.Id == id)
-            //    .Include(p => p.User)
-            //    .Include(p => p.PlanItems)
-            //        .ThenInclude(pc => pc.Class)
-            //    .Select(p => new PlanDetailDTO(
-            //        p.Id,
-            //        p.User.Name + " " + p.User.Surname,
-            //        p.CreatedDate,
-            //        p.Totalprice,
-            //        p.Name,
-            //        p.Description ?? string.Empty,
-            //        p.Weeks,
-            //        p.HealthIssues ?? string.Empty,
-            //        p.PlanItems.Select(pc => new ClassForPlanDTO(
-            //            pc.Class.Id,
-            //            pc.Class.Capacity,
-            //            pc.Class.Date,
-            //            pc.Class.Name ?? string.Empty,
-            //            pc.Class.TypeItems ?? string.Empty,
-            //            pc.Class.Price
-            //        )).ToList()
-            //    )).ToListAsync();
+            IList<PlanDetailDTO> planDetails = await _context.Plans
+                .Where(p => p.Id == id)
+                .Include(p => p.User)
+                .Include(p => p.PlanItems)
+                    .ThenInclude(pc => pc.Class)
+                .Select(p => new PlanDetailDTO(
+                    p.Id,
+                    p.User.Name + " " + p.User.Surname,
+                    p.CreatedDate,
+                    p.Totalprice,
+                    p.Name,
+                    p.Description ?? string.Empty,
+                    p.Weeks,
+                    p.HealthIssues ?? string.Empty,
+                    p.PlanItems.Select(pc => new ClassForPlanDTO(
+                        pc.Class.Id,
+                        pc.Class.Price,
+                        pc.Class.Date,
+                        pc.Class.Name ?? string.Empty,
+                        pc.Class.Capacity,
+                        pc.Class.TypeItems.Select(t => t.Name).ToList()
+                    )).ToList()
+                )).ToListAsync();
 
-            //    if (planDetails == null || !planDetails.Any())
-            //    {
-            //        _logger.LogError(DateTime.Now + $" Plan with id {id} does not exist.");
-            //        return NotFound();
-            //    }
+            if (planDetails == null || !planDetails.Any())
+            {
+                _logger.LogError(DateTime.Now + $" Plan with id {id} does not exist.");
+                return NotFound();
+            }
 
-            //    // Alternative flow: check class capacity
-            //    foreach (var plan in planDetails)
-            //    {
-            //        var lowCapacityClasses = plan.Classes.Where(c => c.capacity <= 0).ToList();
-            //        if (lowCapacityClasses.Any())
-            //        {
-            //            return BadRequest(new
-            //            {
-            //                Message = "One or more classes do not have enough capacity. Please modify selected classes.",
-            //                Classes = lowCapacityClasses
-            //            });
-            //        }
-            //    }
+            // Alternative flow: check class capacity
+            foreach (var plan in planDetails)
+            {
+                var lowCapacityClasses = plan.Classes.Where(c => c.capacity <= 0).ToList();
+                if (lowCapacityClasses.Any())
+                {
+                    return BadRequest(new
+                    {
+                        Message = "One or more classes do not have enough capacity. Please modify selected classes.",
+                        Classes = lowCapacityClasses
+                    });
+                }
+            }
 
-            //    return Ok(planDetails);
+            return Ok(planDetails);
 
-            //}
         }
+    }
     } 
