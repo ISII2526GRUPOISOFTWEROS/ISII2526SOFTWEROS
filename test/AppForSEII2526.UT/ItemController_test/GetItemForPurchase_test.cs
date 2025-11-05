@@ -43,7 +43,7 @@ namespace AppForSEII2526.UT.ItemForPurchase_test
             _context.SaveChanges();
 
         }
-
+        /*
         [Fact]
         [Trait("GetItemForPurchase", "Unit Testing")]
         public async Task GetItemForPurchaseNull4ItemBrand_test()
@@ -71,6 +71,72 @@ namespace AppForSEII2526.UT.ItemForPurchase_test
 
             Assert.Equal(expetedItemsSorted, itemactualresultSorted);
         }
+       */
+        public static IEnumerable<object[]> TestCasesFor_GetItemsForPurchase_OK()
+        {
+            var itemDTOs = new List<ItemForPurchaseDTO>()
+            {
+                new ItemForPurchaseDTO(1, "Foam Roller", "Nike", "Description1", 10.0m, 100),
+                new ItemForPurchaseDTO(2, "Bands", "Domyos", "Description2", 20.0m, 200),
+                new ItemForPurchaseDTO(3, "Kettlebell", "Nike", "Description3", 30.0m, 300),
+            };
+            
+            var itemDTOsTC1 = new List<ItemForPurchaseDTO>() { itemDTOs[0], itemDTOs[1], itemDTOs[2] };
+            var itemDTOsTC2 = new List<ItemForPurchaseDTO>() { itemDTOs[0], itemDTOs[2] };
+            var itemDTOsTC3 = new List<ItemForPurchaseDTO>() { itemDTOs[1] };
+
+
+            var allTest = new List<object?[]>()
+            {
+                new object?[] { null, null, itemDTOsTC1 },
+                new object?[] { "l", null, itemDTOsTC2 },
+                new object?[] { null, "Domyos", itemDTOsTC3 },
+            };
+            return allTest;
+        }
+
+        [Theory]
+        [Trait("GetItemForPurchase", "Unit Testing")]
+        [MemberData(nameof(TestCasesFor_GetItemsForPurchase_OK))]
+        public async Task GetItemForPurchaseFilter_test(string? itemName, string? brandName, string errorExpected)
+        {
+            var mock = new Mock<ILogger<ItemsController>>();
+            ILogger<ItemsController> logger = mock.Object;
+            ItemsController controller = new ItemsController(_context, logger);
+
+            //act
+            var result = await controller.GetItemsForPurchase(itemName, brandName);
+
+            //assert
+            var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
+            var problemDetails = Assert.IsType<ValidationProblemDetails>(badRequestResult.Value);
+            
+
+            Assert.Equal(errorExpected, problemDetails.Errors.First().Value[0]);
+        }
+
+        [Theory]
+        [Trait("GetItemForPurchase", "Unit Testing")]
+        [MemberData(nameof(TestCasesFor_GetItemsForPurchase_OK))]
+        public async Task GetItemForPurchaseFilterBR_test(string? itemName, string? brandName, List<ItemForPurchaseDTO> expectedItems)
+        {
+            var mock = new Mock<ILogger<ItemsController>>();
+            ILogger<ItemsController> logger = mock.Object;
+            ItemsController controller = new ItemsController(_context, logger);
+
+            //act
+            var result = await controller.GetItemsForPurchase(itemName, brandName);
+
+            //assert
+            var okResult = Assert.IsType<OkObjectResult>(result);
+            var itemactualresult = Assert.IsType<List<ItemForPurchaseDTO>>(okResult.Value);
+
+            var expetedItemsSorted = expectedItems.OrderBy(i => i.Name).ToList();
+            var itemactualresultSorted = itemactualresult.OrderBy(i => i.Name).ToList();
+
+            Assert.Equal(expetedItemsSorted, itemactualresultSorted);
+        }
+        /*
         [Fact]
         [Trait("GetItemForPurchase", "Unit Testing")]
         public async Task GetItemForPurchaseItemNameFilter__test()
@@ -188,5 +254,7 @@ namespace AppForSEII2526.UT.ItemForPurchase_test
 
                 Assert.Equal(expetedItemsSorted, itemactualresultSorted);
             }
-        }
+        */
+    }
+
 }
