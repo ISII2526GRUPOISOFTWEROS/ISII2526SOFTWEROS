@@ -7,7 +7,7 @@ namespace AppForSEII2526.API.DTOs.ItemDTOs
         {
         }
 
-        public ItemForCreateDTO(string customerUserName, int paymentMethodId, string street, string city, string country, string description, IList<ItemForPurchaseDTO> purchaseItems, decimal totalPrice)
+        public ItemForCreateDTO(string customerUserName, int paymentMethodId, string street, string city, string country, string description, IList<CreatePurchaseItemDTO> purchaseItems) 
         {
             CustomerUserName = customerUserName;
             PaymentMethodId = paymentMethodId;
@@ -16,7 +16,7 @@ namespace AppForSEII2526.API.DTOs.ItemDTOs
             Country = country;
             Description = description;
             PurchaseItems = purchaseItems;
-            TotalPrice = totalPrice;
+
         }
         [Required]
         [StringLength(50, MinimumLength = 10, ErrorMessage = "Name must have at least 10 characters")]
@@ -46,12 +46,8 @@ namespace AppForSEII2526.API.DTOs.ItemDTOs
 
         [Required(ErrorMessage = "At least one item must be included in the purchase")]
         [MinLength(1, ErrorMessage = "Purchase Item List must containt at least one item")]
-        public IList<ItemForPurchaseDTO> PurchaseItems { get; set; }
+        public IList<CreatePurchaseItemDTO> PurchaseItems { get; set; }
 
-
-        [Required(ErrorMessage = "Total Price is requiered")]
-        [Range(0.01, (double)decimal.MaxValue, ErrorMessage = "Total price must be greater than 0")]
-        public decimal TotalPrice { get; set; }
 
         public override bool Equals(object? obj)
         {
@@ -62,8 +58,7 @@ namespace AppForSEII2526.API.DTOs.ItemDTOs
                    City == dTO.City &&
                    Country == dTO.Country &&
                    Description == dTO.Description &&
-                   EqualityComparer<IList<ItemForPurchaseDTO>>.Default.Equals(PurchaseItems, dTO.PurchaseItems) &&
-                   TotalPrice == dTO.TotalPrice;
+                   EqualityComparer<IList<CreatePurchaseItemDTO>>.Default.Equals(PurchaseItems, dTO.PurchaseItems);
         }
     }
 
