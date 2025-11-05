@@ -48,6 +48,9 @@ namespace AppForSEII2526.API.DTOs.ItemDTOs
         [MinLength(1, ErrorMessage = "Purchase Item List must containt at least one item")]
         public IList<CreatePurchaseItemDTO> PurchaseItems { get; set; }
 
+        [Required(ErrorMessage = "At least one item must be included in the purchase")]
+        [MinLength(1, ErrorMessage = "Purchase Item List must containt at least one item")]
+        public IList<ItemForPurchaseDTO> PurchaseItemsP { get; set; }
 
         public override bool Equals(object? obj)
         {

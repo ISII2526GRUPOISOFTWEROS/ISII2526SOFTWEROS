@@ -1,14 +1,29 @@
 ﻿
 
+using Humanizer;
+
 namespace AppForSEII2526.API.DTOs.ItemDTOs
 {
-    public class PurchaseDetailDTO : ItemForCreateDTO
+    public class PurchaseDetailDTO : ItemForCreateDTO 
     {
-
-        public PurchaseDetailDTO(int id,string customerUserName, int paymentMethodId, string street, string city, string country, string description, IList<ItemForPurchaseDTO> purchaseItems, decimal totalPrice) : base(customerUserName, paymentMethodId, street, city, country, description, purchaseItems, totalPrice)
+        public PurchaseDetailDTO(
+            int id,
+            string customerUserName,
+            int paymentMethodId,
+            string street,
+            string city,
+            string country,
+            string description,
+            IList<CreatePurchaseItemDTO> purchaseItems, 
+            decimal totalPrice
+        ) : base(customerUserName, paymentMethodId, street, city, country, description, purchaseItems)
         {
             Id = id;
+            TotalPrice = totalPrice;
         }
+
+        public int Id { get; set; }
+        public decimal TotalPrice { get; set; }
 
         public override bool Equals(object? obj)
         {
@@ -20,14 +35,24 @@ namespace AppForSEII2526.API.DTOs.ItemDTOs
                    City == dTO.City &&
                    Country == dTO.Country &&
                    Description == dTO.Description &&
-                   EqualityComparer<IList<ItemForPurchaseDTO>>.Default.Equals(PurchaseItems, dTO.PurchaseItems) &&
+                   EqualityComparer<IList<CreatePurchaseItemDTO>>.Default.Equals(PurchaseItems, dTO.PurchaseItems) &&
+                   Id == dTO.Id &&
                    TotalPrice == dTO.TotalPrice;
         }
 
-        public int Id { get; set; }
         public override int GetHashCode()
         {
-            return HashCode.Combine(CustomerUserName, PaymentMethodId, Street, City, Country, Description, PurchaseItems, TotalPrice);
+            HashCode hash = new HashCode();
+            hash.Add(CustomerUserName);
+            hash.Add(PaymentMethodId);
+            hash.Add(Street);
+            hash.Add(City);
+            hash.Add(Country);
+            hash.Add(Description);
+            hash.Add(PurchaseItems);
+            hash.Add(Id);
+            hash.Add(TotalPrice);
+            return hash.ToHashCode();
         }
     }
 }
