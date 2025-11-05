@@ -94,11 +94,33 @@ namespace AppForSEII2526.UT.ItemForPurchase_test
             };
             return allTest;
         }
+        public static IEnumerable<object[]> TestCasesFor_GetItemsForPurchase()
+        {
+            var itemDTOs = new List<ItemForPurchaseDTO>()
+            {
+                new ItemForPurchaseDTO(1, "Foam Roller", "Nike", "Description1", 10.0m, 100),
+                new ItemForPurchaseDTO(2, "Bands", "Domyos", "Description2", 20.0m, 200),
+                new ItemForPurchaseDTO(3, "Kettlebell", "Nike", "Description3", 30.0m, 300),
+            };
+
+            var itemDTOsTC1 = new List<ItemForPurchaseDTO>() { };
+            var itemDTOsTC2 = new List<ItemForPurchaseDTO>() { };
+
+
+            var allTest = new List<object?[]>()
+            {
+                new object?[] { null, "Z", itemDTOsTC1 },
+                new object?[] { "W", null, itemDTOsTC2 },
+
+            };
+            return allTest;
+        }
+
 
         [Theory]
         [Trait("GetItemForPurchase", "Unit Testing")]
-        [MemberData(nameof(TestCasesFor_GetItemsForPurchase_OK))]
-        public async Task GetItemForPurchaseFilter_test(string? itemName, string? brandName, string errorExpected)
+        [MemberData(nameof(TestCasesFor_GetItemsForPurchase))]
+        public async Task GetItemForPurchaseFilterBR_test(string? itemName, string? brandName, string errorExpected)
         {
             var mock = new Mock<ILogger<ItemsController>>();
             ILogger<ItemsController> logger = mock.Object;
@@ -118,7 +140,7 @@ namespace AppForSEII2526.UT.ItemForPurchase_test
         [Theory]
         [Trait("GetItemForPurchase", "Unit Testing")]
         [MemberData(nameof(TestCasesFor_GetItemsForPurchase_OK))]
-        public async Task GetItemForPurchaseFilterBR_test(string? itemName, string? brandName, List<ItemForPurchaseDTO> expectedItems)
+        public async Task GetItemForPurchaseFilter_test(string? itemName, string? brandName, List<ItemForPurchaseDTO> expectedItems)
         {
             var mock = new Mock<ILogger<ItemsController>>();
             ILogger<ItemsController> logger = mock.Object;
