@@ -4,20 +4,15 @@ namespace AppForSEII2526.API.Models
 {
     public class Class
     {
-        public Class()
+        public Class(int id, int capacity, string name, decimal price, DateTime date, IList<PlanItem> planItems, IList<ItemType> typeItems)
         {
-            TypeItems = new List<ItemType>();
-            PlanItems = new List<PlanItem>();
-        }
-
-        public Class(string name, int Capacity, DateTime Date, IList<ItemType> TypeItems, decimal price, IList<PlanItem> PlanItems)
-        {
+            Id = id;
+            Capacity = capacity;
             Name = name;
-            this.Capacity = Capacity;
-            this.Date = Date;
             Price = price;
-            this.TypeItems = TypeItems ?? new List<ItemType>();
-            this.PlanItems = PlanItems ?? new List<PlanItem>();
+            Date = date;
+            PlanItems = planItems;
+            TypeItems = typeItems;
         }
 
         public int Id { get; set; }
