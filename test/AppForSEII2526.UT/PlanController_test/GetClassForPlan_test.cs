@@ -52,9 +52,9 @@ namespace AppForSEII2526.UT.PlanController_test
 
             var ClassesDTOs = new List<ClassForPlanDTO>()
             {
-                new ClassForPlanDTO(1, 20, new DateTime(2011, 10, 20), "Fitness", new List<string> { "Yoga Mat" }),
-                new ClassForPlanDTO(2,20, new DateTime(1988, 02, 23),"Strength Training", new List<string>{ "Dumbbells" }),
-                new ClassForPlanDTO(3,10,new DateTime(2007, 04, 04),"Stretch & Flex", new List<string>{ "Resistance Bands" })
+                new ClassForPlanDTO(1, 20, new DateTime(2011, 10, 20), "Fitness", 20,new List<string> { "Yoga Mat" }),
+                new ClassForPlanDTO(2,20, new DateTime(1988, 02, 23),"Strength Training", 25,new List<string>{ "Dumbbells" }),
+                new ClassForPlanDTO(3,10,new DateTime(2007, 04, 04),"Stretch & Flex",20, new List<string>{ "Resistance Bands" })
             };
 
             var tc1 = new List<ClassForPlanDTO>() { ClassesDTOs[0], ClassesDTOs[1], ClassesDTOs[2] };
