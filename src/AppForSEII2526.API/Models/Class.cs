@@ -2,6 +2,17 @@
 {
     public class Class
     {
+        public Class(int id, int capacity, string name, decimal price, DateTime date, IList<PlanItem> planItems, IList<ItemType> typeItems)
+        {
+            Id = id;
+            Capacity = capacity;
+            Name = name;
+            Price = price;
+            Date = date;
+            PlanItems = planItems;
+            TypeItems = typeItems;
+        }
+
         public int Id { get; set; }
         public int Capacity { get; set; }
         public string Name { get; set; }
