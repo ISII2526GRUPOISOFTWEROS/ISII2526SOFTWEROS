@@ -5,8 +5,8 @@ namespace AppForSEII2526.API.DTOs.ClassesDTOs
 
    
     public class PlanForCreateDTO{
-       public PlanForCreateDTO(string planningName, string? description, int weeks, string? healthIssues,IList<ClassForPlanDTO> selectedClasses,PaymentMethod paymentMethod){
-            Name = planningName;
+       public PlanForCreateDTO(string Name, string? description, int weeks, string? healthIssues,IList<ClassForPlanDTO> selectedClasses,PaymentMethod paymentMethod){
+            Name = Name;
             Description = description;
             Weeks = weeks;
             HealthIssues = healthIssues;

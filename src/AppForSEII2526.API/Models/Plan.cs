@@ -5,6 +5,7 @@
     {
         
         public int Id { get; set; }
+        public ApplicationUser User { get; set; }
         public int Weeks { get; set; }
         public string? HealthIssues { get; set; }
         public string? Description { get; set; }
