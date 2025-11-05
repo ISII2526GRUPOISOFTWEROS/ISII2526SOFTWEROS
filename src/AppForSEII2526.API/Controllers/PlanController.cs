@@ -19,17 +19,85 @@ namespace AppForSEII2526.API.Controllers
 
         [HttpPost]
         [Route("[action]")]
-        [ProducesResponseType(typeof(IList<ClassForPlanDTO>), (int)HttpStatusCode.OK)]
-        public async Task<ActionResult> CreateClassForPlan(string? className, string? classType)
+        [ProducesResponseType(typeof(PlanForCreateDTO), (int)HttpStatusCode.Created)]
+        [ProducesResponseType(typeof(ValidationProblemDetails), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.Conflict)]
+        public async Task<ActionResult> CreatePlan(PlanForCreateDTO planForCreate)
         {
-            IList<ClassForPlanDTO> selectedClasses = await _context.Classes
-                .Include(c => c.TypeItems)
-                .Where(c => (className == null || c.Name.Contains(className)) && (classType == null || c.TypeItems.Any(t => t.Name == classType)))//por tipo
-                .OrderBy(c => c.Date)
-                .Select(c => new ClassForPlanDTO(c.Id, c.Price, c.Date, c.Name ?? string.Empty, c.Capacity, c.TypeItems.Select(t => t.Name).ToList()))
-                .ToListAsync();
-            return Ok(selectedClasses);
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ValidationProblem(ModelState));
+            }
+
+            var paymentMethod = await _context.Set<PaymentMethod>()
+                .FirstOrDefaultAsync(pm => pm.Id == planForCreate.PaymentMethod.Id);
+            if (paymentMethod == null){
+                ModelState.AddModelError("PaymentMethod", "The selected payment method is invalid or not found.");
+                return BadRequest(ValidationProblem(ModelState)); 
+            }
+            if (planForCreate.SelectedClasses == null || !planForCreate.SelectedClasses.Any())
+            {
+                ModelState.AddModelError("SelectedClasses", "You must select at least one class for the plan.");
+                return BadRequest(ValidationProblem(ModelState)); 
+            }
+            var selectedClassIds = planForCreate.SelectedClasses.Select(c => c.Id).ToList();
+            var dbClasses = await _context.Classes
+                .Where(c => selectedClassIds.Contains(c.Id))
+                .ToDictionaryAsync(c => c.Id);
+            decimal totalCost = 0;
+            var planItems = new List<PlanItem>();
+            foreach (var selected in planForCreate.SelectedClasses)
+            {
+                if (!dbClasses.TryGetValue(selected.Id, out var dbClass))
+                {
+                    ModelState.AddModelError("ClassNotFound", $"Error! Class with Id {selected.Id} not found.");
+                    continue;
+                }
+                // precio por clase
+                totalCost += dbClass.Price * planForCreate.Weeks;
+                planItems.Add(new PlanItem(dbClass.Price)
+                {
+                    ClassId = dbClass.Id,
+                    Price = dbClass.Price,
+                });
+            }
+
+            if (ModelState.ErrorCount > 0)
+            {
+                return BadRequest(ValidationProblem(ModelState)); 
+            }
+            var plan = new Plan
+            {
+                Name = planForCreate.Name,
+                Description = planForCreate.Description,
+                Weeks = planForCreate.Weeks,
+                HealthIssues = planForCreate.HealthIssues,
+                Totalprice = totalCost,
+                CreatedDate = DateTime.UtcNow,
+                PlanItems = planItems
+            };
+
+            _context.Plans.Add(plan);
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"{DateTime.Now} - {ex.Message}");
+                return Conflict("There was a problem saving your plan. Please try again later.");
+            }
+            return CreatedAtAction("GetPlanById", new { id = plan.Id }, new{
+                plan.Id,
+                plan.Name,
+                plan.Totalprice,
+                Classes = planItems.Select(pi => new{
+                    pi.ClassId,
+                    pi.Price,
+                    pi.Goal
+                })});
         }
+
 
         //details
 
@@ -75,19 +143,6 @@ namespace AppForSEII2526.API.Controllers
                 _logger.LogError(DateTime.Now + $" Plan with id {id} does not exist.");
                 return NotFound();
             }
-
-            //foreach (var plan in planDetails)
-            //{
-            //    var lowCapacityClasses = plan.Classes.Where(c => c.capacity <= 0).ToList();
-            //    if (lowCapacityClasses.Any())
-            //    {
-            //        return BadRequest(new
-            //        {
-            //            Message = "One or more classes do not have enough capacity. Please modify selected classes.",
-            //            Classes = lowCapacityClasses
-            //        });
-            //    }
-            //}
 
             return Ok(planDetails);
 
