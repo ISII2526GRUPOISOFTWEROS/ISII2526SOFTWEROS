@@ -1,18 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace AppForSEII2526.API.DTOs.PlanningDTOs
+namespace AppForSEII2526.API.DTOs.ClassesDTOs
 {
 
-    public class ClassForPlanDTO
-    {
-        public int ClassId { get; set; }     
-        public string Name { get; set; }      
-        public string Type { get; set; }      
-        public decimal Price { get; set; }   
-        public string Day { get; set; }      
-        public string Time { get; set; }      
-        public string? Goal { get; set; }  
-    }
+   
     public class PlanForCreateDTO{
        public PlanForCreateDTO(string planningName, string? description, int weeks, string? healthIssues,IList<ClassForPlanDTO> selectedClasses,PaymentMethod paymentMethod){
             Name = planningName;
