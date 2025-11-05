@@ -81,7 +81,7 @@ namespace AppForSEII2526.API.Controllers
                 }
                 var classes = await query
                   .OrderBy(i => i.Date)
-                  .Select(i => new ClassForPlanDTO(i.Id, i.Price, i.Date, i.Name, i.TypeItems.Select(itemtype => itemtype.Name).ToList()))
+                  .Select(i => new ClassForPlanDTO(i.Id, i.Price, i.Date, i.Name,i.Capacity, i.TypeItems.Select(itemtype => itemtype.Name).ToList()))
                   .ToListAsync();
                 if (classes.Count == 0)
                 {
@@ -98,77 +98,5 @@ namespace AppForSEII2526.API.Controllers
             }
         }
 
-        [HttpPost]
-        [Route("[action]")]
-        [ProducesResponseType(typeof(IList<ClassForPlanDTO>), (int)HttpStatusCode.OK)]
-        public async Task<ActionResult> CreateClassForPlan(string? className, string? classType)
-        {
-            IList<ClassForPlanDTO> selectedClasses = await _context.Classes
-                .Include(c => c.TypeItems)
-                .Where(c => (className == null || c.Name.Contains(className)) && (classType == null || c.TypeItems.Any(t => t.Name == classType)))//por tipo
-                .OrderBy(c => c.Date)
-                .Select(c => new ClassForPlanDTO(c.Id, c.Price, c.Date, c.Name, c.TypeItems.Select(t => t.Name).ToList()))
-                .ToListAsync();
-            return Ok(selectedClasses);
-
-            [HttpGet]
-            [Route("[action]")]
-            [ProducesResponseType(typeof(IList<PlanDetailDTO>), (int)HttpStatusCode.OK)]
-            [ProducesResponseType((int)HttpStatusCode.NotFound)]
-            public async Task<ActionResult> GetPlanDetails(int id)
-            {
-                if (_context.Plans == null)
-                {
-                    _logger.LogError(DateTime.Now + " Plans table does not exist.");
-                    return NotFound();
-                }
-
-                IList<PlanDetailDTO> planDetails = await _context.Plans
-                    .Where(p => p.Id == id)
-                    .Include(p => p.User)
-                    .Include(p => p.PlanClasses)
-                        .ThenInclude(pc => pc.Class)
-                    .Select(p => new PlanDetailDTO(
-                        p.Id,
-                        p.User.Name + " " + p.User.Surname,
-                        p.DateCreated,
-                        p.TotalPrice,
-                        p.Name,
-                        p.Description ?? string.Empty,
-                        p.NumberOfWeeks,
-                        p.HealthIssues ?? string.Empty,
-                        p.PlanClasses.Select(pc => new ClassForPlanDTO(
-                            pc.Class.Id,
-                            pc.Class.Name ?? string.Empty,
-                            pc.Class.Type ?? string.Empty,
-                            pc.Class.Price,
-                            pc.Class.Date,
-                            pc.Class.Time,
-                            pc.Class.Goals ?? string.Empty,
-                            pc.Class.Capacity
-                        )).ToList()
-                    )).ToListAsync();
-
-                if (planDetails == null || !planDetails.Any())
-                {
-                    _logger.LogError(DateTime.Now + $" Plan with id {id} does not exist.");
-                    return NotFound();
-                }
-
-                foreach (var plan in planDetails)
-                {
-                    var lowCapacityClasses = plan.Classes.Where(c => c.Capacity <= 0).ToList();
-                    if (lowCapacityClasses.Any())
-                    {
-                        return BadRequest(new
-                        {
-                            Message = "One or more classes do not have enough capacity. Please modify selected classes.",
-                            Classes = lowCapacityClasses
-                        });
-                    }
-                }
-
-                return Ok(planDetails);
-            }
-        }
+       
     } }
