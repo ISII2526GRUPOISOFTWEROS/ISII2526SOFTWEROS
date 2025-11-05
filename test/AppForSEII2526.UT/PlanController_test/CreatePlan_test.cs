@@ -66,7 +66,6 @@ namespace AppForSEII2526.UT.Plan_test
             var mockLogger = new Mock<ILogger<PlanController>>();
             var controller = new PlanController(_context, mockLogger.Object);
 
-            // Reemplaza la inicialización de PlanForCreateDTO usando el constructor requerido
             var dto = new PlanForCreateDTO(
                 "Empty Plan", // Name
                 "No classes", // Description
