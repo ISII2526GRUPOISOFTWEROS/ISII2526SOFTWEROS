@@ -2,9 +2,6 @@
 {
     public class ItemForPurchaseDTO
     {
-        public ItemForPurchaseDTO()
-        {
-        }
         public ItemForPurchaseDTO(int id, string name, string brand, string description, decimal price, int quantityavailbableforpurchase)
         {
             Id = id;
@@ -15,16 +12,6 @@
             QuantityAvailableForPurchase = quantityavailbableforpurchase;
 
         }
-
-        public ItemForPurchaseDTO( string name, string brand, decimal price, int quantitytobuy)
-        {
-            Name = name;
-            Brand = brand;
-            Price = price;
-            QuantityToBuy = quantitytobuy;
-
-        }
-
 
         public int Id { get; set; }
         [Required]
