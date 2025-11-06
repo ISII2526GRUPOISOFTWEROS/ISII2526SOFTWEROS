@@ -19,6 +19,7 @@ namespace AppForSEII2526.API.DTOs.ItemDTOs
             TotalPrice = totalPrice;
         }
         [Required]
+        [EmailAddress]
         [StringLength(50, MinimumLength = 10, ErrorMessage = "Name must have at least 10 characters")]
         public string CustomerUserName { get; set; }
 
