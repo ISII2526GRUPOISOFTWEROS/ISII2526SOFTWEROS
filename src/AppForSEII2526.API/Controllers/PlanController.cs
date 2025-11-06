@@ -33,12 +33,12 @@ namespace AppForSEII2526.API.Controllers
                 .FirstOrDefaultAsync(pm => pm.Id == planForCreate.PaymentMethod.Id);
             if (paymentMethod == null){
                 ModelState.AddModelError("PaymentMethod", "The selected payment method is invalid or not found.");
-                return BadRequest(ValidationProblem(ModelState)); 
+                return BadRequest(ValidationProblem(ModelState));
             }
             if (planForCreate.SelectedClasses == null || !planForCreate.SelectedClasses.Any())
             {
                 ModelState.AddModelError("SelectedClasses", "You must select at least one class for the plan.");
-                return BadRequest(ValidationProblem(ModelState)); 
+                return BadRequest(ValidationProblem(ModelState));
             }
             var selectedClassIds = planForCreate.SelectedClasses.Select(c => c.Id).ToList();
             var dbClasses = await _context.Classes
@@ -55,7 +55,7 @@ namespace AppForSEII2526.API.Controllers
                 }
                 // precio por clase
                 totalCost += dbClass.Price * planForCreate.Weeks;
-                planItems.Add(new PlanItem(dbClass.Price)
+                planItems.Add(new PlanItem
                 {
                     ClassId = dbClass.Id,
                     Price = dbClass.Price,
@@ -64,7 +64,7 @@ namespace AppForSEII2526.API.Controllers
 
             if (ModelState.ErrorCount > 0)
             {
-                return BadRequest(ValidationProblem(ModelState)); 
+                return BadRequest(ValidationProblem(ModelState));
             }
             var plan = new Plan
             {
@@ -101,51 +101,51 @@ namespace AppForSEII2526.API.Controllers
 
         //details
 
-        [HttpGet]
-        [Route("[action]")]
-        [ProducesResponseType(typeof(IList<PlanDetailDTO>), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        public async Task<ActionResult> GetPlanDetails(int id)
-        {
-            if (_context.Plans == null)
-            {
-                _logger.LogError(DateTime.Now + " Plans table does not exist.");
-                return NotFound();
-            }
+        //[HttpGet]
+        //[Route("[action]")]
+        //[ProducesResponseType(typeof(IList<PlanDetailDTO>), (int)HttpStatusCode.OK)]
+        //[ProducesResponseType((int)HttpStatusCode.NotFound)]
+        //public async Task<ActionResult> GetPlanDetails(int id)
+        //{
+        //    if (_context.Plans == null)
+        //    {
+        //        _logger.LogError(DateTime.Now + " Plans table does not exist.");
+        //        return NotFound();
+        //    }
 
-            PlanDetailDTO? planDetails = await _context.Plans
-                .Where(p => p.Id == id)
-                .Include(p => p.User)
-                .Include(p => p.PlanItems)
-                    .ThenInclude(pc => pc.Class)
-                        .ThenInclude(c => c.TypeItems) 
-                .Select(p => new PlanDetailDTO(
-                    p.Id,
-                    "hduewi23@gmail.com", ///p.User.UserName,
-                    p.CreatedDate,
-                    p.Totalprice,
-                    p.Name, //?? string.Empty,
-                    p.Description, // ?? string.Empty,
-                    p.Weeks,
-                    p.HealthIssues, // ?? string.Empty,
-                    p.PlanItems.Select(pc => new ClassForPlanDTO(
-                        pc.Class.Id,
-                        pc.Class.Price,
-                        pc.Class.Date,
-                        pc.Class.Name, // ?? string.Empty,
-                        pc.Class.Capacity,
-                        pc.Class.TypeItems.Select(t => t.Name).ToList()
-                    )).ToList()
-                )).FirstOrDefaultAsync();
+        //    PlanDetailDTO? planDetails = await _context.Plans
+        //        .Where(p => p.Id == id)
+        //        .Include(p => p.User)
+        //        .Include(p => p.PlanItems)
+        //            .ThenInclude(pc => pc.Class)
+        //                .ThenInclude(c => c.TypeItems)
+        //        .Select(p => new PlanDetailDTO(
+        //            p.Id,
+        //            "hduewi23@gmail.com", ///p.User.UserName,
+        //            p.CreatedDate,
+        //            p.Totalprice,
+        //            p.Name, //?? string.Empty,
+        //            p.Description, // ?? string.Empty,
+        //            p.Weeks,
+        //            p.HealthIssues, // ?? string.Empty,
+        //            p.PlanItems.Select(pc => new ClassForPlanDTO(
+        //                pc.Class.Id,
+        //                pc.Class.Price,
+        //                pc.Class.Date,
+        //                pc.Class.Name, // ?? string.Empty,
+        //                pc.Class.Capacity,
+        //                pc.Class.TypeItems.Select(t => t.Name).ToList()
+        //            )).ToList()
+        //        )).FirstOrDefaultAsync();
 
-            if (planDetails == null)
-            {
-                _logger.LogError(DateTime.Now + $" Plan with id {id} does not exist.");
-                return NotFound();
-            }
+        //    if (planDetails == null)
+        //    {
+        //        _logger.LogError(DateTime.Now + $" Plan with id {id} does not exist.");
+        //        return NotFound();
+        //    }
 
-            return Ok(planDetails);
+        //    return Ok(planDetails);
 
-        }
+        //}
     }
 }

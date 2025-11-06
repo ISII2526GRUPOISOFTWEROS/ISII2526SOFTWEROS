@@ -9,6 +9,7 @@ namespace AppForSEII2526.API.Models
         public Plan()
         {
             PlanItems = new List<PlanItem>();
+            User = null!;
         }
 
         public int Id { get; set; }
