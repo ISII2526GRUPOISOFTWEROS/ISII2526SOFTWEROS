@@ -48,6 +48,7 @@ namespace AppForSEII2526.API.Controllers
                         pi.Item.Id,
                         pi.Item.Name ?? string.Empty,
                         pi.Item.Brand.Name ?? string.Empty,
+                        pi.Item.Description ?? string.Empty,
                         pi.Price,
                         pi.Amount_bought)).ToList(),
                     p.Total_prices))
