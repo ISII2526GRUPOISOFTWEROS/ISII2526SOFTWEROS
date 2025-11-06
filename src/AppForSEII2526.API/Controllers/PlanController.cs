@@ -55,7 +55,7 @@ namespace AppForSEII2526.API.Controllers
                 }
                 // precio por clase
                 totalCost += dbClass.Price * planForCreate.Weeks;
-                planItems.Add(new PlanItem
+                planItems.Add(new PlanItem(dbClass.Price)
                 {
                     ClassId = dbClass.Id,
                     Price = dbClass.Price,

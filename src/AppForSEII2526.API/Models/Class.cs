@@ -4,6 +4,12 @@ namespace AppForSEII2526.API.Models
 {
     public class Class
     {
+        public Class()
+        {
+            PlanItems = new List<PlanItem>();
+            TypeItems = new List<ItemType>();
+            Name = string.Empty; 
+        }
         public Class(int id, int capacity, string name, decimal price, DateTime date, IList<PlanItem> planItems, IList<ItemType> typeItems)
         {
             Id = id;
