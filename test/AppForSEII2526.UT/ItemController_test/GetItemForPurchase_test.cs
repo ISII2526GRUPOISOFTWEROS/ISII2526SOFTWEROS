@@ -55,7 +55,7 @@ namespace AppForSEII2526.UT.ItemForPurchase_test
             var itemDTOsTC1 = new List<ItemForPurchaseDTO>() { itemDTOs[0], itemDTOs[1], itemDTOs[2] };
             var itemDTOsTC2 = new List<ItemForPurchaseDTO>() { itemDTOs[0], itemDTOs[2] };
             var itemDTOsTC3 = new List<ItemForPurchaseDTO>() { itemDTOs[1] };
-            var itemDTOsTC4 = new List<ItemForPurchaseDTO>() { itemDTOs[1] };
+            var itemDTOsTC4 = new List<ItemForPurchaseDTO>() { itemDTOs[0] };
 
 
 
@@ -64,7 +64,10 @@ namespace AppForSEII2526.UT.ItemForPurchase_test
                 new object?[] { null, null, itemDTOsTC1 },
                 new object?[] { "l", null, itemDTOsTC2 },
                 new object?[] { null, "Domyos", itemDTOsTC3 },
-                new object?[] { "Foam", "Nike", itemDTOsTC3 },
+                new object?[] { "Foam", "Nike", itemDTOsTC4 },
+                new object?[] { null, "Nike", itemDTOsTC2 },
+                new object?[] { "", null, itemDTOsTC1 },
+
 
             };
             return allTest;
