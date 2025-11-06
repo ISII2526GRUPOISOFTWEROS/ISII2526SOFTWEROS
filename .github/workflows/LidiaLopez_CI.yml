@@ -10,10 +10,11 @@ on:
 # for considering only those changes affecting to a specific folder
 #    paths:
 #      - 'src/AppForMovies.API**'
-#  pull_request:
- #   branches: 
-  #     - development
-
+  pull_request:
+    branches: 
+       - development
+       
+  workflow_dispatch:
 jobs:
   build:
     runs-on: ubuntu-latest
