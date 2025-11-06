@@ -1,33 +1,48 @@
 ﻿
 
+
+
 namespace AppForSEII2526.API.DTOs.ItemDTOs
 {
-    public class PurchaseDetailDTO : ItemForCreateDTO
+    public class PurchaseDetailDTO 
     {
 
-        public PurchaseDetailDTO(int id,string customerUserName, int paymentMethodId, string street, string city, string country, string description, IList<ItemForPurchaseDTO> purchaseItems, decimal totalPrice) : base(customerUserName, paymentMethodId, street, city, country, description, purchaseItems, totalPrice)
+        public PurchaseDetailDTO(int id, string paymentMethod, string street, string city, string country, string description, IList<PurchasedItemDTO> purchaseItems, decimal totalPrice) 
         {
             Id = id;
+            PaymentMethod = paymentMethod;
+            Street = street;
+            City = city;
+            Country = country;
+            Description = description;
+            PurchaseItems = purchaseItems;
+            TotalPrice = totalPrice;
         }
 
-        public override bool Equals(object? obj)
-        {
-            return obj is PurchaseDetailDTO dTO &&
-                   base.Equals(obj) &&
-                   CustomerUserName == dTO.CustomerUserName &&
-                   PaymentMethodId == dTO.PaymentMethodId &&
-                   Street == dTO.Street &&
-                   City == dTO.City &&
-                   Country == dTO.Country &&
-                   Description == dTO.Description &&
-                   EqualityComparer<IList<ItemForPurchaseDTO>>.Default.Equals(PurchaseItems, dTO.PurchaseItems) &&
-                   TotalPrice == dTO.TotalPrice;
-        }
 
         public int Id { get; set; }
-        public override int GetHashCode()
-        {
-            return HashCode.Combine(CustomerUserName, PaymentMethodId, Street, City, Country, Description, PurchaseItems, TotalPrice);
-        }
+
+        public string PaymentMethod { get; set; }
+
+        public string DeliveryAddress => $"{Street}, {City}, {Country}";
+
+        [JsonIgnore]
+        public string Street { get; set; }
+
+        [JsonIgnore]
+        public string City { get; set; }
+
+        [JsonIgnore]
+        public string Country { get; set; }
+
+        public string? Description { get; set; }
+
+        public IList<PurchasedItemDTO> PurchaseItems { get; set; }
+
+        public decimal TotalPrice { get; set; }
+
+   
+
+     
     }
 }
