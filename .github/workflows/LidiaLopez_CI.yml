@@ -4,15 +4,15 @@
 name: Continous Integration fired when a pull request is done to development
 
 on:
-#  push:
-#    branches: 
-#      - development
+  push:
+    branches: 
+     -LidiaLopez-CICD
 # for considering only those changes affecting to a specific folder
 #    paths:
 #      - 'src/AppForMovies.API**'
-  pull_request:
-    branches: 
-       - development
+#  pull_request:
+ #   branches: 
+  #     - development
 
 jobs:
   build:
