@@ -7,6 +7,17 @@ namespace AppForSEII2526.API.DTOs.ItemDTOs
         {
         }
 
+        public ItemForCreateDTO(int paymentMethodId, string street, string city, string country, string description, IList<ItemForPurchaseDTO> purchaseItems, decimal totalPrice)
+        {
+            PaymentMethodId = paymentMethodId;
+            Street = street;
+            City = city;
+            Country = country;
+            Description = description;
+            PurchaseItems = purchaseItems;
+            TotalPrice = totalPrice;
+        }
+
         public ItemForCreateDTO(string customerUserName, int paymentMethodId, string street, string city, string country, string description, IList<ItemForPurchaseDTO> purchaseItems, decimal totalPrice)
         {
             CustomerUserName = customerUserName;
@@ -19,6 +30,7 @@ namespace AppForSEII2526.API.DTOs.ItemDTOs
             TotalPrice = totalPrice;
         }
         [Required]
+        [EmailAddress]
         [StringLength(50, MinimumLength = 10, ErrorMessage = "Name must have at least 10 characters")]
         public string CustomerUserName { get; set; }
 
