@@ -46,7 +46,7 @@
 //                Description = "For beginners",
 //                Weeks = 4,
 //                HealthIssues = "None",
-//                //PaymentMethod = new PaymentMethod { Id = 1, Name = "Credit Card" }, 
+//                PaymentMethod = new PaymentMethod { Id = 1, Name = "Credit Card" }, 
 //                SelectedClasses = new List<ClassForPlanDTO>
 //                {
 //                    new ClassForPlanDTO(1, 15, DateTime.Today.AddDays(2), "Morning Yoga", 10, new List<string>{"Cardio"})
@@ -71,7 +71,7 @@
 //                Name = "Empty Plan",
 //                Description = "No classes",
 //                Weeks = 2,
-//                PaymentMethod = new PaymentMethod { Id = 1, Name = "Credit Card" }, // ← también corregido
+//                PaymentMethod = new PaymentMethod { Id = 1, Name = "Credit Card" }, 
 //                SelectedClasses = new List<ClassForPlanDTO>()
 //            };
 
