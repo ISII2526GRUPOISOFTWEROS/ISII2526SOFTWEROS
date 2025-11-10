@@ -30,7 +30,7 @@ namespace AppForSEII2526.API.Controllers
             }
 
             var paymentMethod = await _context.Set<PaymentMethod>()
-                .FirstOrDefaultAsync(pm => pm.Id == planForCreate.PaymentMethodId);
+                .FirstOrDefaultAsync(pm => pm.Id == planForCreate.PaymentMethod.Id);
             if (paymentMethod == null){
                 ModelState.AddModelError("PaymentMethod", "The selected payment method is invalid or not found.");
                 return BadRequest(ValidationProblem(ModelState));
