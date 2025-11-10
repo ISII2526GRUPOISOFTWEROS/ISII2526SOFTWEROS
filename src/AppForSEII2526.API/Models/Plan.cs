@@ -3,8 +3,20 @@
     [Index(nameof(Name), IsUnique = true)]
     public class Plan
     {
-        
+        public Plan()
+        {
+            PlanItems = new List<PlanItem>();
+            User = null!;
+        }
+
         public int Id { get; set; }
+
+        public string? UserId { get; set; }
+
+        [ForeignKey(nameof(UserId))]
+        public ApplicationUser User { get; set; }
+
+        
         public int Weeks { get; set; }
         public string? HealthIssues { get; set; }
         public string? Description { get; set; }
