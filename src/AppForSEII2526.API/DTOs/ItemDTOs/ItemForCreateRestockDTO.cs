@@ -1,4 +1,5 @@
 ﻿
+
 namespace AppForSEII2526.API.DTOs.ItemDTOs
 {
     public class ItemForCreateRestockDTO
@@ -7,7 +8,7 @@ namespace AppForSEII2526.API.DTOs.ItemDTOs
         {
         }
 
-        public ItemForCreateRestockDTO(int id, string title, string deliveryAddress, string? description, DateTime? expectedDate, DateTime restockDate, decimal totalPrice, IList<RestockItem> restockItems, ApplicationUser restockResponsible)
+        public ItemForCreateRestockDTO(int id, string title, string deliveryAddress, string? description, DateTime? expectedDate, DateTime restockDate, decimal totalPrice, RestockItemForCreateDTO restockItems, string restockResponsible)
         {
             Id = id;
             Title = title;
@@ -16,7 +17,7 @@ namespace AppForSEII2526.API.DTOs.ItemDTOs
             ExpectedDate = expectedDate;
             RestockDate = restockDate;
             TotalPrice = totalPrice;
-            RestockItems = restockItems;
+            RestockItems = (IList<RestockItemForCreateDTO>)restockItems;
             RestockResponsible = restockResponsible;
         }
 
@@ -32,10 +33,9 @@ namespace AppForSEII2526.API.DTOs.ItemDTOs
         public Decimal TotalPrice { get; set; }
 
         //References
-        public IList<RestockItem> RestockItems { get; set; }
-        public ApplicationUser RestockResponsible { get; set; }
+        public IList<RestockItemForCreateDTO> RestockItems { get; set; } 
+        public string RestockResponsible { get; set; }
 
-        
         public override bool Equals(object? obj)
         {
             return obj is ItemForCreateRestockDTO dTO &&
@@ -46,8 +46,8 @@ namespace AppForSEII2526.API.DTOs.ItemDTOs
                    ExpectedDate == dTO.ExpectedDate &&
                    RestockDate == dTO.RestockDate &&
                    TotalPrice == dTO.TotalPrice &&
-                   EqualityComparer<IList<RestockItem>>.Default.Equals(RestockItems, dTO.RestockItems) &&
-                   EqualityComparer<ApplicationUser>.Default.Equals(RestockResponsible, dTO.RestockResponsible);
+                   EqualityComparer<IList<RestockItemForCreateDTO>>.Default.Equals(RestockItems, dTO.RestockItems) &&
+                   RestockResponsible == dTO.RestockResponsible;
         }
     }
 

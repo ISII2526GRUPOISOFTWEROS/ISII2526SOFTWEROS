@@ -202,9 +202,7 @@ namespace AppForSEII2526.API.Controllers
                 restock.ExpectedDate,
                 restock.RestockDate,
                 restock.TotalPrice,
-                restock.RestockItems,
-                admin
-            );
+                TODO, TODO);
 
 
             return CreatedAtAction("GetRestock", new { id = restock.Id }, restockForCreate);

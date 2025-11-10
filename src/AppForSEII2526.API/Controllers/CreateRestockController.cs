@@ -53,14 +53,14 @@ namespace AppForSEII2526.API.Controllers
 
                 // Verificar que el usuario responsable de la reposición existe
                 var admin = await _context.Users
-                    .FirstOrDefaultAsync(user => user.UserName == restockForCreate.RestockResponsible.Name);
+                    .FirstOrDefaultAsync(user => user.UserName == restockForCreate.RestockResponsible);
                 if (admin == null)
                 {
                     return Conflict("El responsable de reposición no existe.");
                 }
 
                 // Obtenemos los Items de la base de datos y verificamos su disponibilidad para reposición
-                var itemsNames = restockForCreate.RestockItems.Select(ri => ri.Item.Name).ToList<string>();
+                var itemsNames = restockForCreate.RestockItems.Select(ri => ri.ItemName).ToList<string>();
 
                 var items = _context.Items.Include(i => i.RestockItems)
                     .ThenInclude(ri => ri.Restock)
@@ -84,7 +84,12 @@ namespace AppForSEII2526.API.Controllers
                     restockForCreate.RestockDate,
                     restockForCreate.Title,
                     restockForCreate.TotalPrice,
-                    restockForCreate.RestockItems,
+                    restockForCreate.RestockItems.Select(ri => new RestockItem
+                    {
+                        ItemId = ri.ItemId,
+                        Quantity = ri.Quantity,
+                        RestockPrice = ri.RestockPrice
+                    }).ToList(),
                     admin
                 );  
 
@@ -92,11 +97,11 @@ namespace AppForSEII2526.API.Controllers
 
                 foreach (var restockItem in restockForCreate.RestockItems)
                 {
-                    var existingItem = items.FirstOrDefault(i => i.Name == restockItem.Item.Name);
+                    var existingItem = items.FirstOrDefault(i => i.Name == restockItem.ItemName);
 
                     if (existingItem == null)
                     {
-                        ModelState.AddModelError("RestockItems", $"El ítem con nombre {restockItem.Item.Name} no existe.");
+                        ModelState.AddModelError("RestockItems", $"El ítem con nombre {restockItem.ItemName} no existe.");
                     }
                     if (existingItem.QuantityForRestock < restockItem.Quantity)
                     {
@@ -154,9 +159,15 @@ namespace AppForSEII2526.API.Controllers
                     restock.ExpectedDate,
                     restock.RestockDate,
                     restock.TotalPrice,
-                    restock.RestockItems,
-                    admin
-                );
+                    restock.RestockItems new RestockItemForCreateDTO()
+                    {
+                        ItemId = restock.Id,
+                        ItemName = restock.Title ?? "(Unknown)",
+                        Quantity = restock.Id,
+                        RestockPrice = restock.TotalPrice
+                    },
+                    admin.UserName
+                    );
 
 
                 return CreatedAtAction("GetRestock",new { id = restock.Id }, restockForCreate);
