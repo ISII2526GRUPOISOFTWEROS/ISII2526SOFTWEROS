@@ -12,24 +12,21 @@ namespace AppForSEII2526.UT.Plan_test
     {
         public CreatePlan_test()
         {
-            var pm = new TestPaymentMethod() { Name = "Credit Card" };
-           
+            var user = new ApplicationUser()
+            {
+                Id = "3",
+                UserName = "test",
+                Surname = "user",
+                Email = "test@test.com",
+            };
+            _context.Users.AddRange(user);
             _context.SaveChanges();
+            var paymentMethods = new List<CreditCard>()
+            {
+                new CreditCard(){ Id= 3,User= user, CreditCardNumber= "664543223", ExpirationDate= new DateTime(29,12,2025)},
 
-            var type = new ItemType() { Name = "Cardio" };
-            _context.ItemTypes.Add(type);
-            _context.SaveChanges();
-
-            var cls = new Class(
-                0, // id 
-                10, // capacity
-                "Morning Yoga", // name
-                15, // price
-                DateTime.Today.AddDays(2), // date
-                new List<PlanItem>(), // planItems
-                new List<ItemType> { type } // typeItems
-            );
-            _context.Classes.Add(cls);
+            };
+            _context.CreditCards.AddRange(paymentMethods);
             _context.SaveChanges();
         }
 
@@ -40,7 +37,6 @@ namespace AppForSEII2526.UT.Plan_test
             var mockLogger = new Mock<ILogger<PlanController>>();
             var controller = new PlanController(_context, mockLogger.Object);
 
-            // Reemplaza la inicialización de PlanForCreateDTO usando el constructor requerido
             var dto = new PlanForCreateDTO(
                 "Basic Plan", // Name
                 "For beginners", // Description
