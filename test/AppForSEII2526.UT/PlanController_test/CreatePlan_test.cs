@@ -57,17 +57,15 @@ namespace AppForSEII2526.UT.Plan_test
                 Email = "test5@test.com",
             };
             var dto = new PlanForCreateDTO(
-                "Basic Plan", // Name
-                "For beginners", // Description
-                4, // Weeks
-                "None", // HealthIssues
-                new List<ClassForPlanDTO>
-                {
-                    new ClassForPlanDTO(1, 15, DateTime.Today.AddDays(2), "Morning Yoga", 10, new List<string>{"Cardio"})
-                },
-                new CreditCard { Id = 5, User = user, CreditCardNumber = "682945623", ExpirationDate = new DateTime(2025, 12, 3) }
-            
-            );
+             "Basic Plan", 
+             "For beginners", 4,
+             "None", 
+             new List<ClassForPlanDTO>
+             {
+                new ClassForPlanDTO(1, 15, DateTime.Today.AddDays(2), "Morning Yoga", 10, new List<string>{"Cardio"})
+             },
+             3 // PaymentMethodId 
+         );
 
             var result = await controller.CreatePlan(dto);
 
@@ -90,13 +88,16 @@ namespace AppForSEII2526.UT.Plan_test
             };
 
             var dto = new PlanForCreateDTO(
-                "Empty Plan", // Name
-                "No classes", // Description
-                2, // Weeks
-                null, // HealthIssues
-                new List<ClassForPlanDTO>(),
-                new CreditCard { Id = 2, User = user, CreditCardNumber = "664575623", ExpirationDate = new DateTime(2025, 12, 22) } 
-            );
+            "Basic Plan",
+            "For beginners", 4,
+            "None",
+            new List<ClassForPlanDTO>
+            {
+                new ClassForPlanDTO(1, 15, DateTime.Today.AddDays(2), "Morning Yoga", 10, new List<string>{"Cardio"})
+            },
+           2 // PaymentMethodId 
+        );
+           
 
             var result = await controller.CreatePlan(dto);
 
@@ -127,7 +128,7 @@ namespace AppForSEII2526.UT.Plan_test
                 {
                     new ClassForPlanDTO(1, 15, DateTime.Today.AddDays(2), "Morning Yoga", 10, new List<string>{"Cardio"})
                 },
-                new CreditCard { Id = 4, User = user, CreditCardNumber = "669855623", ExpirationDate = new DateTime(2025, 11, 2) } // PaymentMethod
+                1// PaymentMethod
             );
 
             var result = await controller.CreatePlan(dto);
