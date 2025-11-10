@@ -3,6 +3,14 @@
     [Index(nameof(Name), IsUnique = true)]
     public class ItemType
     {
+
+        private string v;
+
+        public ItemType(string v)
+        {
+            this.v = v;
+        }
+
         public ItemType()
         {
         }

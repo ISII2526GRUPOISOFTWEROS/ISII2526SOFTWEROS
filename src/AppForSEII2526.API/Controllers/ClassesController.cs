@@ -83,7 +83,7 @@ namespace AppForSEII2526.API.Controllers
                 }
                 var classes = await query
                   .OrderBy(i => i.Date)
-                  .Select(i => new ClassForPlanDTO(i.Id, i.Price, i.Date, i.Name, i.Capacity, i.TypeItems.Select(itemtype => itemtype.Name).ToList()))
+                  .Select(i => new ClassForPlanDTO(i.Id, i.Price, i.Date, i.Name,i.Capacity, i.TypeItems.Select(itemtype => itemtype.Name).ToList()))
                   .ToListAsync();
                 if (classes.Count == 0)
                 {
@@ -103,4 +103,3 @@ namespace AppForSEII2526.API.Controllers
         }
     }
 }
-
