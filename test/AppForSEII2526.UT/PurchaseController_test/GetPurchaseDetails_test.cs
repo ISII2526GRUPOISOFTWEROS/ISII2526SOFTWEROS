@@ -22,12 +22,12 @@ namespace AppForSEII2526.UT.PurchaseController_test
             };
             _context.Users.AddRange(user);
             _context.SaveChanges();
-            var paymentMethods = new List<PaymentMethod>()
+            var paymentMethods = new List<Bizum>()
             {
                 new Bizum(){ Id= 1,User= user, TelephoneNumber= 664543223},
 
             };
-            _context.PaymentMethods.AddRange(paymentMethods);
+            _context.Bizums.AddRange(paymentMethods);
             _context.SaveChanges();
 
             var brands = new List<Brand>()
