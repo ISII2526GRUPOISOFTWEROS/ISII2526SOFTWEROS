@@ -128,7 +128,7 @@ namespace AppForSEII2526.UT.Plan_test
                 {
                     new ClassForPlanDTO(1, 15, DateTime.Today.AddDays(2), "Morning Yoga", 10, new List<string>{"Cardio"})
                 },
-                1// PaymentMethod
+                3// PaymentMethod
             );
 
             var result = await controller.CreatePlan(dto);
