@@ -23,7 +23,7 @@ namespace AppForSEII2526.UT.Plan_test
             _context.SaveChanges();
             var paymentMethods = new List<CreditCard>()
             {
-                new CreditCard(){ Id= 3,User= user, CreditCardNumber= "664543223", ExpirationDate= new DateTime(2025,12,6)} };
+                new CreditCard(){ Id= 3,User= user, CreditCardNumber= "664543223", ExpirationDate=DateTime.UtcNow.AddYears(1) } };
             _context.CreditCards.AddRange(paymentMethods);
 
             var type = new ItemType() { Name = "Cardio" };
