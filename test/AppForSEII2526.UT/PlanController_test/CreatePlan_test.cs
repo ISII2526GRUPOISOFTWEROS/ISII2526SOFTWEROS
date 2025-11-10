@@ -23,7 +23,7 @@ namespace AppForSEII2526.UT.Plan_test
             _context.SaveChanges();
             var paymentMethods = new List<CreditCard>()
             {
-                new CreditCard(){ Id= 3,User= user, CreditCardNumber= "664543223", ExpirationDate= new DateTime(2025,12,11)} };
+                new CreditCard(){ Id= 3,User= user, CreditCardNumber= "664543223", ExpirationDate= new DateTime(10,12,2026)} };
             _context.CreditCards.AddRange(paymentMethods);
 
             var type = new ItemType() { Name = "Cardio" };
@@ -65,7 +65,7 @@ namespace AppForSEII2526.UT.Plan_test
                 {
                     new ClassForPlanDTO(1, 15, DateTime.Today.AddDays(2), "Morning Yoga", 10, new List<string>{"Cardio"})
                 },
-                new CreditCard { Id = 5, User = user, CreditCardNumber = "682945623", ExpirationDate = new DateTime(2025, 12, 10) }
+                new CreditCard { Id = 5, User = user, CreditCardNumber = "682945623", ExpirationDate = new DateTime(21, 12, 2025) }
             
             );
 
@@ -95,7 +95,7 @@ namespace AppForSEII2526.UT.Plan_test
                 2, // Weeks
                 null, // HealthIssues
                 new List<ClassForPlanDTO>(),
-                new CreditCard { Id = 2, User = user, CreditCardNumber = "664575623", ExpirationDate = new DateTime(2026, 12, 10) } 
+                new CreditCard { Id = 2, User = user, CreditCardNumber = "664575623", ExpirationDate = new DateTime(20, 12, 2025) } 
             );
 
             var result = await controller.CreatePlan(dto);
@@ -127,7 +127,7 @@ namespace AppForSEII2526.UT.Plan_test
                 {
                     new ClassForPlanDTO(1, 15, DateTime.Today.AddDays(2), "Morning Yoga", 10, new List<string>{"Cardio"})
                 },
-                new CreditCard { Id = 4, User = user, CreditCardNumber = "669855623", ExpirationDate = new DateTime(2025, 11, 11) } // PaymentMethod
+                new CreditCard { Id = 4, User = user, CreditCardNumber = "669855623", ExpirationDate = new DateTime(20, 11, 2026) } // PaymentMethod
             );
 
             var result = await controller.CreatePlan(dto);
