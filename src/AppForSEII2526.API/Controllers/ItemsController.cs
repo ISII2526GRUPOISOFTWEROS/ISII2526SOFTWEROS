@@ -209,7 +209,49 @@ namespace AppForSEII2526.API.Controllers
             });
         }
 
-      
+        [HttpGet]
+        [Route("[action]")]
+        [ProducesResponseType(typeof(IList<PurchaseDetailDTO>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        public async Task<ActionResult> GetPurchaseDetails(int id)
+        {
+            if (_context.Purchases == null)
+            {
+                _logger.LogError(DateTime.Now + " Purchases table does not exist.");
+                return NotFound();
+            }
+
+            IList<PurchaseDetailDTO> purchaseDetails = await _context.Purchases
+                .Where(p => p.Id == id)
+                .Include(p => p.PaymentMethod)
+                .ThenInclude(pm => pm.User)
+                .Include(p => p.PurchaseItems)
+                .ThenInclude(pi => pi.Item)
+                .Select(p => new PurchaseDetailDTO(
+                    p.Id,
+                    p.PaymentMethod.User.UserName,
+                    p.PaymentMethod.Id,
+                    p.Street,
+                    p.City,
+                    p.Country,
+                    p.Description ?? string.Empty,
+                    p.PurchaseItems.Select(pi => new ItemForPurchaseDTO(
+                        pi.Item.Id,
+                        pi.Item.Name ?? string.Empty,
+                        pi.Item.Brand.Name ?? string.Empty,
+                        pi.Item.Description ?? string.Empty,
+                        pi.Price,
+                        pi.Amount_bought)).ToList(),
+                    p.Total_prices))
+                .ToListAsync();
+
+            if (purchaseDetails == null || !purchaseDetails.Any())
+            {
+                _logger.LogError(DateTime.Now + $" Rental with id {id} dot not exist.");
+                return NotFound();
+            }
+            return Ok(purchaseDetails);
+        }
 
     }
 }
