@@ -31,7 +31,8 @@ namespace AppForSEII2526.API.Controllers
 
             var paymentMethod = await _context.Set<PaymentMethod>()
                 .FirstOrDefaultAsync(pm => pm.Id == planForCreate.PaymentMethod.Id);
-            if (paymentMethod == null){
+            if (paymentMethod == null)
+            {
                 ModelState.AddModelError("PaymentMethod", "The selected payment method is invalid or not found.");
                 return BadRequest(ValidationProblem(ModelState));
             }
@@ -87,15 +88,17 @@ namespace AppForSEII2526.API.Controllers
                 _logger.LogError($"{DateTime.Now} - {ex.Message}");
                 return Conflict("There was a problem saving your plan. Please try again later.");
             }
-            return CreatedAtAction("GetPlanById", new { id = plan.Id }, new{
+            return CreatedAtAction("GetPlanById", new { id = plan.Id }, new
+            {
                 plan.Id,
                 plan.Name,
                 plan.Totalprice,
-                Classes = planItems.Select(pi => new{
+                Classes = planItems.Select(pi => new {
                     pi.ClassId,
                     pi.Price,
                     pi.Goal
-                })});
+                })
+            });
         }
 
 
