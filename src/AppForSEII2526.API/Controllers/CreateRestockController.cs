@@ -159,13 +159,7 @@ namespace AppForSEII2526.API.Controllers
                     restock.ExpectedDate,
                     restock.RestockDate,
                     restock.TotalPrice,
-                    restock.RestockItems new RestockItemForCreateDTO()
-                    {
-                        ItemId = restock.Id,
-                        ItemName = restock.Title ?? "(Unknown)",
-                        Quantity = restock.Id,
-                        RestockPrice = restock.TotalPrice
-                    },
+                    restockForCreate.RestockItems,
                     admin.UserName
                     );
 

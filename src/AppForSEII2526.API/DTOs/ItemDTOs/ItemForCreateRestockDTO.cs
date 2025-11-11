@@ -4,28 +4,45 @@ namespace AppForSEII2526.API.DTOs.ItemDTOs
 {
     public class ItemForCreateRestockDTO
     {
-        public ItemForCreateRestockDTO()
-        {
-        }
+        //public ItemForCreateRestockDTO()
+        //{
+        //}
 
-        public ItemForCreateRestockDTO(int id, string title, string deliveryAddress, string? description, DateTime? expectedDate, DateTime restockDate, decimal totalPrice, RestockItemForCreateDTO restockItems, string restockResponsible)
+        public ItemForCreateRestockDTO(int id, string title, string deliveryAddress, string? description, DateTime? expectedDate, DateTime restockDate, decimal totalPrice, IList<RestockItemForCreateDTO> restockItems, string restockResponsible)
         {
             Id = id;
-            Title = title;
-            DeliveryAddress = deliveryAddress;
+            Title = title ?? throw new ArgumentNullException(nameof(title));
+            DeliveryAddress = deliveryAddress ?? throw new ArgumentNullException(nameof(deliveryAddress));
             Description = description;
             ExpectedDate = expectedDate;
             RestockDate = restockDate;
             TotalPrice = totalPrice;
-            RestockItems = (IList<RestockItemForCreateDTO>)restockItems;
+            RestockItems = restockItems;
             RestockResponsible = restockResponsible;
+        }
+
+        public ItemForCreateRestockDTO()
+        {
+            RestockItems = new List<RestockItemForCreateDTO>();
+            RestockResponsible = string.Empty;
         }
 
 
 
         public int Id { get; set; }
+
+        [DataType(System.ComponentModel.DataAnnotations.DataType.MultilineText)]
+        [Display(Name = "Title")]
+        [StringLength(50, MinimumLength = 2, ErrorMessage = "Title must have at least 2 characters")]
+        [Required(AllowEmptyStrings = false, ErrorMessage = "Introduce the item title")]
         public string Title { get; set; } = null!;
+
+        [DataType(System.ComponentModel.DataAnnotations.DataType.MultilineText)]
+        [Display(Name = "Delivery Address")]
+        [StringLength(50, MinimumLength = 5, ErrorMessage = "Delivery address must have at least 5 characters")]
+        [Required(AllowEmptyStrings = false, ErrorMessage = "Please, enter your address for delivery")]
         public string DeliveryAddress { get; set; } = null!;
+
         public string? Description { get; set; }
         public DateTime? ExpectedDate { get; set; }
         public DateTime RestockDate { get; set; }
@@ -46,7 +63,8 @@ namespace AppForSEII2526.API.DTOs.ItemDTOs
                    ExpectedDate == dTO.ExpectedDate &&
                    RestockDate == dTO.RestockDate &&
                    TotalPrice == dTO.TotalPrice &&
-                   EqualityComparer<IList<RestockItemForCreateDTO>>.Default.Equals(RestockItems, dTO.RestockItems) &&
+                   /*EqualityComparer<IList<RestockItemForCreateDTO>>.Default.Equals(RestockItems, dTO.RestockItems) */
+                   RestockItems.SequenceEqual(dTO.RestockItems) &&
                    RestockResponsible == dTO.RestockResponsible;
         }
     }

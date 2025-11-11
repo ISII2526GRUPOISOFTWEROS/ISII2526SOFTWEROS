@@ -1,4 +1,5 @@
-﻿namespace AppForSEII2526.API.DTOs.ItemDTOs
+﻿
+namespace AppForSEII2526.API.DTOs.ItemDTOs
 {
     public class ItemForRestockDTO
     {
@@ -13,7 +14,10 @@
         
 
         public int Id { get; set; }
+        [StringLength(50, ErrorMessage =  "Name cannot be longer than 50 characters.")]
         public string? Name { get; set; }
+
+        [StringLength(50, ErrorMessage = "Name cannot be longer than 50 characters.")]
         public string Brand { get; set; }
         public int QuantityAvailableForRestock { get; set; }
 
@@ -28,6 +32,11 @@
                    Brand == dTO.Brand &&
                    QuantityAvailableForRestock == dTO.QuantityAvailableForRestock &&
                    RestockPrice == dTO.RestockPrice;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Id, Name, Brand, QuantityAvailableForRestock, RestockPrice);
         }
     }
 }

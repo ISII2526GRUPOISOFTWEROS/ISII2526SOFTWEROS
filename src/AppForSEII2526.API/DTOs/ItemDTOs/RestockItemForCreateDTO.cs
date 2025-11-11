@@ -2,21 +2,18 @@
 {
     public class RestockItemForCreateDTO
     {
-        public RestockItemForCreateDTO()
-        {
-        }
-
         public RestockItemForCreateDTO(string itemName, int itemId, int quantity, decimal restockPrice)
         {
             ItemName = itemName;
             ItemId = itemId;
-            Quantity = quantity;
+            Quantity = quantity; // El tipo int no puede ser null, así que no se necesita el operador ?? ni la excepción.
             RestockPrice = restockPrice;
         }
 
         public string ItemName { get; set; }
 
         public int ItemId { get; set; }
+
         public int Quantity { get; set; }
         public decimal RestockPrice { get; set; }
 
@@ -27,6 +24,11 @@
                    ItemId == dTO.ItemId &&
                    Quantity == dTO.Quantity &&
                    RestockPrice == dTO.RestockPrice;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(ItemName, ItemId, Quantity, RestockPrice);
         }
     }
 }
