@@ -19,6 +19,7 @@ namespace AppForSEII2526.API.Models
         [ForeignKey(nameof(UserId))]
         public ApplicationUser User { get; set; }
 
+        
         public int Weeks { get; set; }
         public string? HealthIssues { get; set; }
         public string? Description { get; set; }
