@@ -30,7 +30,7 @@ namespace AppForSEII2526.API.Controllers
 
         [HttpPost]
         [Route("[action]")]
-        [ProducesResponseType(typeof(ItemForPurchaseDTO), (int)HttpStatusCode.Created)]
+        [ProducesResponseType(typeof(PurchaseDetailDTO), (int)HttpStatusCode.Created)]
         [ProducesResponseType(typeof(ValidationProblemDetails), (int)HttpStatusCode.BadRequest)]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.Conflict)]
         public async Task<ActionResult> CreateItemForPurchase(ItemForCreateDTO itemForCreate)
@@ -72,6 +72,7 @@ namespace AppForSEII2526.API.Controllers
 
             var dbItems = await _context.Items
                 .Where(i => requestedItemsIds.Contains(i.Id))
+                .Include(i=>i.Brand)
                 .ToDictionaryAsync(i => i.Id);
 
             decimal totalCost = 0;
@@ -139,19 +140,26 @@ namespace AppForSEII2526.API.Controllers
                 return Conflict("Error" + ex.Message);
             }
 
-
-
-            return CreatedAtAction("GetItemsForPurchase", new { id = purchase.Id }, new
-            {
+            var result = new PurchaseDetailDTO(
                 purchase.Id,
-                purchase.Total_prices,
-                Items = purchaseItems.Select(pi => new
-                {
-                    pi.ItemId,
-                    pi.Amount_bought,
-                    pi.Price
-                })
-            });
+                GetPaymentMethodName(purchase.PaymentMethod),
+                purchase.Street,
+                purchase.City,
+                purchase.Country,
+                purchase.Description ?? string.Empty,
+                purchase.PurchaseItems.Select(pi => {
+                    var item = dbItems[pi.ItemId];
+
+                    return new PurchasedItemDTO(
+                        item.Name ?? string.Empty,
+                        item.Brand.Name ?? string.Empty,
+                        pi.Price,
+                        pi.Amount_bought
+                    );
+                }).ToList(),
+                purchase.Total_prices);
+   
+            return CreatedAtAction("GetPurchaseDetails", new { id = purchase.Id }, result);
         }
 
         [HttpGet]
