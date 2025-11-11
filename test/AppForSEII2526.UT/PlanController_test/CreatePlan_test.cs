@@ -28,7 +28,7 @@ namespace AppForSEII2526.UT.Plan_test
             _context.SaveChanges();
 
             _validCreditCard = new CreditCard()
-            { 
+            {
                 Id = 0,
                 User = _userWithCard,
                 CreditCardNumber = "664543223",
@@ -38,14 +38,15 @@ namespace AppForSEII2526.UT.Plan_test
 
             _cardioType = new ItemType() { Name = "Cardio" };
             _context.ItemTypes.Add(_cardioType);
+
             _class = new Class(
-                0,                      
-                10,                     
-                "Morning Yoga",         
-                15,                     
-                DateTime.Today.AddDays(2), 
-                new List<PlanItem>(),   
-                new List<ItemType> { _cardioType } 
+                0,
+                10,
+                "Morning Yoga",
+                15,
+                DateTime.Today.AddDays(2),
+                new List<PlanItem>(),
+                new List<ItemType> { _cardioType }
             );
             _context.Classes.Add(_class);
 
@@ -83,9 +84,7 @@ namespace AppForSEII2526.UT.Plan_test
                 },
                 paymentMethod.Id // PaymentMethod valido
             );
-
             var result = await controller.CreatePlan(dto);
-
             var created = Assert.IsType<CreatedAtActionResult>(result);
             Assert.True(created.StatusCode == 201 || created.StatusCode is null);
             Assert.NotNull(created.Value);
@@ -96,8 +95,7 @@ namespace AppForSEII2526.UT.Plan_test
         public async Task CreatePlan_NoClasses_ReturnsBadRequest()
         {
             var controller = CreateController();
-            var paymentMethod = _context.CreditCards.First(); 
-
+            var paymentMethod = _context.CreditCards.First();
             var dto = new PlanForCreateDTO(
                 "Plan Without Classes",
                 "No classes selected",
@@ -106,11 +104,9 @@ namespace AppForSEII2526.UT.Plan_test
                 new List<ClassForPlanDTO>(), //lista vacia
                 paymentMethod.Id
             );
-
             var result = await controller.CreatePlan(dto);
-
             var bad = Assert.IsType<BadRequestObjectResult>(result);
-            Assert.NotNull(bad.Value); 
+            Assert.NotNull(bad.Value);
         }
 
         [Fact]
@@ -135,11 +131,12 @@ namespace AppForSEII2526.UT.Plan_test
                         classEntity.Capacity,
                         new List<string> { _cardioType.Name })
                 },
-                999 
+                999
             );
+
             var result = await controller.CreatePlan(dto);
             var bad = Assert.IsType<BadRequestObjectResult>(result);
-            Assert.NotNull(bad.Value); 
+            Assert.NotNull(bad.Value);
         }
     }
 }
