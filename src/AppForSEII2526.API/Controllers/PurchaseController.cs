@@ -37,8 +37,8 @@ namespace AppForSEII2526.API.Controllers
         public async Task<ActionResult> CreateItemForPurchase(ItemForCreateDTO itemForCreate)
         {
 
-            //var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var userId = "1";
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            //var userId = "1";
 
             if (string.IsNullOrEmpty(userId))
             {
