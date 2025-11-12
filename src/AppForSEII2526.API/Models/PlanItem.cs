@@ -1,9 +1,13 @@
-﻿namespace AppForSEII2526.API.Models
+﻿using Humanizer.Localisation;
+
+namespace AppForSEII2526.API.Models
 {
     [PrimaryKey(nameof(ClassId),
 nameof(PlanId))]
     public class PlanItem
     {
+        public PlanItem(decimal price)
+        { }
         public int ClassId { get; set; }
         public int PlanId { get; set; }
         public string? Goal { get; set; }

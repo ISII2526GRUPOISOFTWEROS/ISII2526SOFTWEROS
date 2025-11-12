@@ -3,6 +3,14 @@
     [Index(nameof(Name), IsUnique = true)]
     public class ItemType
     {
+
+        private string v;
+
+        public ItemType(string v)
+        {
+            this.v = v;
+        }
+
         public ItemType()
         {
         }
@@ -24,8 +32,11 @@
         public int Id { get; set; }
         public string? Name { get; set; }
 
-        //Reference
         public IList<Item> Items { get; set; }
+        
+    public ICollection<Class> Classes { get; set; } = new List<Class>();
+
+
 
     }
 }
