@@ -11,7 +11,7 @@ namespace AppForSEII2526.API.Models
             TypeItems = new List<ItemType>();
         }
 
-        public Class(int id, int capacity, string name, decimal price, DateTime date, IList<PlanItem> planItems, IList<ItemType> typeItems)
+        public Class(int id, int capacity, string name, decimal price, DateTime date, IList<PlanItem> planItems, ICollection<ItemType> typeItems)
         {
             Id = id;
             Capacity = capacity;
@@ -31,6 +31,6 @@ namespace AppForSEII2526.API.Models
 
         public IList<PlanItem> PlanItems { get; set; }
 
-        public IList<ItemType> TypeItems { get; set; }
+        public ICollection<ItemType> TypeItems { get; set; }
     }
 }

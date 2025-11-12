@@ -71,8 +71,10 @@ namespace AppForSEII2526.API.Controllers
                 // Filters
                 if (itemTypes != null && itemTypes.Count > 0)
                 {
-                    query = query.Where(c => c.TypeItems.Any(t => itemTypes.Contains(t.Name)));
+                    var normalizedTypes = itemTypes.Select(t => t.ToLower()).ToList();
+                    query = query.Where(c => c.TypeItems.Any(t => normalizedTypes.Contains(t.Name.ToLower())));
                 }
+
                 if (date.HasValue)
                 {
                     query = query.Where(c => c.Date.Date == date.Value.Date);
