@@ -20,42 +20,29 @@ namespace AppForSEII2526.UT.Classes_test
         public GetClassForPlan_test()
         {
             var typeItems = new List<ItemType>()
-            {
-                new ItemType("Yoga Mat"),
-                new ItemType("Dumbbells"),
-                new ItemType("Resistance Bands"),
-                new ItemType() { Name = "Cardio" },
-                new ItemType() { Name = "Strength" }
-            };
-
-            var planItems = new List<PlanItem>
-            {
-                new PlanItem(20),
-                new PlanItem(15),
-                new PlanItem(25),
-            };
+    {
+        new ItemType("Yoga Mat"),
+        new ItemType("Dumbbells"),
+        new ItemType("Resistance Bands"),
+    };
 
             _context.ItemTypes.AddRange(typeItems);
             _context.SaveChanges();
 
             var classes = new List<Class>()
-            {
+    {
+        new(1, 15, "Morning Yoga", 15, DateTime.Today.AddDays(2), new List<PlanItem>(), new List<ItemType>{ typeItems[0] }),
+        new(2, 10, "HIIT Session", 20, DateTime.Today.AddDays(5), new List<PlanItem>(), new List<ItemType>{ typeItems[1] }),
+        new(3, 12, "Evening Cardio", 25, DateTime.Today.AddDays(7), new List<PlanItem>(), new List<ItemType>{ typeItems[2] }),
+    };
 
-                new(1, 15, "Morning Yoga", 15, DateTime.Today.AddDays(2), new List<PlanItem>{ planItems[0] }, new List<ItemType>{ typeItems[0] }),
-                new(2, 10, "HIIT Session", 20, DateTime.Today.AddDays(5), new List<PlanItem>{ planItems[1] }, new List<ItemType>{ typeItems[1] }),
-                new(3, 12, "Evening Cardio", 25, DateTime.Today.AddDays(7), new List<PlanItem>{ planItems[2] }, new List<ItemType>{ typeItems[0] }),
-            };
+            ApplicationUser user = new("Pepe", "López");
 
-            ApplicationUser user = new ApplicationUser("Pepe", "López");
-
-            _context.AddRange(typeItems);
-            _context.AddRange(planItems);
             _context.AddRange(classes);
             _context.Add(user);
-            _context.Classes.AddRange(classes);
             _context.SaveChanges();
-
         }
+
 
         [Fact]
         [Trait("GetClassForPlan", "Unit Testing")]
@@ -79,7 +66,7 @@ namespace AppForSEII2526.UT.Classes_test
             var mockLogger = new Mock<ILogger<ClassesController>>();
             var controller = new ClassesController(_context, mockLogger.Object);
 
-            var result = await controller.GetClassForPlan(new List<string> { "Cardio" }, null, null, null);
+            var result = await controller.GetClassForPlan(new List<string> { "Dumbbells" }, null, null, null);
 
             var ok = Assert.IsType<OkObjectResult>(result);
             var values = Assert.IsType<List<ClassForPlanDTO>>(ok.Value);
