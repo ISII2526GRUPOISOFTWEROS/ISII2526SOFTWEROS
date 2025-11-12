@@ -7,6 +7,9 @@ on:
   push:
     branches:
       - LidiaLopez-CICD
+      # - development
+  # paths:
+      # - 'src/AppForMovies.API**'
   workflow_dispatch:
 
 jobs:
@@ -62,4 +65,5 @@ jobs:
           app-name: 'AppForKairos'
           slot-name: 'Production'
           package: .
+
           
