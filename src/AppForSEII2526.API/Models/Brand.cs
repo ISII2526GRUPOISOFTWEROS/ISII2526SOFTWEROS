@@ -5,6 +5,11 @@
         public Brand()
         {
         }
+        public Brand(int id, string? name)
+        {
+            Id = id;
+            Name = name;
+        }
 
         public Brand(int id, string? name, IList<Item> items)
         {

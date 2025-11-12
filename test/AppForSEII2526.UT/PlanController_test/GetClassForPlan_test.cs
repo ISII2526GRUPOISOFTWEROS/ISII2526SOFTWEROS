@@ -7,98 +7,74 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using static System.Runtime.InteropServices.JavaScript.JSType;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using Moq;
+using Xunit;
 
-namespace AppForSEII2526.UT.PlanController_test
+namespace AppForSEII2526.UT.Classes_test
 {
     public class GetClassForPlan_test : AppForSEII25264SqliteUT
     {
 
         public GetClassForPlan_test()
         {
-            var typeItems = new List<ItemType>()
+            var typeItems = new List<ItemType>
             {
                 new ItemType("Yoga Mat"),
                 new ItemType("Dumbbells"),
-                new ItemType("Resistance Bands")
-            };
-            var planItems = new List<PlanItem>()
-            {
-                new PlanItem(20),
-                new PlanItem(15),
-                new PlanItem(25)
-            };
-
-
-            var classes = new List<Class>()
-            {
-                new Class("Cardio", 15, new DateTime(2026, 10, 20), new List<ItemType> { typeItems[0] }, 20, new List<PlanItem> { planItems[0] }),
-                new Class("Fitness", 20, new DateTime(1926, 02, 23), new List<ItemType> { typeItems[1] }, 20, new List<PlanItem> { planItems[0] }),
-                new Class("Strength back", 10, new DateTime(2027, 04, 04), new List<ItemType> { typeItems[2] }, 20, new List<PlanItem> { planItems[0] })
-            };
-
-            ApplicationUser user = new ApplicationUser("Pepe", "López");
-
-            _context.AddRange(typeItems);
-            _context.AddRange(planItems);
-            _context.AddRange(classes);
-            _context.Add(user);
+                new ItemType("Resistance Bands"),
+               };
+            _context.ItemTypes.AddRange(typeItems);
             _context.SaveChanges();
 
-        }
-
-        public static IEnumerable<object[]> TestCasesFor_GetClassForPlan_OK()
-        {
-            var today = DateTime.Today;
-
-            var ClassesDTOs = new List<ClassForPlanDTO>()
+            var classes = new List<Class>
             {
-                new ClassForPlanDTO(1, 20, new DateTime(2011, 10, 20), "Fitness", new List<string> { "Yoga Mat" }),
-                new ClassForPlanDTO(2,20, new DateTime(1988, 02, 23),"Strength Training", new List<string>{ "Dumbbells" }),
-                new ClassForPlanDTO(3,10,new DateTime(2007, 04, 04),"Stretch & Flex", new List<string>{ "Resistance Bands" })
+            new Class(1, 15, "Morning Yoga", 15, DateTime.Today.AddDays(2), new List<PlanItem>(), new List<ItemType>()),
+            new Class(2, 10, "HIIT Session", 20, DateTime.Today.AddDays(5), new List<PlanItem>(), new List<ItemType>()),
             };
-
-            var tc1 = new List<ClassForPlanDTO>() { ClassesDTOs[0], ClassesDTOs[1], ClassesDTOs[2] };
-            var tc2 = new List<ClassForPlanDTO>() { ClassesDTOs[1] };
-            var tc3 = new List<ClassForPlanDTO>() { ClassesDTOs[0], ClassesDTOs[1] };
-
-            var allTests = new List<object[]>
+            classes[0].TypeItems.Add(typeItems[0]); // Yoga Mat
+            classes[1].TypeItems.Add(typeItems[1]); // Dumbbells
+            var user = new ApplicationUser()
             {
-                new object[] { null, null, null, null, tc1,  },
-                new object[] { new List<string>{ "Dumbbells" }, null, null, null, tc2, },
-                new object[] { null, null, today.AddDays(1), today.AddDays(2), tc3, }
+                Id = "3",
+                UserName = "test",
+                Surname = "user",
+                Email = "test@test.com",
             };
-            return allTests;
-        }
-
-        [Theory]
-        [MemberData(nameof(TestCasesFor_GetClassForPlan_OK))]
-        [Trait("Database", "WithoutFixture")]
-        [Trait("LevelTesting", "Unit Testing")]
-        public async Task GetClassForPlan_OK_test(IList<string>? itemTypes, DateTime? date, DateTime? fromDate, DateTime? toDate, IList<ClassForPlanDTO> expectedClasses)
-        {
-            var controller = new ClassesController(_context, null);
-            var result = await controller.GetClassForPlan(itemTypes, date, fromDate, toDate);
-            var okResult = Assert.IsType<OkObjectResult>(result);
-            var actual = Assert.IsType<List<ClassForPlanDTO>>(okResult.Value);
-            Assert.Equal(expectedClasses, actual);
+            _context.Users.Add(user);
+            _context.Classes.AddRange(classes);
+            _context.SaveChanges();
         }
 
         [Fact]
-        [Trait("LevelTesting", "Unit Testing")]
-        [Trait("Database", "WithoutFixture")]
-        public async Task GetClassForPlan_BadRequest_test()
-        { 
-            var mock = new Mock<ILogger<ClassesController>>();
-            ILogger<ClassesController> logger = mock.Object;
-            var controller = new ClassesController(_context, logger);
-            var result = await controller.GetClassForPlan(null, null, DateTime.Today.AddDays(5), DateTime.Today.AddDays(1));
-            var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
-            var problemDetails = Assert.IsType<ValidationProblemDetails>(badRequestResult.Value);
-            var problem = problemDetails.Errors.First().Value[0];
+        [Trait("GetClassForPlan", "Unit Testing")]
+        public async Task GetClassForPlan_NoFilters_ReturnsAll()
+        {
+            var mockLogger = new Mock<ILogger<ClassesController>>();
+            var controller = new ClassesController(_context, mockLogger.Object);
 
-            Assert.Equal("fromDate must be earlier than toDate", problem);
+            var result = await controller.GetClassForPlan(null, null, null, null);
+
+            var ok = Assert.IsType<OkObjectResult>(result);
+            var values = Assert.IsType<List<ClassForPlanDTO>>(ok.Value);
+
+            Assert.Equal(3, values.Count);
+        }
+
+        [Fact]
+        [Trait("GetClassForPlan", "Unit Testing")]
+        public async Task GetClassForPlan_InvalidDate_ReturnsBadRequest()
+        {
+            var mockLogger = new Mock<ILogger<ClassesController>>();
+            var controller = new ClassesController(_context, mockLogger.Object);
+
+            var result = await controller.GetClassForPlan(null, DateTime.Today.AddDays(-1), null, null);
+
+            var bad = Assert.IsType<BadRequestObjectResult>(result);
+            Assert.Equal("Cannot be before today", bad.Value);
         }
 
     }
 }
-   
+

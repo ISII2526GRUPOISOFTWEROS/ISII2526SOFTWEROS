@@ -22,4 +22,17 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<IncidentItem> IncidentItems { get; set; }
     public DbSet<ItemForExercise> ItemForExercises { get; set; }
     public DbSet<ItemType> ItemTypes { get; set; }
+    public DbSet<ApplicationUser> ApplicationUser { get; set; }
+    public DbSet<PaymentMethod> PaymentMethod { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+
+        modelBuilder.Entity<Class>()
+            .HasMany(c => c.TypeItems)
+            .WithMany(t => t.Classes)
+            .UsingEntity(j => j.ToTable("ClassItemTypes"));
+    }
+
 }

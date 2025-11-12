@@ -1,7 +1,6 @@
 ﻿using AppForSEII2526.API.DTOs.ItemDTOs;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Identity.Client;
 
 namespace AppForSEII2526.API.Controllers
 {
@@ -9,7 +8,6 @@ namespace AppForSEII2526.API.Controllers
     [ApiController]
     public class ItemsController : ControllerBase
     {
-
         private ApplicationDbContext _context; //Access to the db
         private ILogger<ItemsController> _logger;
 
@@ -19,24 +17,37 @@ namespace AppForSEII2526.API.Controllers
             _logger = logger;
         }
 
-        
-
+        //[HttpGet]
+        //[Route("[action]")]
+        //[ProducesResponseType(typeof(decimal),(int)HttpStatusCode.OK)]//Successful return
+        //[ProducesResponseType(typeof(string),(int)HttpStatusCode.BadRequest)]//Bad return
+        //public async Task<ActionResult> ComputeDivision(decimal op1, decimal op2)
+        //{
+        //    if(op2== 0)
+        //    {
+        //        string error ="Division by zero is not allowed.";
+        //       //_logger.LogError(DateTime.Now+   error);
+        //        return BadRequest(error);
+        //    }
+        //    decimal result = op1/ op2;
+        //    return Ok(result);
+        //}
         [HttpGet]
         [Route("[action]")]
-        [ProducesResponseType(typeof(IList<ItemForRestockDTO>), (int) HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(IList<ItemForRestockDTO>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
-            
+
         public async Task<ActionResult> GetItemsForRestock(string? itemName, int? quantityForRestock)
         {
             IList<ItemForRestockDTO> itemsDTOs = await _context.Items
-                .Where(Item => Item.Name.Contains(itemName) 
+                .Where(Item => Item.Name.Contains(itemName)
                             || Item.QuantityForRestock > quantityForRestock)
 
                 .OrderBy(Item => Item.Name)
 
-                .Select(Item => new ItemForRestockDTO(Item.Id, 
-                                                    Item.Name, 
-                                                    Item.Brand.Name, 
+                .Select(Item => new ItemForRestockDTO(Item.Id,
+                                                    Item.Name,
+                                                    Item.Brand.Name,
                                                     Item.QuantityAvailableForPurchase,
                                                     Item.QuantityForRestock))
 
@@ -45,6 +56,7 @@ namespace AppForSEII2526.API.Controllers
             return Ok(itemsDTOs);
 
         }
+
 
         [HttpGet]
         [Route("[action]")]
@@ -66,24 +78,6 @@ namespace AppForSEII2526.API.Controllers
                 return BadRequest(error);
             }
             return Ok(itemsDTOS);
-        }
-
-    }   
+        }   
+    }
 }
-
-        //[ProducesResponseType(typeof(decimal),(int)HttpStatusCode.OK)]//Successful return
-        //[ProducesResponseType(typeof(string),(int)HttpStatusCode.BadRequest)]//Bad return
-        //public async Task<ActionResult> ComputeDivision(decimal op1, decimal op2)
-        //{
-        //    if(op2== 0)
-        //    {
-        //        string error ="Division by zero is not allowed.";
-        //       //_logger.LogError(DateTime.Now+   error);
-        //        return BadRequest(error);
-        //    }
-        //    decimal result = op1/ op2;
-        //    return Ok(result);
-        //}
-        
-
-

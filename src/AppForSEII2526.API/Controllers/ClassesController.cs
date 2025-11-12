@@ -72,8 +72,10 @@ namespace AppForSEII2526.API.Controllers
                 // Filters
                 if (itemTypes != null && itemTypes.Count > 0)
                 {
-                    query = query.Where(c => c.TypeItems.Any(t => itemTypes.Contains(t.Name)));
+                    var normalizedTypes = itemTypes.Select(t => t.ToLower()).ToList();
+                    query = query.Where(c => c.TypeItems.Any(t => normalizedTypes.Contains(t.Name.ToLower())));
                 }
+
                 if (date.HasValue)
                 {
                     query = query.Where(c => c.Date.Date == date.Value.Date);
@@ -84,7 +86,7 @@ namespace AppForSEII2526.API.Controllers
                 }
                 var classes = await query
                   .OrderBy(i => i.Date)
-                  .Select(i => new ClassForPlanDTO(i.Id, i.Price, i.Date, i.Name, i.Capacity, i.TypeItems.Select(itemtype => itemtype.Name).ToList()))
+                  .Select(i => new ClassForPlanDTO(i.Id, i.Price, i.Date, i.Name,i.Capacity, i.TypeItems.Select(itemtype => itemtype.Name).ToList()))
                   .ToListAsync();
                 if (classes.Count == 0)
                 {
