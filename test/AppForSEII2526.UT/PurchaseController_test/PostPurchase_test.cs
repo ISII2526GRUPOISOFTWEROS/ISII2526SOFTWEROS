@@ -10,8 +10,6 @@ namespace AppForSEII2526.UT.PurchaseController_test
 {
     public class PostPurchase_test : AppForSEII25264SqliteUT
     {
-        private readonly int existingPurchaseId;
-
         public PostPurchase_test()
         {
             var user = new ApplicationUser()
@@ -20,6 +18,7 @@ namespace AppForSEII2526.UT.PurchaseController_test
                 UserName = "test",
                 Surname = "user",
                 Email = "test@test.com",
+                Address = "C/ Plaza Mayor 1, Albacete, Spain",
             };
             _context.Users.AddRange(user);
             _context.SaveChanges();
@@ -65,25 +64,46 @@ namespace AppForSEII2526.UT.PurchaseController_test
         [Trait("PostPurchase", "Unit Testing")]
         public async Task PostPurchase_ReturnsCreated()
         {
-            var introduce = new ItemForCreateDTO(
+            var mock = new Mock<ILogger<PurchaseController>>();
+            ILogger<PurchaseController> logger = mock.Object;
+            PurchaseController controller = new PurchaseController(_context, logger);
+
+            var input = new ItemForCreateDTO(
                    paymentMethodId: 1,
+                   street: "C/Plaza Mayor",
+                   city: "Albacete",
+                   country: "Spain",
+                   description: "First purchase",
+                   purchaseItems: new List<CreatePurchaseItemDTO>()
+                   {
+                       new CreatePurchaseItemDTO(1, 2),
+                       new CreatePurchaseItemDTO(2, 3),
+                   }
+                );
+
+            var expected = new PurchaseDetailDTO(
+                   id: 1,
+                   paymentMethod: "Bizum",
                    street: "C/Plaza Mayor",
                    city:"Albacete",
                    country:"Spain",
-                   description:"First purchase",
-                   items: new List<ItemForPurchaseDTO>
-                   {
-                            new ItemForPurchaseDTO(),
-                            new ItemForPurchaseDTO(),
-        
-                   }
+                   description: "First purchase",
+                     purchaseItems: new List<PurchasedItemDTO>()
+                     {
+                          new PurchasedItemDTO( "Foam Roller", "Nike",2, 10),
+                          new PurchasedItemDTO( "Bands","Domyos", 3, 20),
+                     }
+                     , totalPrice: 80.0m
                 );
+
+
+            var result = await controller.CreateItemForPurchase(input);
+
+            var created = Assert.IsType<CreatedAtActionResult>(result);
+            var actual = Assert.IsType<PurchaseDetailDTO>(created.Value);
+
+            Assert.Equal(expected, actual);
+
         }
-
-
-
-
-
-
     }
 }
