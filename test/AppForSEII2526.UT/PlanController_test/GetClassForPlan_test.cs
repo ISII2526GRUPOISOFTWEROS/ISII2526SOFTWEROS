@@ -62,21 +62,6 @@ namespace AppForSEII2526.UT.Classes_test
             Assert.Equal(3, values.Count);
         }
 
-        //[Fact]
-        //[Trait("GetClassForPlan", "Unit Testing")]
-        //public async Task GetClassForPlan_FilterByType_ReturnsFiltered()
-        //{
-        //    var mockLogger = new Mock<ILogger<ClassesController>>();
-        //    var controller = new ClassesController(_context, mockLogger.Object);
-
-        //    var result = await controller.GetClassForPlan(new List<string> { "Cardio" }, null, null, null);
-
-        //    var ok = Assert.IsType<OkObjectResult>(result);
-        //    var values = Assert.IsType<List<ClassForPlanDTO>>(ok.Value);
-
-        //    Assert.Equal(2, values.Count);
-        //}
-
         [Fact]
         [Trait("GetClassForPlan", "Unit Testing")]
         public async Task GetClassForPlan_InvalidDate_ReturnsBadRequest()
