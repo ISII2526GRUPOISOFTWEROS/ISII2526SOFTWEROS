@@ -137,3 +137,33 @@ VALUES
 
 
 COMMIT TRANSACTION;
+
+--{
+--"customerUserName": "Pepe.Gomez",
+--"paymentMethodId": 1,
+--"street": "C/Plaza Mayor",
+--"city": "Cuenca",
+--"country": "Spain",
+--"description": "Purchase of resistance equipment",
+--"purchaseItems": [
+--{
+--"id": 1,
+--"name": "Resistance band set",
+--"brand": "Nike",
+--"description": "Set of bands",
+--"price": 22.00,
+--"quantityAvailableForPurchase": 2,
+--"quantityToBuy": 2
+--},
+--{
+--"id": 2,
+--"name": "Foam Roller",
+--"brand": "Adidas",
+--"description": "Foam roller for muscle recovery and massage",
+--"price": 25.00,
+--"quantityAvailableForPurchase": 1,
+--"quantityToBuy": 1
+--}
+--],
+--"totalPrice": 69.00
+--}
