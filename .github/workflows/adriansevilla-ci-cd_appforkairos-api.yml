@@ -9,7 +9,7 @@ on:
       - AdrianSevilla-CI-CD
 #     - development
 #    paths:
-#      - 'src/AppForMovies.API**'
+#      - 'src/AppForSEII2526.API**'
   workflow_dispatch:
 
 jobs:
@@ -82,3 +82,4 @@ jobs:
           package: .
 
           
+
