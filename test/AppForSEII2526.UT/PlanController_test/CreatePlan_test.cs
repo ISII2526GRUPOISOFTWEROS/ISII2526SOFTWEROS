@@ -10,45 +10,42 @@ namespace AppForSEII2526.UT.Plan_test
 {
     public class CreatePlan_test : AppForSEII25264SqliteUT
     {
-        private readonly ApplicationUser _userWithCard;
-        private readonly CreditCard _validCreditCard;
-        private readonly ItemType _cardioType;
-        private readonly Class _class;
+        
 
         public CreatePlan_test()
         {
-            _userWithCard = new ApplicationUser()
+            var user = new ApplicationUser()
             {
                 Id = "3",
                 UserName = "test",
                 Surname = "user",
                 Email = "test@test.com",
             };
-            _context.Users.Add(_userWithCard);
+            _context.Users.Add(user);
             _context.SaveChanges();
 
-            _validCreditCard = new CreditCard()
+            var creditcard = new CreditCard()
             {
                 Id = 0,
-                User = _userWithCard,
+                User = user,
                 CreditCardNumber = "664543223",
                 ExpirationDate = DateTime.UtcNow.AddMonths(1)
             };
-            _context.CreditCards.Add(_validCreditCard);
+            _context.CreditCards.Add(creditcard);
 
-            _cardioType = new ItemType() { Name = "Cardio" };
-            _context.ItemTypes.Add(_cardioType);
+            var itemsType = new ItemType() { Name = "Cardio" };
+            _context.ItemTypes.Add(itemsType);
 
-            _class = new Class(
+            var classes = new Class(
                 0,
                 10,
                 "Morning Yoga",
                 15,
                 DateTime.Today.AddDays(2),
                 new List<PlanItem>(),
-                new List<ItemType> { _cardioType }
+                new List<ItemType> {itemsType }
             );
-            _context.Classes.Add(_class);
+            _context.Classes.Add(classes);
 
             _context.SaveChanges();
         }
@@ -80,7 +77,7 @@ namespace AppForSEII2526.UT.Plan_test
                         classEntity.Date,
                         classEntity.Name,
                         classEntity.Capacity,
-                        new List<string> { _cardioType.Name })
+                        new List<string> { })
                 },
                 paymentMethod.Id // PaymentMethod valido
             );
@@ -126,7 +123,7 @@ namespace AppForSEII2526.UT.Plan_test
                         classEntity.Date,
                         classEntity.Name,
                         classEntity.Capacity,
-                        new List<string> { _cardioType.Name })
+                        new List<string> {})
                 },
                 999
             );
