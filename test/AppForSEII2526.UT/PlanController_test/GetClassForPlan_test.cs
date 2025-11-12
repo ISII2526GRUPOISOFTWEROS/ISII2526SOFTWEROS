@@ -19,32 +19,28 @@ namespace AppForSEII2526.UT.Classes_test
 
         public GetClassForPlan_test()
         {
-            var typeItems = new List<ItemType>()
-    {
-        new ItemType("Yoga Mat"),
-        new ItemType("Dumbbells"),
-        new ItemType("Resistance Bands"),
-    };
-
+            var typeItems = new List<ItemType>
+            {
+                new ItemType("Yoga Mat"),
+                new ItemType("Dumbbells"),
+                new ItemType("Resistance Bands"),
+               };
             _context.ItemTypes.AddRange(typeItems);
             _context.SaveChanges();
 
-            var classes = new List<Class>()
-    {
-        new(1, 15, "Morning Yoga", 15, DateTime.Today.AddDays(2), new List<PlanItem>(), new List<ItemType>{ typeItems[0] }),
-        new(2, 10, "HIIT Session", 20, DateTime.Today.AddDays(5), new List<PlanItem>(), new List<ItemType>{ typeItems[1] }),
-        new(3, 12, "Evening Cardio", 25, DateTime.Today.AddDays(7), new List<PlanItem>(), new List<ItemType>{ typeItems[2] }),
-    };
+            var classes = new List<Class>
+            {
+            new Class(1, 15, "Morning Yoga", 15, DateTime.Today.AddDays(2), new List<PlanItem>(), new List<ItemType>()),
+            new Class(2, 10, "HIIT Session", 20, DateTime.Today.AddDays(5), new List<PlanItem>(), new List<ItemType>()),
+            };
+            classes[0].TypeItems.Add(typeItems[0]); // Yoga Mat
+            classes[1].TypeItems.Add(typeItems[1]); // Dumbbells
 
-            ApplicationUser user = new("Pepe", "López");
-
-            _context.AddRange(classes);
-            _context.Add(user);
+            _context.Classes.AddRange(classes);
             _context.SaveChanges();
         }
 
-
-        [Fact]
+            [Fact]
         [Trait("GetClassForPlan", "Unit Testing")]
         public async Task GetClassForPlan_NoFilters_ReturnsAll()
         {
