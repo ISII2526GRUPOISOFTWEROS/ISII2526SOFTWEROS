@@ -1,7 +1,9 @@
 ﻿namespace AppForSEII2526.API.DTOs.ItemDTOs
 {
     public class ItemForPurchaseDTO
-    {
+    {public ItemForPurchaseDTO() { 
+
+        }
         public ItemForPurchaseDTO(int id, string name, string brand, string description, decimal price, int quantityavailbableforpurchase)
         {
             Id = id;
@@ -26,7 +28,6 @@
         public decimal Price { get; set; }
 
         public int QuantityAvailableForPurchase { get; set; }
-        public int QuantityToBuy { get; set; }
 
 
         public override bool Equals(object? obj)
