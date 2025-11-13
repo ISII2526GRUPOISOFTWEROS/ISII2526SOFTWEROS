@@ -8,12 +8,12 @@ namespace AppForSEII2526.API.Controllers
 
     [Route("api/[controller]")]
     [ApiController]
-    public class CreateRestockController : ControllerBase
+    public class RestockController : ControllerBase
     {
             private ApplicationDbContext _context; //Access to the db
-            private ILogger<CreateRestockController> _logger;
+            private ILogger<RestockController> _logger;
 
-            public CreateRestockController(ApplicationDbContext context, ILogger<CreateRestockController> logger)
+            public RestockController(ApplicationDbContext context, ILogger<RestockController> logger)
             {
                 _context = context;
                 _logger = logger;

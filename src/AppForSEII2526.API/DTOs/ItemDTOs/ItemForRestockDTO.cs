@@ -3,14 +3,13 @@ namespace AppForSEII2526.API.DTOs.ItemDTOs
 {
     public class ItemForRestockDTO
     {
+        public ItemForRestockDTO(string brand, string name, int quantityavailablerestock, decimal restockprice)
         {
-            Brand = brand;
             Name = name;
+            Brand = brand;
             QuantityAvailableForRestock = quantityavailablerestock;
             RestockPrice = restockprice;
-
         }
-        
 
         public int Id { get; set; }
         [StringLength(50, ErrorMessage =  "Name cannot be longer than 50 characters.")]

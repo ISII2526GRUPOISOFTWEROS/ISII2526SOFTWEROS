@@ -5,6 +5,8 @@ using Microsoft.Identity.Client;
 
 namespace AppForSEII2526.API.Controllers
 {
+
+    //Restock Get Method
     [Route("api/[controller]")]
     [ApiController]
     public class ItemsController : ControllerBase

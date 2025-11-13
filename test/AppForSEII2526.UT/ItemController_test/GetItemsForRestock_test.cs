@@ -1,4 +1,4 @@
-﻿using AppForMovies.UT;
+﻿using AppForSEII2526.UT;
 using AppForSEII2526.API.Controllers;
 using AppForSEII2526.API.DTOs.ItemDTOs;
 using System;
@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace AppForSEII2526.UT.ItemController
 {
-    public class GetItemsForRestock_test : AppForMovies4SqliteUT
+    public class GetItemsForRestock_test : AppForSEII25264SqliteUT
     {
         private ILogger<ItemsController> _logger;
 
