@@ -3,21 +3,8 @@
     [Index(nameof(Name), IsUnique = true)]
     public class ItemType
     {
-
-        private string v;
-
-        public ItemType(string v)
-        {
-            this.v = v;
-        }
-
         public ItemType()
         {
-        }
-        public ItemType(int id, string? name)
-        {
-            Id = id;
-            Name = name;
         }
 
         public ItemType(int id, string? name, IList<Item> items)
