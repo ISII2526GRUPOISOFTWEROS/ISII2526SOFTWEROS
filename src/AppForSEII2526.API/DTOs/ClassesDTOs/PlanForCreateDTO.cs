@@ -32,7 +32,7 @@ namespace AppForSEII2526.API.DTOs.ClassesDTOs
 
         [Required]
         public int PaymentMethodId { get; set; }  
-        [Required]
+     
         public IList<GoalForClassDTO>? Goals { get; set; }
     }
 

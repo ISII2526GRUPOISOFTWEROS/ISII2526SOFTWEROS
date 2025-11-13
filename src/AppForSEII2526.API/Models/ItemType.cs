@@ -34,7 +34,6 @@
 
         public IList<Item> Items { get; set; }
 
-        public ICollection<Class> Classes { get; set; } = new List<Class>();
 
 
 
