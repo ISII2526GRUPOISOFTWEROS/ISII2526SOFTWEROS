@@ -18,9 +18,9 @@ namespace AppForSEII2526.UT.Classes_test
         {
             var typeItems = new List<ItemType>
             {
-                new ItemType() { Id = 1, Name = "Yoga Mat", Items = new List<Item>() },
-                new ItemType() { Id = 2, Name = "Dumbbells", Items = new List<Item>() },
-                new ItemType() { Id = 3, Name = "Resistance Bands", Items = new List<Item>() }
+                new ItemType() {  Name = "Yoga Mat"},
+                new ItemType() {  Name = "Dumbbells"},
+                new ItemType() {  Name = "Resistance Bands"}
             };
             _context.ItemTypes.AddRange(typeItems);
             _context.SaveChanges();
