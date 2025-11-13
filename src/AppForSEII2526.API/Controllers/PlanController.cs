@@ -24,7 +24,6 @@ namespace AppForSEII2526.API.Controllers
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.Conflict)]
         public async Task<ActionResult> CreatePlan(PlanForCreateDTO planForCreate)
         {
-            // Validaciones básicas
             if (planForCreate == null)
             {
                 return BadRequest("No plan data provided.");
@@ -55,7 +54,6 @@ namespace AppForSEII2526.API.Controllers
                 return BadRequest(ValidationProblem(ModelState));
             }
 
-            // Verificar que el método de pago existe
             var paymentMethod = await _context.Set<PaymentMethod>()
                 .FirstOrDefaultAsync(pm => pm.Id == planForCreate.PaymentMethodId);
 
@@ -65,7 +63,6 @@ namespace AppForSEII2526.API.Controllers
                 return BadRequest(ValidationProblem(ModelState));
             }
 
-            // Verificar que las clases seleccionadas existen
             var selectedClassIds = planForCreate.SelectedClasses.Select(c => c.Id).ToList();
             var dbClasses = await _context.Classes
                 .Include(c => c.TypeItems)
@@ -91,8 +88,6 @@ namespace AppForSEII2526.API.Controllers
                     ModelState.AddModelError("ClassNotFound", $"Error! Class with Id {selected.Id} not found.");
                     continue;
                 }
-
-                // Aquí agregas directamente al Plan
                 plan.PlanItems.Add(new PlanItem(dbClass.Price)
                 {
                     Class = dbClass,
