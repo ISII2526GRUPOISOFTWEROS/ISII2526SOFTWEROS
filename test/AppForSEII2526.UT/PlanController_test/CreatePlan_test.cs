@@ -33,7 +33,7 @@ namespace AppForSEII2526.UT.Plan_test
             };
             _context.CreditCards.Add(creditcard);
 
-            var itemsType = new ItemType() { Name = "Cardio" };
+            var itemsType = new ItemType() {  };
             _context.ItemTypes.Add(itemsType);
 
             var classes = new Class(

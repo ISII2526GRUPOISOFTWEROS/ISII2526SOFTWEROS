@@ -3,14 +3,12 @@
     [Index(nameof(Name), IsUnique = true)]
     public class ItemType
     {
-        public ItemType(IList<Item> items)
+        public ItemType()
         {
             Items = new List<Item>();
         }
 
-        public ItemType()
-        {        
-        }
+        
         public ItemType(int id, string? name, IList<Item> items)
         {
             Id = id;
