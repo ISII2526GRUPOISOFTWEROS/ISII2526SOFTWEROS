@@ -9,12 +9,12 @@
         }
 
         
-        public ItemType(int id, string? name, IList<Item> items)
-        {
-            Id = id;
-            Name = name;
-            Items = items;
-        }
+        //public ItemType(int id, string? name, IList<Item> items)
+        //{
+        //    Id = id;
+        //    Name = name;
+        //    Items = items;
+        //}
 
 
 
