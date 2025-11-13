@@ -21,10 +21,10 @@ namespace AppForSEII2526.UT.Classes_test
         {
             var typeItems = new List<ItemType>
             {
-                new ItemType("Yoga Mat"),
-                new ItemType("Dumbbells"),
-                new ItemType("Resistance Bands"),
-               };
+             new ItemType(1, "Yoga Mat", new List<Item>()),
+            new ItemType(2, "Dumbbells", new List<Item>()),
+            new ItemType(3, "Resistance Bands", new List<Item>()),
+            };
             _context.ItemTypes.AddRange(typeItems);
             _context.SaveChanges();
 

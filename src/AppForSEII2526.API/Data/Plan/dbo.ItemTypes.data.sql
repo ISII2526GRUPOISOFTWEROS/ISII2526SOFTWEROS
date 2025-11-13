@@ -1,6 +1,6 @@
-﻿SET IDENTITY_INSERT [dbo].[ItemTypes] ON
-INSERT INTO [dbo].[ItemTypes] ([Id], [Name], [ClassId]) VALUES (1, N'Cardio Equipment', NULL)
-INSERT INTO [dbo].[ItemTypes] ([Id], [Name], [ClassId]) VALUES (2, N'Strength Equipment', NULL)
-INSERT INTO [dbo].[ItemTypes] ([Id], [Name], [ClassId]) VALUES (3, N'Accessories', NULL)
-SET IDENTITY_INSERT [dbo].[ItemTypes] OFF
-
+﻿SET IDENTITY_INSERT [dbo].[ClassItemType] ON
+INSERT INTO [dbo].[ClassItemType] ([ClassesId], [TypeItemsId]) VALUES (1, 1); 
+INSERT INTO [dbo].[ClassItemType] ([ClassesId], [TypeItemsId]) VALUES (1, 2); 
+INSERT INTO [dbo].[ClassItemType] ([ClassesId], [TypeItemsId]) VALUES (2, 1); 
+INSERT INTO [dbo].[ClassItemType] ([ClassesId], [TypeItemsId]) VALUES (3, 3); 
+SET IDENTITY_INSERT [dbo].[ClassItemType] OFF;
