@@ -66,32 +66,6 @@ namespace AppForSEII2526.API.Controllers
                 return BadRequest(error);
             }
             return Ok(itemsDTOS);
-        }
-
-        
-
-
-
-
-
+        }   
     }
-
-   
 }
-
-        //[ProducesResponseType(typeof(decimal),(int)HttpStatusCode.OK)]//Successful return
-        //[ProducesResponseType(typeof(string),(int)HttpStatusCode.BadRequest)]//Bad return
-        //public async Task<ActionResult> ComputeDivision(decimal op1, decimal op2)
-        //{
-        //    if(op2== 0)
-        //    {
-        //        string error ="Division by zero is not allowed.";
-        //       //_logger.LogError(DateTime.Now+   error);
-        //        return BadRequest(error);
-        //    }
-        //    decimal result = op1/ op2;
-        //    return Ok(result);
-        //}
-        
-
-
