@@ -33,7 +33,7 @@ namespace AppForSEII2526.API.Controllers
                 return NotFound();
             }
 
-            
+
             var restock = await _context.Restock
                 .Where(r => r.Id == id)
                 .Include(r => r.RestockItems)
