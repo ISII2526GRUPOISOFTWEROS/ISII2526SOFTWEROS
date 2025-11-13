@@ -82,6 +82,8 @@ namespace AppForSEII2526.UT.Plan_test
                 paymentMethod.Id // PaymentMethod valido
             );
             var result = await controller.CreatePlan(dto);
+            var created = Assert.IsType<CreatedAtActionResult>(result);
+            Assert.NotNull(created.Value);
         }
 
         [Fact]
