@@ -1,6 +1,4 @@
-﻿
-
-namespace AppForSEII2526.API.DTOs.ItemDTOs
+﻿namespace AppForSEII2526.API.DTOs.RestockDTOs
 {
     public class ItemForCreateRestockDTO
     {
@@ -47,7 +45,7 @@ namespace AppForSEII2526.API.DTOs.ItemDTOs
         public DateTime? ExpectedDate { get; set; }
         public DateTime RestockDate { get; set; }
         [Precision(5, 2)]
-        public Decimal TotalPrice { get; set; }
+        public decimal TotalPrice { get; set; }
 
         //References
         public IList<RestockItemForCreateDTO> RestockItems { get; set; } 
