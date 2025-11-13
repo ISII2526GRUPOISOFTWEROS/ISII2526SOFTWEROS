@@ -7,12 +7,12 @@
                 ItemId = itemId;
                 Quantity = quantity;
             }
-            [Required(ErrorMessage = "At least one item must be included in the purchase")]
-            [Range(1, int.MaxValue, ErrorMessage = "Purchase Item List must containt at least one item")]
+            [Required(ErrorMessage = "ItemId is required")]
+            [Range(1, int.MaxValue, ErrorMessage = "ItemId must be a positive number.")]
             public int ItemId { get; set; }
 
-            [Required(ErrorMessage = "At least one item must be included in the purchase")]
-            [Range(1, int.MaxValue, ErrorMessage = "Purchase Item List must containt at least one item")]
+            [Required(ErrorMessage = "Quantity is required")]
+            [Range(1, int.MaxValue, ErrorMessage = "Quantity must be greater than zero.")]
             public int Quantity { get; set; }
         }
     }
