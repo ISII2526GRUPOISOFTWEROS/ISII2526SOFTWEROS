@@ -18,32 +18,26 @@ namespace AppForSEII2526.UT.Classes_test
         {
             var classes = new List<Class>
 {
-    new Class()
-    {
-        Id = 1,
-        Capacity = 15,
-        Name = "Morning Yoga",
-        Date = DateTime.Today.AddDays(2),
-        PlanItems = new List<PlanItem>(),
-        TypeItems = new List<ItemType>()
-    },
+  
     new Class()
     {
         Id = 2,
         Capacity = 10,
         Name = "HIIT Session",
+        Price = 20,
         Date = DateTime.Today.AddDays(5),
         PlanItems = new List<PlanItem>(),
-        TypeItems = new List<ItemType>()
+        TypeItems = new List<ItemType>(){ new ItemType() { Name = "Cardio" } }
     },
     new Class()
     {
         Id = 3,
         Capacity = 12,
         Name = "Strength Training",
+        Price = 25,
         Date = DateTime.Today.AddDays(3),
         PlanItems = new List<PlanItem>(),
-        TypeItems = new List<ItemType>()
+        TypeItems = new List<ItemType>(){ new ItemType() { Name = "Fitness" } }
     }
 };
 
