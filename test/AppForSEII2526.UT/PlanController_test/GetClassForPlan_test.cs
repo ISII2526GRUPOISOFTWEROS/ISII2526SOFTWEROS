@@ -1,57 +1,65 @@
 ﻿using AppForSEII2526.API.Controllers;
 using AppForSEII2526.API.DTOs.ClassesDTOs;
 using AppForSEII2526.API.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace AppForSEII2526.UT.Classes_test
 {
     public class GetClassForPlan_test : AppForSEII25264SqliteUT
     {
-
         public GetClassForPlan_test()
         {
             var typeItems = new List<ItemType>
-{
-    new ItemType() { Name = "Yoga Mat" },
-    new ItemType() { Name = "Dumbbells" },
-    new ItemType() { Name = "Resistance Bands" }
-};
+            {
+                new ItemType() { Id = 1, Name = "Yoga Mat", Items = new List<Item>() },
+                new ItemType() { Id = 2, Name = "Dumbbells", Items = new List<Item>() },
+                new ItemType() { Id = 3, Name = "Resistance Bands", Items = new List<Item>() }
+            };
             _context.ItemTypes.AddRange(typeItems);
             _context.SaveChanges();
 
             var classes = new List<Class>
-{
-             new Class()
-            {       
-            Id = 1,
-            Capacity = 15,
-            Name = "Morning Yoga",
-            Price = 15,
-            Date = DateTime.Today.AddDays(2),
-            PlanItems = new List<PlanItem>(),
-            TypeItems = new List<ItemType>() { typeItems[0] } 
-            },
-            new Class()
             {
-            Id = 2,
-            Capacity = 10,
-            Name = "HIIT Session",
-            Price = 20,
-            Date = DateTime.Today.AddDays(5),
-            PlanItems = new List<PlanItem>(),
-            TypeItems = new List<ItemType>() { typeItems[1] }  
-            },
-    };
-            
+                new Class()
+                {
+                    Id = 1,
+                    Capacity = 15,
+                    Name = "Morning Yoga",
+                    Price = 15,
+                    Date = DateTime.Today.AddDays(2),
+                    PlanItems = new List<PlanItem>(),
+                    TypeItems = new List<ItemType>() { typeItems[0] } 
+                },
+                new Class()
+                {
+                    Id = 2,
+                    Capacity = 10,
+                    Name = "HIIT Session",
+                    Price = 20,
+                    Date = DateTime.Today.AddDays(5),
+                    PlanItems = new List<PlanItem>(),
+                    TypeItems = new List<ItemType>() { typeItems[1] } 
+                },
+                new Class()
+                {
+                    Id = 3,
+                    Capacity = 12,
+                    Name = "Strength Training",
+                    Price = 25,
+                    Date = DateTime.Today.AddDays(3),
+                    PlanItems = new List<PlanItem>(),
+                    TypeItems = new List<ItemType>() { typeItems[2] } 
+                }
+            };
+            _context.Classes.AddRange(classes);
+
             var user = new ApplicationUser()
             {
                 Id = "3",
@@ -60,7 +68,7 @@ namespace AppForSEII2526.UT.Classes_test
                 Email = "test@test.com",
             };
             _context.Users.Add(user);
-            _context.Classes.AddRange(classes);
+
             _context.SaveChanges();
         }
 
@@ -91,7 +99,5 @@ namespace AppForSEII2526.UT.Classes_test
             var bad = Assert.IsType<BadRequestObjectResult>(result);
             Assert.Equal("Cannot be before today", bad.Value);
         }
-
     }
 }
-
