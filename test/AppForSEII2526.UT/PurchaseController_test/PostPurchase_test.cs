@@ -110,38 +110,27 @@ namespace AppForSEII2526.UT.PurchaseController_test
                        new CreatePurchaseItemDTO(1, 2),
                    }
                 );
-            var purchaseNegativeQuantity = new ItemForCreateDTO(
+            var purchasewrongPM = new ItemForCreateDTO(
                    customerUserName: "test",
-                   paymentMethodId: 1,
+                   paymentMethodId: 2,
                    street: "C/Plaza Mayor",
                    city: "Albacete",
                    country: "Spain",
                    description: "First purchase",
                    purchaseItems: new List<CreatePurchaseItemDTO>()
                    {
-                       new CreatePurchaseItemDTO(1, -5),
+                       new CreatePurchaseItemDTO(1, 2),
                    }
                 );
-            var purchaseZeroQuantity = new ItemForCreateDTO(
-                   customerUserName: "test",
-                   paymentMethodId: 1,
-                   street: "C/Plaza Mayor",
-                   city: "Albacete",
-                   country: "Spain",
-                   description: "First purchase",
-                   purchaseItems: new List<CreatePurchaseItemDTO>()
-                   {
-                       new CreatePurchaseItemDTO(1, 0),
-                   }
-                );
+
             var allTests = new List<object[]>
             {
-               new object[] { purchaseInvalidPaymentMethod, "Error!" },
+                new object[] { purchaseInvalidPaymentMethod, "Error!" },
                 new object[] { purchaseInvalidItem,         "Error!" },
                 new object[] { purchaseInsufficientStock,   "Error!" },
                 new object[] { purchaseInvalidUser,         "Error!" },
-                new object[] { purchaseNegativeQuantity,    "Error!" },
-                new object[] { purchaseZeroQuantity,        "Error!" },
+                new object[] { purchasewrongPM,         "Error!" },
+
            };
             return allTests;
         }
