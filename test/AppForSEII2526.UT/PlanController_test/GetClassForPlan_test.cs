@@ -20,21 +20,38 @@ namespace AppForSEII2526.UT.Classes_test
         public GetClassForPlan_test()
         {
             var typeItems = new List<ItemType>
-            {
-             new ItemType(1, "Yoga Mat", new List<Item>()),
-            new ItemType(2, "Dumbbells", new List<Item>()),
-            new ItemType(3, "Resistance Bands", new List<Item>()),
-            };
+{
+    new ItemType() { Name = "Yoga Mat" },
+    new ItemType() { Name = "Dumbbells" },
+    new ItemType() { Name = "Resistance Bands" }
+};
             _context.ItemTypes.AddRange(typeItems);
             _context.SaveChanges();
 
             var classes = new List<Class>
+{
+             new Class()
+            {       
+            Id = 1,
+            Capacity = 15,
+            Name = "Morning Yoga",
+            Price = 15,
+            Date = DateTime.Today.AddDays(2),
+            PlanItems = new List<PlanItem>(),
+            TypeItems = new List<ItemType>() { typeItems[0] } 
+            },
+            new Class()
             {
-            new Class(1, 15, "Morning Yoga", 15, DateTime.Today.AddDays(2), new List<PlanItem>(), new List<ItemType>()),
-            new Class(2, 10, "HIIT Session", 20, DateTime.Today.AddDays(5), new List<PlanItem>(), new List<ItemType>()),
-            };
-            classes[0].TypeItems.Add(typeItems[0]); // Yoga Mat
-            classes[1].TypeItems.Add(typeItems[1]); // Dumbbells
+            Id = 2,
+            Capacity = 10,
+            Name = "HIIT Session",
+            Price = 20,
+            Date = DateTime.Today.AddDays(5),
+            PlanItems = new List<PlanItem>(),
+            TypeItems = new List<ItemType>() { typeItems[1] }  
+            },
+    };
+            
             var user = new ApplicationUser()
             {
                 Id = "3",
