@@ -16,30 +16,22 @@ namespace AppForSEII2526.UT.Classes_test
     {
         public GetClassForPlan_test()
         {
+            var typeItems = new List<ItemType>
+            {
+                 new ItemType() { Name = "Yoga Mat" },
+                new ItemType() { Name = "Dumbbells" }
+               };
+            _context.ItemTypes.AddRange(typeItems);
+            _context.SaveChanges();
+
             var classes = new List<Class>
-{
-  
-    new Class()
-    {
-        Id = 2,
-        Capacity = 10,
-        Name = "HIIT Session",
-        Price = 20,
-        Date = DateTime.Today.AddDays(5),
-        PlanItems = new List<PlanItem>(),
-        TypeItems = new List<ItemType>(){ new ItemType() { Name = "Cardio" } }
-    },
-    new Class()
-    {
-        Id = 3,
-        Capacity = 12,
-        Name = "Strength Training",
-        Price = 25,
-        Date = DateTime.Today.AddDays(3),
-        PlanItems = new List<PlanItem>(),
-        TypeItems = new List<ItemType>(){ new ItemType() { Name = "Fitness" } }
-    }
-};
+            {
+            new Class(1, 15, "Morning Yoga", 15, DateTime.Today.AddDays(2), new List<PlanItem>(), new List<ItemType>()),
+            new Class(2, 10, "HIIT Session", 20, DateTime.Today.AddDays(5), new List<PlanItem>(), new List<ItemType>()),
+            };
+            classes[0].TypeItems.Add(typeItems[0]); 
+            classes[1].TypeItems.Add(typeItems[1]); 
+            
 
             _context.Classes.AddRange(classes);
 
