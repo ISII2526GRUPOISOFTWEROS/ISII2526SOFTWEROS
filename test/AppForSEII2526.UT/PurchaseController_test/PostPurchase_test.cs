@@ -134,15 +134,14 @@ namespace AppForSEII2526.UT.PurchaseController_test
                        new CreatePurchaseItemDTO(1, 0),
                    }
                 );
-            var invalidmessage = "The test method expected 2 parameter values, but 1 parameter value was provided.";
             var allTests = new List<object[]>
             {
-                new object[] { purchaseInvalidPaymentMethod,invalidmessage},
-                new object[] { purchaseInvalidItem,invalidmessage},
-                new object[] { purchaseInsufficientStock,invalidmessage },
-                new object[] { purchaseInvalidUser,invalidmessage },
-                new object[] { purchaseNegativeQuantity,invalidmessage },
-                new object[] { purchaseZeroQuantity,invalidmessage },
+               new object[] { purchaseInvalidPaymentMethod, "Error!" },
+                new object[] { purchaseInvalidItem,         "Error!" },
+                new object[] { purchaseInsufficientStock,   "Error!" },
+                new object[] { purchaseInvalidUser,         "Error!" },
+                new object[] { purchaseNegativeQuantity,    "Error!" },
+                new object[] { purchaseZeroQuantity,        "Error!" },
            };
             return allTests;
         }
@@ -153,11 +152,16 @@ namespace AppForSEII2526.UT.PurchaseController_test
         {
             var mock = new Mock<ILogger<PurchaseController>>();
             ILogger<PurchaseController> logger = mock.Object;
+
             PurchaseController controller = new PurchaseController(_context, logger);
+            
             var result = await controller.CreateItemForPurchase(input);
+
             var badRequest = Assert.IsType<BadRequestObjectResult>(result);
-            var problemDetails = Assert.IsType<ValidationProblemDetails>(badRequest.Value);
+            var innerResult = Assert.IsType<ObjectResult>(badRequest.Value);
+            var problemDetails = Assert.IsType<ValidationProblemDetails>(innerResult.Value);
             var errorActual = problemDetails.Errors.First().Value[0];
+
             Assert.StartsWith(errors, errorActual);
         }
 
