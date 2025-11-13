@@ -7,9 +7,12 @@
         {
             Items = new List<Item>();
         }
-     
+        public ItemType(string? Name)
+        {
+            Name = Name;
+        }
 
-       
+
 
 
         public int Id { get; set; }
