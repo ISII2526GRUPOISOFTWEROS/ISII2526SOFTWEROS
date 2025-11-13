@@ -2,6 +2,7 @@
 using AppForSEII2526.API.DTOs.PurchaseDTOs;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 namespace AppForSEII2526.API.Controllers
 {
     [Route("api/[controller]")]
@@ -35,8 +36,7 @@ namespace AppForSEII2526.API.Controllers
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.Conflict)]
         public async Task<ActionResult> CreateItemForPurchase(ItemForCreateDTO itemForCreate)
         {
-
-            if (!ModelState.IsValid)
+   if (!ModelState.IsValid)
             {
                 return BadRequest(ValidationProblem(ModelState));
             }
@@ -68,7 +68,9 @@ namespace AppForSEII2526.API.Controllers
                 return BadRequest(ValidationProblem(ModelState));
             }
 
-            var requestedItemsIds = itemForCreate.PurchaseItems.Select(pi => pi.Id).ToList();
+            
+
+            var requestedItemsIds = itemForCreate.PurchaseItems.Select(pi => pi.ItemId).ToList();
 
             var dbItems = await _context.Items
                 .Where(i => requestedItemsIds.Contains(i.Id))
@@ -80,31 +82,31 @@ namespace AppForSEII2526.API.Controllers
 
             foreach (var pi in itemForCreate.PurchaseItems)
             {
-                if (!dbItems.TryGetValue(pi.Id, out var dbItem))
+                if (!dbItems.TryGetValue(pi.ItemId, out var dbItem))
                 {
-                    ModelState.AddModelError("ItemNotFound", $"Error! Item with Id {pi.Id} not found.");
+                    ModelState.AddModelError("ItemNotFound", $"Error! Item with Id {pi.ItemId} not found.");
                     continue;
                 }
-                if (pi.QuantityAvailableForPurchase <= 0)
+                if (pi.Quantity <= 0)
                 {
-                    ModelState.AddModelError("InvalidQuantity", $"Error! Item {dbItem.Name} has invalid quantity {pi.QuantityAvailableForPurchase}. Quantity must be greater than zero.");
+                    ModelState.AddModelError("InvalidQuantity", $"Error! Item {dbItem.Name} has invalid quantity {pi.Quantity}. Quantity must be greater than zero.");
                     continue;
                 }
 
-                if (pi.QuantityAvailableForPurchase > dbItem.QuantityAvailableForPurchase)
+                if (pi.Quantity > dbItem.QuantityAvailableForPurchase)
                 {
-                    ModelState.AddModelError("InsufficientStock", $"Error! Item {dbItem.Name} does not have enough stock. Available: {dbItem.QuantityAvailableForPurchase}, Requested: {pi.QuantityAvailableForPurchase}");
+                    ModelState.AddModelError("InsufficientStock", $"Error! Item {dbItem.Name} does not have enough stock. Available: {dbItem.QuantityAvailableForPurchase}, Requested: {pi.Quantity}");
                     continue;
                 }
                 purchaseItems.Add(new PurchaseItem
                 {
                     ItemId = dbItem.Id,
-                    Amount_bought = pi.QuantityAvailableForPurchase,
+                    Amount_bought = pi.Quantity,
                     Price = dbItem.PurchasePrice
                 });
 
-                totalCost += dbItem.PurchasePrice * pi.QuantityAvailableForPurchase;
-                dbItem.QuantityAvailableForPurchase -= pi.QuantityAvailableForPurchase;
+                totalCost += dbItem.PurchasePrice * pi.Quantity;
+                dbItem.QuantityAvailableForPurchase -= pi.Quantity;
                 _context.Items.Update(dbItem);
             }
 
