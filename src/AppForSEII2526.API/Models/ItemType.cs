@@ -7,11 +7,14 @@
         {
             Items = new List<Item>();
         }
-        public ItemType(string? Name)
-        {
-            Name = Name;
-        }
+     
 
+        public ItemType(int id, string? name, IList<Item> items)
+        {
+            Id = id;
+            Name = name;
+            Items = items;
+        }
 
 
 

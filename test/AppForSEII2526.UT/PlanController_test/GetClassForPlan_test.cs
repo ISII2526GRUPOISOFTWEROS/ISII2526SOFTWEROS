@@ -16,49 +16,43 @@ namespace AppForSEII2526.UT.Classes_test
     {
         public GetClassForPlan_test()
         {
-            var typeItems = new List<ItemType>
-            {
-                new ItemType() {  Name = "Yoga Mat"},
-                new ItemType() {  Name = "Dumbbells"},
-                new ItemType() {  Name = "Resistance Bands"}
-            };
-            _context.ItemTypes.AddRange(typeItems);
-            _context.SaveChanges();
-
             var classes = new List<Class>
-            {
-                new Class()
-                {
-                    Id = 1,
-                    Capacity = 15,
-                    Name = "Morning Yoga",
-                    Price = 15,
-                    Date = DateTime.Today.AddDays(2),
-                    PlanItems = new List<PlanItem>(),
-                    TypeItems = new List<ItemType>() { typeItems[0] } 
-                },
-                new Class()
-                {
-                    Id = 2,
-                    Capacity = 10,
-                    Name = "HIIT Session",
-                    Price = 20,
-                    Date = DateTime.Today.AddDays(5),
-                    PlanItems = new List<PlanItem>(),
-                    TypeItems = new List<ItemType>() { typeItems[1] } 
-                },
-                new Class()
-                {
-                    Id = 3,
-                    Capacity = 12,
-                    Name = "Strength Training",
-                    Price = 25,
-                    Date = DateTime.Today.AddDays(3),
-                    PlanItems = new List<PlanItem>(),
-                    TypeItems = new List<ItemType>() { typeItems[2] } 
-                }
-            };
+{
+    new Class()
+    {
+        Id = 1,
+        Capacity = 15,
+        Name = "Morning Yoga",
+        Price = 15,
+        Date = DateTime.Today.AddDays(2),
+        PlanItems = new List<PlanItem>(),
+        TypeItems = new List<ItemType>() 
+    },
+    new Class()
+    {
+        Id = 2,
+        Capacity = 10,
+        Name = "HIIT Session",
+        Price = 20,
+        Date = DateTime.Today.AddDays(5),
+        PlanItems = new List<PlanItem>(),
+        TypeItems = new List<ItemType>() 
+    },
+    new Class()
+    {
+        Id = 3,
+        Capacity = 12,
+        Name = "Strength Training",
+        Price = 25,
+        Date = DateTime.Today.AddDays(3),
+        PlanItems = new List<PlanItem>(),
+        TypeItems = new List<ItemType>() 
+    }
+};
+
             _context.Classes.AddRange(classes);
+          
+
 
             var user = new ApplicationUser()
             {
