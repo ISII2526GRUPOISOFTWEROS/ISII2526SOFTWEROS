@@ -1,5 +1,6 @@
 ﻿
 using AppForSEII2526.API.DTOs.PurchaseDTOs;
+
 namespace AppForSEII2526.API.DTOs.ItemDTOs
 {
     public class ItemForCreateDTO
@@ -8,8 +9,9 @@ namespace AppForSEII2526.API.DTOs.ItemDTOs
         {
         }
 
-        public ItemForCreateDTO(int paymentMethodId, string street, string city, string country, string description, IList<CreatePurchaseItemDTO> purchaseItems)
+        public ItemForCreateDTO(string customerUserName, int paymentMethodId, string street, string city, string country, string description, IList<CreatePurchaseItemDTO> purchaseItems)
         {
+            CustomerUserName = customerUserName;
             PaymentMethodId = paymentMethodId;
             Street = street;
             City = city;
@@ -17,7 +19,9 @@ namespace AppForSEII2526.API.DTOs.ItemDTOs
             Description = description;
             PurchaseItems = purchaseItems;
         }
-
+        [Required]
+        [StringLength(50, MinimumLength = 10, ErrorMessage = "Name must have at least 10 characters")]
+        public string CustomerUserName { get; set; }
 
         [Required(ErrorMessage = "PaymentMethod is requiered")]
         [Range(1, int.MaxValue, ErrorMessage = "A valid PaymentMethod must be greater than 0")]
@@ -29,7 +33,7 @@ namespace AppForSEII2526.API.DTOs.ItemDTOs
         public string Street { get; set; }
 
         [Required(ErrorMessage = "City is requiered")]
-        [StringLength(100, MinimumLength = 3, ErrorMessage = "City must have between 3 and 100 characters")] 
+        [StringLength(100, MinimumLength = 3, ErrorMessage = "City must have between 3 and 100 characters")]
         public string City { get; set; }
 
 
@@ -38,7 +42,7 @@ namespace AppForSEII2526.API.DTOs.ItemDTOs
         public string Country { get; set; }
 
 
-        [StringLength(100,  ErrorMessage = "Description cannot exceed 100 characters")]
+        [StringLength(100, ErrorMessage = "Description cannot exceed 100 characters")]
         public string? Description { get; set; }
 
         [Required(ErrorMessage = "At least one item must be included in the purchase")]
@@ -47,10 +51,10 @@ namespace AppForSEII2526.API.DTOs.ItemDTOs
 
 
 
-
         public override bool Equals(object? obj)
         {
             return obj is ItemForCreateDTO dTO &&
+                   CustomerUserName == dTO.CustomerUserName &&
                    PaymentMethodId == dTO.PaymentMethodId &&
                    Street == dTO.Street &&
                    City == dTO.City &&

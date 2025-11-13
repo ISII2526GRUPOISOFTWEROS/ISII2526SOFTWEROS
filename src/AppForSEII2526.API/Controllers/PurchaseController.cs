@@ -36,32 +36,21 @@ namespace AppForSEII2526.API.Controllers
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.Conflict)]
         public async Task<ActionResult> CreateItemForPurchase(ItemForCreateDTO itemForCreate)
         {
-
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            //var userId = "1";
-
-            if (string.IsNullOrEmpty(userId))
+   if (!ModelState.IsValid)
             {
-                return Unauthorized();
-            }
-
-            var paymentMethod = await _context.Set<PaymentMethod>()
-                .Include(pm => pm.User)
-                .FirstOrDefaultAsync(pm => pm.Id == itemForCreate.PaymentMethodId);
-
-            if (paymentMethod == null)
-            {
-                ModelState.AddModelError("PaymentMethod", "ERROR! The selected payment method is not registered for this user.");
                 return BadRequest(ValidationProblem(ModelState));
             }
 
-            if (!ModelState.IsValid)
+
+            var user = _context.ApplicationUser.FirstOrDefault(au => au.UserName == itemForCreate.CustomerUserName);
+
+            if (user == null)
             {
+                ModelState.AddModelError("UserNotFound", $"Error! Username is not registred");
                 return BadRequest(ValidationProblem(ModelState));
             }
             var checkPM = await _context.Set<PaymentMethod>()
-                .AnyAsync(pm => pm.Id == itemForCreate.PaymentMethodId);
-
+                .AnyAsync(pm => pm.Id == itemForCreate.PaymentMethodId && pm.User.Id == user.Id);
 
 
             if (!checkPM)
@@ -69,6 +58,14 @@ namespace AppForSEII2526.API.Controllers
                 ModelState.AddModelError("PaymentMethod", "Error! The selected payment method is not registered for this user.");
                 return BadRequest(ValidationProblem(ModelState));
 
+            }
+
+            var paymentMethod = await _context.Set<PaymentMethod>().FirstOrDefaultAsync(pm => pm.Id == itemForCreate.PaymentMethodId);
+
+            if (paymentMethod == null || paymentMethod.User.Id != user.Id)
+            {
+                ModelState.AddModelError("PaymentMethod", "ERROR! The selected payment method is not registered for this user.");
+                return BadRequest(ValidationProblem(ModelState));
             }
 
             
