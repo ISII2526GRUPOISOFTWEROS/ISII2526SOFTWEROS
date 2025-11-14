@@ -31,8 +31,10 @@ namespace AppForSEII2526.API.Controllers
         public async Task<ActionResult> GetItemsForRestock(string? itemName, int? quantityForRestock)
         {
             IList<ItemForRestockDTO> itemsDTOs = await _context.Items
-                .Where(Item => Item.Name.Contains(itemName) 
-                            || Item.QuantityForRestock > quantityForRestock)
+                .Where(Item => (itemName == null ||  Item.Name.Contains(itemName))
+                            && (Item.QuantityAvailableForPurchase < Item.QuantityForRestock)
+                            && (quantityForRestock == null || Item.QuantityAvailableForPurchase <= quantityForRestock))
+
 
                 .OrderBy(Item => Item.Name)
 
@@ -43,6 +45,13 @@ namespace AppForSEII2526.API.Controllers
                                                     Item.QuantityForRestock))
 
                 .ToListAsync();
+
+            if (itemsDTOs.Count == 0)
+            {
+                string error = "The item must need a restock";
+                _logger.LogWarning(DateTime.Now + " " + error);
+                return BadRequest(error);
+            }
 
             return Ok(itemsDTOs);
 

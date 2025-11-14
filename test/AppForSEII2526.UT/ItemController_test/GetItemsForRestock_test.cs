@@ -1,6 +1,7 @@
-﻿using AppForSEII2526.UT;
-using AppForSEII2526.API.Controllers;
+﻿using AppForSEII2526.API.Controllers;
 using AppForSEII2526.API.DTOs.ItemDTOs;
+using AppForSEII2526.UT;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 //using AppForSEII2526.DTOs
 
-namespace AppForSEII2526.UT.ItemController
+namespace AppForSEII2526.UT.RestockController_test
 {
     public class GetItemsForRestock_test : AppForSEII25264SqliteUT
     {
@@ -16,58 +17,120 @@ namespace AppForSEII2526.UT.ItemController
 
         public GetItemsForRestock_test() //constructor  
         {
-            var items = new List<Item>()
+            var brands = new List<Brand>()
             {
-                new Item(){ Id=1, Name="ItemA", QuantityForRestock=5, Brand=new Brand(){ Name="BrandA"}, QuantityAvailableForPurchase=10 },
-                new Item(){ Id=2, Name="ItemB", QuantityForRestock=15, Brand=new Brand(){ Name="BrandB"}, QuantityAvailableForPurchase=20 },
-                new Item(){ Id=3, Name="ItemC", QuantityForRestock=25, Brand=new Brand(){ Name="BrandC"}, QuantityAvailableForPurchase=30 },
+                new Brand(){ Name="Nike"},
+                new Brand(){ Name="Domyos"},
 
             };
 
+            var itemTypes = new List<ItemType>()
+            {
+                new ItemType(){ Name="Strength Equipment"},
+                new ItemType(){ Name="Cardio Equipment"},
+            };
+
+
+            var items = new List<Item>()
+            {
+                new Item(){ Name="Foam Roller", QuantityForRestock=30, Brand= brands[0], QuantityAvailableForPurchase=25 ,ItemType = itemTypes[0]},
+                new Item(){ Name="Bands", QuantityForRestock=20, Brand=brands[1], QuantityAvailableForPurchase=15 ,ItemType = itemTypes[1]},
+                new Item(){ Name="Kettlebell", QuantityForRestock=30, Brand=brands[0], QuantityAvailableForPurchase=25 ,ItemType = itemTypes[0]},
+
+            };
+
+
+            _context.Items.AddRange(items);
+            _context.Brands.AddRange(brands);
+            _context.ItemTypes.AddRange(itemTypes);
+
+            _context.SaveChanges();
+
             //var itemsDTOsTc1 = new List<ItemForCreateRestockDTO>() { items[0], items[1] };
 
-
-
         }
-        //[Fact]
-        //public async Task GetItemsForRestock_ShouldReturnItemsMatchingCriteria()
-        //{
-        //    // Arrange
-        //    var controller = new ItemsController(_context, _logger);
-        //    string itemName = "ItemA";
-        //    int quantityForRestock = 10;
-        //    // Act
-        //    var result = await controller.GetItemsForRestock(itemName, quantityForRestock) as ActionResult;
-        //    // Assert
-        //    Assert.NotNull(result);
-        //    var okResult = Assert.IsType<OkObjectResult>(result);
-        //    var items = Assert.IsAssignableFrom<IList<ItemForRestockDTO>>(okResult.Value);
-        //    Assert.Single(items);
-        //    Assert.Equal("ItemA", items[0].Name);
-        //}
 
-        //Theory made in class
-        //[Theory]
-        //[Trait("LevelTesting", "Unit testing")]
-        //[MemberData(nameof(GetItemsForRestock_test))]
-        //public async Task GetItemsForRestock_ShouldReturnItemsMatchingCriteria(string? itemName, int? quantityForRestock)
-        //{
-        //    // Arrange
-        //    var controller = new ItemsController(_context, null);
 
-        //    // Act
-        //    var result = await controller.GetItemsForRestock(itemName, quantityForRestock);
+        public static IEnumerable<object[]> TestCasesFor_GetItemsForRestock_OK()
+        {
+            var itemDTOs = new List<ItemForRestockDTO>()
+            {
+                new ItemForRestockDTO("Nike", "Foam Roller", 25, 30),
+                new ItemForRestockDTO("Domyos", "Bands", 15, 20),
+                new ItemForRestockDTO("Nike", "Kettlebell", 25, 30),
+            };
+
+            var itemDTOsTC1 = new List<ItemForRestockDTO>() { itemDTOs[1], itemDTOs[0], itemDTOs[2] };
+            var itemDTOsTC2 = new List<ItemForRestockDTO>() { itemDTOs[0], itemDTOs[2] };
+            var itemDTOsTC3 = new List<ItemForRestockDTO>() { itemDTOs[1] };
+            var itemDTOsTC4 = new List<ItemForRestockDTO>() { itemDTOs[0] };
 
 
 
-        //    // Assert
-        //    Assert.NotNull(result);
-        //    var okResult = Assert.IsType<OkObjectResult>(result);
-        //    var items = Assert.IsAssignableFrom<IList<ItemForRestockDTO>>(okResult.Value);
-        //    Assert.Single(items);
-        //    Assert.Equal("ItemA", items[0].Name);
-        //}
+            var allTest = new List<object?[]>()
+            {
+                new object?[] { null, null, itemDTOsTC1 },
+                new object?[] { "l", null,  itemDTOsTC2 },
+                new object?[] { null, 20, itemDTOsTC3 },
+                new object?[] { "Foam", null, itemDTOsTC4 },
 
-    
+                
+            };
+            return allTest;
+        }
+
+        [Theory]
+        [MemberData(nameof(TestCasesFor_GetItemsForRestock_OK))]
+        [Trait("Database", "WithoutFixture")]
+        [Trait("LevelTesting", "Unit testing")]
+        public async Task GetItemsForRestock_Ok_test(string? itemName, int? quantityForRestock, 
+            IList<ItemForRestockDTO> expectedItems)
+        {
+            // Arrange
+            var controller = new ItemsController(_context, null);
+
+            // Act
+            var result = await controller.GetItemsForRestock(itemName, quantityForRestock);
+
+            
+
+            // Assert
+            var okResult = Assert.IsType<OkObjectResult>(result);
+
+            var itemsDTOActual = Assert.IsType<List<ItemForRestockDTO>>(okResult.Value);
+            Assert.Equal(expectedItems, itemsDTOActual);
+        }
+
+
+
+        [Fact]
+        [Trait("Database", "WithoutFixture")]
+        [Trait("LevelTesting", "Unit testing")]
+        public async Task GetItemsForRestock_badrequest_test()
+        {
+            // Arrange
+            List<ItemForRestockDTO> expectedItems = new List<ItemForRestockDTO>()
+            {
+                new ItemForRestockDTO("Nike", "Foam Roller", 30, 25)
+            };
+            var mock = new Mock<ILogger<ItemsController>>();
+            ILogger<ItemsController> logger = mock.Object;
+            ItemsController controller = new ItemsController(_context, logger);
+
+            // Act
+            var result = await controller.GetItemsForRestock("Foam Roller", 10);
+
+            // Assert
+            var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
+            var problem = Assert.IsType<string>(badRequestResult.Value);
+
+
+            Assert.Equal("The item must need a restock", problem);
+        }
+
+        
+        
+
+
     }
 }
