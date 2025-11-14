@@ -24,6 +24,25 @@ namespace AppForSEII2526.API.Controllers
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.Conflict)]
         public async Task<ActionResult> CreatePlan(PlanForCreateDTO planForCreate)
         {
+
+            var user = _context.ApplicationUser.FirstOrDefault(au => au.UserName == planForCreate.UserName);
+
+            if (user == null)
+            {
+                ModelState.AddModelError("UserNotFound", $"Error! Username is not registred");
+                return BadRequest(ValidationProblem(ModelState));
+            }
+            var checkPM = await _context.Set<PaymentMethod>()
+                .AnyAsync(pm => pm.Id == planForCreate.PaymentMethodId && pm.User.Id == user.Id);
+
+
+            if (!checkPM)
+            {
+                ModelState.AddModelError("PaymentMethod", "Error! The selected payment method is not registered for this user.");
+                return BadRequest(ValidationProblem(ModelState));
+
+            }
+
             if (planForCreate == null)
             {
                 return BadRequest("No plan data provided.");
@@ -78,7 +97,8 @@ namespace AppForSEII2526.API.Controllers
                 HealthIssues = planForCreate.HealthIssues,
                 Totalprice = totalCost,
                 CreatedDate = DateTime.UtcNow,
-                PlanItems = new List<PlanItem>()
+                PlanItems = new List<PlanItem>(),
+                User = user
             };
 
             foreach (var selected in planForCreate.SelectedClasses)

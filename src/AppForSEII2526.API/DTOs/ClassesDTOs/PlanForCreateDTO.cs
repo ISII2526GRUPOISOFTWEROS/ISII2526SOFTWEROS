@@ -5,9 +5,10 @@ namespace AppForSEII2526.API.DTOs.ClassesDTOs
     public class PlanForCreateDTO
     {
         public PlanForCreateDTO() { }
-        public PlanForCreateDTO(string Name, string? description, int weeks, string? healthIssues, IList<ClassForPlanDTO> selectedClasses, int paymentMethodId)
+        public PlanForCreateDTO(string Name, string userName, string? description, int weeks, string? healthIssues, IList<ClassForPlanDTO> selectedClasses, int paymentMethodId)
         {
             this.Name = Name;
+            this.UserName = userName;
             this.Description = description;
             this.Weeks = weeks;
             this.HealthIssues = healthIssues;
@@ -16,6 +17,10 @@ namespace AppForSEII2526.API.DTOs.ClassesDTOs
         [Required]
         [StringLength(60, MinimumLength = 3, ErrorMessage = "Plan name must have at least 3 characters")]
         public string Name { get; set; } = string.Empty;
+
+        [Required]
+        [StringLength(50, MinimumLength = 3, ErrorMessage = "Plan name must have at least 10 characters")]
+        public string UserName { get; set; } = string.Empty;
 
         [StringLength(100, ErrorMessage = "Description cannot exceed 100 characters")]
         public string? Description { get; set; }
@@ -34,6 +39,19 @@ namespace AppForSEII2526.API.DTOs.ClassesDTOs
         public int PaymentMethodId { get; set; }  
      
         public IList<GoalForClassDTO>? Goals { get; set; }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is PlanForCreateDTO dTO &&
+                   Name == dTO.Name &&
+                   UserName == dTO.UserName &&
+                   Description == dTO.Description &&
+                   Weeks == dTO.Weeks &&
+                   HealthIssues == dTO.HealthIssues &&
+                   EqualityComparer<IList<ClassSelectionDTO>>.Default.Equals(SelectedClasses, dTO.SelectedClasses) &&
+                   PaymentMethodId == dTO.PaymentMethodId &&
+                   EqualityComparer<IList<GoalForClassDTO>?>.Default.Equals(Goals, dTO.Goals);
+        }
     }
 
     public class ClassSelectionDTO

@@ -60,12 +60,14 @@ namespace AppForSEII2526.UT.PlanController_test
         [Trait("CreatePlan", "Unit Testing")]
         public async Task CreatePlan_Success()
         {
+            var mockLogger = new Mock<ILogger<ClassesController>>();
             var controller = CreateController();
             var classEntity = _context.Classes.First();
             var paymentMethod = _context.CreditCards.First(); // tarjeta válida
 
             var dto = new PlanForCreateDTO(
                 "Basic Plan",
+                "test",
                 "For beginners",
                 4,
                 "None",
@@ -77,7 +79,7 @@ namespace AppForSEII2526.UT.PlanController_test
                         classEntity.Date,
                         classEntity.Name,
                         classEntity.Capacity,
-                        new List<string> { })
+                        new List<string> { }), 
                 },
                 paymentMethod.Id // PaymentMethod valido
             );
@@ -94,6 +96,7 @@ namespace AppForSEII2526.UT.PlanController_test
             var paymentMethod = _context.CreditCards.First();
             var dto = new PlanForCreateDTO(
                 "Plan Without Classes",
+                "test",
                 "No classes selected",
                 4,
                 "None",
@@ -114,6 +117,7 @@ namespace AppForSEII2526.UT.PlanController_test
 
             var dto = new PlanForCreateDTO(
                 "Invalid PM Plan",
+                "test",
                 "Bad payment method",
                 2,
                 null,

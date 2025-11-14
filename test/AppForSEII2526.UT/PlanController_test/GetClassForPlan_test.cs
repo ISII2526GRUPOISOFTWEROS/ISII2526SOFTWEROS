@@ -55,12 +55,16 @@ namespace AppForSEII2526.UT.PlanController_test
         [Trait("GetClassForPlan", "Unit Testing")]
         public async Task GetClassForPlan_NoFilters_ReturnsAll()
         {
-            var mockLogger = new Mock<ILogger<ClassesController>>();
-            var controller = new ClassesController(_context, mockLogger.Object);
+            var mock = new Mock<ILogger<PlanController>>();
+            ILogger<PlanController> logger = mock.Object;
 
-            var result = await controller.GetClassForPlan(null, null, null, null);
+            PlanController controller = new PlanController(_context, logger);
 
-            var ok = Assert.IsType<OkObjectResult>(result);
+            var result = await controller.GetClassForPlan();
+
+            Assert.IsType<NotFoundResult>(result);
+
+        var ok = Assert.IsType<OkObjectResult>(result);
             var values = Assert.IsType<List<ClassForPlanDTO>>(ok.Value);
 
             Assert.Equal(3, values.Count);
