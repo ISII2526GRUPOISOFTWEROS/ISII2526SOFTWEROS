@@ -27,15 +27,17 @@ namespace AppForSEII2526.API.DTOs.ClassesDTOs
             return obj is ClassForPlanDTO dTO &&
                    Id == dTO.Id &&
                    price == dTO.price &&
-                   capacity == dTO.capacity &&
                    EqualityComparer<IList<string?>>.Default.Equals(itemType, dTO.itemType) &&
                    date == dTO.date &&
-                   Name == dTO.Name;
+                   Name == dTO.Name &&
+                   capacity == dTO.capacity;
         }
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(Id, price, itemType, date, Name);
+            return HashCode.Combine(Id, price, itemType, date, Name, capacity);
         }
     }
 }
+
+        
