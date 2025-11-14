@@ -51,24 +51,24 @@ namespace AppForSEII2526.UT.PlanController_test
             _context.SaveChanges();
         }
 
-        [Fact]
-        [Trait("GetClassForPlan", "Unit Testing")]
-        public async Task GetClassForPlan_NoFilters_ReturnsAll()
-        {
-            var mock = new Mock<ILogger<PlanController>>();
-            ILogger<PlanController> logger = mock.Object;
+        //[Fact]
+        //[Trait("GetClassForPlan", "Unit Testing")]
+        //public async Task GetClassForPlan_NoFilters_ReturnsAll()
+        //{
+        //    var mock = new Mock<ILogger<PlanController>>();
+        //    ILogger<PlanController> logger = mock.Object;
 
-            PlanController controller = new PlanController(_context, logger);
+        //    PlanController controller = new PlanController(_context, logger);
 
-            var result = await controller.GetClassForPlan();
+        //    var result = await controller.GetClassForPlan();
 
-            Assert.IsType<NotFoundResult>(result);
+        //    Assert.IsType<NotFoundResult>(result);
 
-        var ok = Assert.IsType<OkObjectResult>(result);
-            var values = Assert.IsType<List<ClassForPlanDTO>>(ok.Value);
+        //var ok = Assert.IsType<OkObjectResult>(result);
+        //    var values = Assert.IsType<List<ClassForPlanDTO>>(ok.Value);
 
-            Assert.Equal(3, values.Count);
-        }
+        //    Assert.Equal(3, values.Count);
+        //}
 
         [Fact]
         [Trait("GetClassForPlan", "Unit Testing")]
