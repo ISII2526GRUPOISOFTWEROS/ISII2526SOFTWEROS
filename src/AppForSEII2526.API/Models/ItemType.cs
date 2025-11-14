@@ -3,22 +3,11 @@
     [Index(nameof(Name), IsUnique = true)]
     public class ItemType
     {
-
-        private string v;
-
-        public ItemType(string v)
-        {
-            this.v = v;
-        }
-
         public ItemType()
         {
+            Items = new List<Item>();
         }
-        public ItemType(int id, string? name)
-        {
-            Id = id;
-            Name = name;
-        }
+
 
         public ItemType(int id, string? name, IList<Item> items)
         {
@@ -33,8 +22,7 @@
         public string? Name { get; set; }
 
         public IList<Item> Items { get; set; }
-        
-    public ICollection<Class> Classes { get; set; } = new List<Class>();
+
 
 
 

@@ -109,10 +109,7 @@ namespace AppForSEII2526.UT.ItemForPurchase_test
             var okResult = Assert.IsType<OkObjectResult>(result);
             var itemactualresult = Assert.IsType<List<ItemForPurchaseDTO>>(okResult.Value);
 
-            var expetedItemsSorted = expectedItems.OrderBy(i => i.Name).ToList();
-            var itemactualresultSorted = itemactualresult.OrderBy(i => i.Name).ToList();
-
-            Assert.Equal(expetedItemsSorted, itemactualresultSorted);
+            Assert.Equal(expectedItems, itemactualresult);
         }
     }
 

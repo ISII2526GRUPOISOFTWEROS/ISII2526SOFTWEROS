@@ -1,136 +1,210 @@
 ﻿using AppForSEII2526.API.Controllers;
 using AppForSEII2526.API.DTOs.ClassesDTOs;
+using AppForSEII2526.API.DTOs.PlanDTOs;
 using AppForSEII2526.API.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moq;
-using Xunit;
 
-namespace AppForSEII2526.UT.Plan_test
+namespace AppForSEII2526.UT.PlanController_test
 {
     public class CreatePlan_test : AppForSEII25264SqliteUT
     {
-
+        private const string _userName = "Pepe.Gomez";
+        private const string _name = "Pepe";
+        private const string _surname = "Gomez";
+        private const string _deliveryAddress = "Avda. España s/n, Albacete 02071";
 
         public CreatePlan_test()
         {
             var user = new ApplicationUser()
             {
-                Id = "3",
+                Id = "1",
                 UserName = "test",
                 Surname = "user",
                 Email = "test@test.com",
             };
-            _context.Users.Add(user);
-            _context.SaveChanges();
-
-            var creditcard = new CreditCard()
+            _context.Users.AddRange(user);
+            var paymentMethods = new List<Bizum>()
             {
-                Id = 0,
-                User = user,
-                CreditCardNumber = "664543223",
-                ExpirationDate = DateTime.UtcNow.AddMonths(1)
+                new Bizum(){ Id= 1,User= user, TelephoneNumber= 664543223},
+
             };
-            _context.CreditCards.Add(creditcard);
+            _context.Bizums.AddRange(paymentMethods);
+            var types = new List<ItemType>()
+            {
+                new ItemType { Name = "Yoga" },
+                new ItemType { Name = "Pilates" }
+            };
 
-            var itemsType = new ItemType() { Name = "Cardio" };
-            _context.ItemTypes.Add(itemsType);
+            var classes = new List<Class>()
+            {
+                new Class { Id = 1, Name = "Morning Yoga", Price = 10.0m, Date = DateTime.Today.AddDays(1), TypeItems = new List<ItemType> { types[0] } },
+                new Class { Id = 2, Name = "Evening Pilates", Price = 15.0m, Date = DateTime.Today.AddDays(2), TypeItems = new List<ItemType> { types[1] } }
+            };
 
-            var classes = new Class(
-                0,
-                10,
-                "Morning Yoga",
-                15,
-                DateTime.Today.AddDays(2),
-                new List<PlanItem>(),
-                new List<ItemType> { itemsType }
-            );
-            _context.Classes.Add(classes);
-
+            _context.AddRange(types);
+            _context.AddRange(classes);
             _context.SaveChanges();
         }
 
-        private PlanController CreateController()
+        public static IEnumerable<object[]> TestCasesFor_CreatePlan_Error()
         {
-            var mockLogger = new Mock<ILogger<PlanController>>();
-            return new PlanController(_context, mockLogger.Object);
-        }
+            
+            var planUserNotRegistered = new PlanForCreateDTO
+            {
+                UserName = "victor.lopez@uclm.es",
+                Name = "Plan 1",
+                Weeks = 4,
+                PaymentMethodId = 1,
+                SelectedClasses = new List<ClassSelectionDTO>
+{
+    new ClassSelectionDTO
+    {
+        Id = 1,
+        Name = "Morning Yoga",
+        Price = 10m,
+        Date = DateTime.Today.AddDays(1),
+        ItemType = new List<string?> { "Yoga" }
+    },
+    new ClassSelectionDTO
+    {
+        Id = 2,
+        Name = "Evening Pilates",
+        Price = 15m,
+        Date = DateTime.Today.AddDays(2),
+        ItemType = new List<string?> { "Pilates" }
+    }
+}
+            };
 
-        [Fact]
-        [Trait("CreatePlan", "Unit Testing")]
-        public async Task CreatePlan_Success()
-        {
-            var controller = CreateController();
-            var classEntity = _context.Classes.First();
-            var paymentMethod = _context.CreditCards.First(); // tarjeta válida
 
-            var dto = new PlanForCreateDTO(
-                "Basic Plan",
-                "For beginners",
-                4,
-                "None",
-                new List<ClassForPlanDTO>
+                var planNoClasses = new PlanForCreateDTO
                 {
-                    new ClassForPlanDTO(
-                        classEntity.Id,
-                        classEntity.Price,
-                        classEntity.Date,
-                        classEntity.Name,
-                        classEntity.Capacity,
-                        new List<string> { })
-                },
-                paymentMethod.Id // PaymentMethod valido
-            );
-            var result = await controller.CreatePlan(dto);
+                    UserName = "elena@uclm.es",
+                    Name = "Plan 2",
+                    Weeks = 4,
+                    PaymentMethodId = 1,
+                    SelectedClasses = new List<ClassSelectionDTO>
+{
+    new ClassSelectionDTO
+    {
+        Id = 1,
+        Name = "Morning Yoga",
+        Price = 10m,
+        Date = DateTime.Today.AddDays(1),
+        ItemType = new List<string?> { "Yoga" }
+    },
+    new ClassSelectionDTO
+    {
+        Id = 2,
+        Name = "Evening Pilates",
+        Price = 15m,
+        Date = DateTime.Today.AddDays(2),
+        ItemType = new List<string?> { "Pilates" }
+    }
+}
+                };
+
+                    var planInvalidWeeks = new PlanForCreateDTO
+            {
+                UserName = "elena@uclm.es",
+                Name = "Plan 3",
+                Weeks = 0,
+                PaymentMethodId = 1,
+                        SelectedClasses = new List<ClassSelectionDTO>
+{
+    new ClassSelectionDTO
+    {
+        Id = 1,
+        Name = "Morning Yoga",
+        Price = 10m,
+        Date = DateTime.Today.AddDays(1),
+        ItemType = new List<string?> { "Yoga" }
+    },
+    new ClassSelectionDTO
+    {
+        Id = 2,
+        Name = "Evening Pilates",
+        Price = 15m,
+        Date = DateTime.Today.AddDays(2),
+        ItemType = new List<string?> { "Pilates" }
+    } }
+};
+
+                        var allTests = new List<object[]>
+            {
+                new object[] { planUserNotRegistered, "Error! Username is not registred" },
+                new object[] { planNoClasses, "At least one class must be selected." },
+                new object[] { planInvalidWeeks, "Weeks must be greater than 0." }
+            };
+
+            return allTests;
+        }
+
+        [Theory]
+        [Trait("LevelTesting", "Unit Testing")]
+        [MemberData(nameof(TestCasesFor_CreatePlan_Error))]
+        public async Task CreatePlan_Error_test(PlanForCreateDTO planDTO, string errorExpected)
+        {
+            var mock = new Mock<ILogger<PlanController>>();
+            ILogger<PlanController> logger = mock.Object;
+
+            var controller = new PlanController(_context, logger);
+
+            var result = await controller.CreatePlan(planDTO);
+
+            var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
+            var problemDetails = Assert.IsType<ValidationProblemDetails>(badRequestResult.Value);
+            var errorActual = problemDetails.Errors.First().Value[0];
+            Assert.StartsWith(errorExpected, errorActual);
         }
 
         [Fact]
-        [Trait("CreatePlan", "Unit Testing")]
-        public async Task CreatePlan_NoClasses_ReturnsBadRequest()
+        [Trait("LevelTesting", "Unit Testing")]
+        public async Task CreatePlan_Success_test()
         {
-            var controller = CreateController();
-            var paymentMethod = _context.CreditCards.First();
-            var dto = new PlanForCreateDTO(
-                "Plan Without Classes",
-                "No classes selected",
-                4,
-                "None",
-                new List<ClassForPlanDTO>(), //lista vacia
-                paymentMethod.Id
-            );
-            var result = await controller.CreatePlan(dto);
-            var bad = Assert.IsType<BadRequestObjectResult>(result);
-            Assert.NotNull(bad.Value);
-        }
+            var mock = new Mock<ILogger<PlanController>>();
+            ILogger<PlanController> logger = mock.Object;
 
-        [Fact]
-        [Trait("CreatePlan", "Unit Testing")]
-        public async Task CreatePlan_InvalidPaymentMethod_ReturnsBadRequest()
-        {
-            var controller = CreateController();
-            var classEntity = _context.Classes.First();
+            var controller = new PlanController(_context, logger);
 
-            var dto = new PlanForCreateDTO(
-                "Invalid PM Plan",
-                "Bad payment method",
-                2,
-                null,
-                new List<ClassForPlanDTO>
-                {
-                    new ClassForPlanDTO(
-                        classEntity.Id,
-                        classEntity.Price,
-                        classEntity.Date,
-                        classEntity.Name,
-                        classEntity.Capacity,
-                        new List<string> {})
-                },
-                999
-            );
+            var planDTO = new PlanForCreateDTO
+            {
+                UserName = _userName,
+                Name = "Healthy Plan",
+                Weeks = 2,
+                PaymentMethodId = 1,
+                SelectedClasses = new List<ClassSelectionDTO>
+{
+    new ClassSelectionDTO
+    {
+        Id = 1,
+        Name = "Morning Yoga",
+        Price = 10m,
+        Date = DateTime.Today.AddDays(1),
+        ItemType = new List<string?> { "Yoga" }
+    },
+    new ClassSelectionDTO
+    {
+        Id = 2,
+        Name = "Evening Pilates",
+        Price = 15m,
+        Date = DateTime.Today.AddDays(2),
+        ItemType = new List<string?> { "Pilates" }
+    } }
+};
 
-            var result = await controller.CreatePlan(dto);
-            var bad = Assert.IsType<BadRequestObjectResult>(result);
-            Assert.NotNull(bad.Value);
+                var result = await controller.CreatePlan(planDTO);
+
+            var createdResult = Assert.IsType<CreatedAtActionResult>(result);
+            dynamic response = createdResult.Value;
+
+            Assert.Equal(planDTO.Name, (string)response.Name);
+            Assert.Equal(planDTO.Weeks, (int)response.Weeks);
+            Assert.Equal(50m, (decimal)response.Totalprice); 
+            Assert.Equal(planDTO.SelectedClasses.Count, ((IEnumerable<dynamic>)response.Classes).Count());
         }
     }
 }

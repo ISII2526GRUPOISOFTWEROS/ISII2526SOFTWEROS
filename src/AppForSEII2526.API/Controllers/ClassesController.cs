@@ -42,67 +42,77 @@ namespace AppForSEII2526.API.Controllers
         [ProducesResponseType(typeof(IList<ClassForPlanDTO>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.BadRequest)]
         public async Task<ActionResult> GetClassForPlan(
-          [FromQuery] IList<string>? itemTypes, DateTime? date, DateTime? fromDate, DateTime? toDate)
+      [FromQuery] IList<string>? itemTypes,
+      DateTime? date,
+      DateTime? fromDate,
+      DateTime? toDate)
         {
             try
             {
-                // fechas
-                if (date.HasValue && date.Value.Date < DateTime.Today)
+                if ((date.HasValue && date.Value.Date < DateTime.Today) ||
+                    (fromDate.HasValue && fromDate.Value.Date < DateTime.Today) ||
+                    (toDate.HasValue && toDate.Value.Date < DateTime.Today))
                 {
-                    string error = "Cannot be before today";
-                    _logger.LogWarning(DateTime.Now + " " + error);
+                    string error = "The selected date cannot be before today.";
+                    _logger.LogWarning($"{DateTime.Now} {error}");
                     return BadRequest(error);
                 }
-                if (fromDate.HasValue && fromDate.Value.Date < DateTime.Today)
-                {
-                    string error = "Cannot be before today";
-                    _logger.LogWarning(DateTime.Now + " " + error);
-                    return BadRequest(error);
-                }
-                if (toDate.HasValue && toDate.Value.Date < DateTime.Today)
-                {
-                    string error = "Cannot be before today";
-                    _logger.LogWarning(DateTime.Now + " " + error);
-                    return BadRequest(error);
-                }
-                // built query
+
                 var query = _context.Classes
                     .Include(c => c.TypeItems)
                     .AsQueryable();
-                // Filters
+
+                if (!itemTypes?.Any() == true && !date.HasValue && !fromDate.HasValue && !toDate.HasValue)
+                {
+                    DateTime start = DateTime.Today;
+                    DateTime end = DateTime.Today.AddDays(7);
+
+                    query = query.Where(c => c.Date.Date >= start && c.Date.Date <= end);
+                }
+
                 if (itemTypes != null && itemTypes.Count > 0)
                 {
-                    var normalizedTypes = itemTypes.Select(t => t.ToLower()).ToList();
-                    query = query.Where(c => c.TypeItems.Any(t => normalizedTypes.Contains(t.Name.ToLower())));
+                    var normalized = itemTypes.Select(t => t.ToLower()).ToList();
+                    query = query.Where(c => c.TypeItems.Any(t => normalized.Contains(t.Name.ToLower())));
                 }
 
                 if (date.HasValue)
                 {
                     query = query.Where(c => c.Date.Date == date.Value.Date);
                 }
-                else if (fromDate.HasValue && toDate.HasValue)
+
+                if (fromDate.HasValue && toDate.HasValue)
                 {
-                    query = query.Where(c => c.Date.Date >= fromDate.Value.Date && c.Date.Date <= toDate.Value.Date);
+                    query = query.Where(c =>
+                        c.Date.Date >= fromDate.Value.Date &&
+                        c.Date.Date <= toDate.Value.Date);
                 }
+
                 var classes = await query
-                  .OrderBy(i => i.Date)
-                  .Select(i => new ClassForPlanDTO(i.Id, i.Price, i.Date, i.Name,i.Capacity, i.TypeItems.Select(itemtype => itemtype.Name).ToList()))
-                  .ToListAsync();
+                    .OrderBy(c => c.Date)
+                    .Select(c => new ClassForPlanDTO(
+                        c.Id,
+                        c.Price,
+                        c.Date,
+                        c.Name,
+                        c.Capacity,
+                        c.TypeItems.Select(t => t.Name).ToList()))
+                    .ToListAsync();
+
                 if (classes.Count == 0)
                 {
-                    string error = "No classes available";
-                    _logger.LogWarning(DateTime.Now + " " + error);
+                    string error = "No classes available.";
+                    _logger.LogWarning($"{DateTime.Now} {error}");
                     return BadRequest(error);
                 }
+
                 return Ok(classes);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error");
-                return BadRequest("Error");
+                _logger.LogError(ex, "Error getting classes for plan");
+                return BadRequest("An error occurred while retrieving classes.");
             }
-
-
         }
     }
 }

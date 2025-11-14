@@ -4,22 +4,21 @@
 ----------------------------------------------------
 -- Borrar datos de todas las tablas
 ----------------------------------------------------
-DELETE FROM [dbo].[PurchaseItems];
-DELETE FROM [dbo].[Purchases];
-DELETE FROM [dbo].[PaymentMethod];
-DELETE FROM [dbo].[Items];
 DELETE FROM [dbo].[ItemTypes];
-DELETE FROM [dbo].[Brands];
+DELETE FROM [dbo].[Plans];
+DELETE FROM [dbo].[PaymentMethod];
+DELETE FROM [dbo].[Classes];
+DELETE FROM [dbo].[PlanItems];
 DELETE FROM [dbo].[AspNetUsers];
 
 ----------------------------------------------------
 -- Reiniciar los contadores IDENTITY
 ----------------------------------------------------
-DBCC CHECKIDENT ('[dbo].[Brands]', RESEED, 0);
+DBCC CHECKIDENT ('[dbo].[Plans]', RESEED, 0);
 DBCC CHECKIDENT ('[dbo].[ItemTypes]', RESEED, 0);
-DBCC CHECKIDENT ('[dbo].[Items]', RESEED, 0);
+DBCC CHECKIDENT ('[dbo].[Classes]', RESEED, 0);
 DBCC CHECKIDENT ('[dbo].[PaymentMethod]', RESEED, 0);
-DBCC CHECKIDENT ('[dbo].[Purchases]', RESEED, 0);
+DBCC CHECKIDENT ('[dbo].[PlanItems]', RESEED, 0);
 
 ----------------------------------------------------
 -- AspNetUsers 
@@ -40,49 +39,35 @@ VALUES
     (N'3', N'Javier', N'Hernandez', N'Javier.Hernandez', N'Javier.Hernandez', N'Javierhernandez@example.com', N'Javierhernandez@example.com', 0, NULL, NULL, NULL, N'645686744', 1, 1, NULL, 0, 0);
 
 ----------------------------------------------------
--- Brands 
+-- Plans
 ----------------------------------------------------
-SET IDENTITY_INSERT [dbo].[Brands] ON;
+SET IDENTITY_INSERT [dbo].[Plans] ON
+INSERT INTO [dbo].[Plans] ([Id], [UserId], [Weeks], [HealthIssues], [Description], [Name], [Totalprice], [CreatedDate]) VALUES (11, N'1', 1, N'', N'', N'BackPlan', CAST(25.00 AS Decimal(10, 2)), N'2025-11-27 10:00:00')
+INSERT INTO [dbo].[Plans] ([Id], [UserId], [Weeks], [HealthIssues], [Description], [Name], [Totalprice], [CreatedDate]) VALUES (15, N'2', 2, N'', N'', N'ArmPlan', CAST(26.00 AS Decimal(10, 2)), N'2025-12-09 10:10:00')
+INSERT INTO [dbo].[Plans] ([Id], [UserId], [Weeks], [HealthIssues], [Description], [Name], [Totalprice], [CreatedDate]) VALUES (16, N'3', 3, N'', N'', N'LegPlan', CAST(28.00 AS Decimal(10, 2)), N'2025-11-30 10:00:00')
+SET IDENTITY_INSERT [dbo].[Plans] OFF
 
-INSERT INTO [dbo].[Brands] ([Id], [Name]) VALUES (1, N'Nike');
-INSERT INTO [dbo].[Brands] ([Id], [Name]) VALUES (2, N'Adidas');
-INSERT INTO [dbo].[Brands] ([Id], [Name]) VALUES (3, N'Domyos');
-
-SET IDENTITY_INSERT [dbo].[Brands] OFF;
 
 ----------------------------------------------------
 -- ItemTypes 
 ----------------------------------------------------
 SET IDENTITY_INSERT [dbo].[ItemTypes] ON;
-INSERT INTO [dbo].[ItemTypes] ([Id], [Name]) VALUES (1, N'Cardio Equipment')
-INSERT INTO [dbo].[ItemTypes] ([Id], [Name]) VALUES (2, N'Strength Equipment')
-INSERT INTO [dbo].[ItemTypes] ([Id], [Name]) VALUES (3, N'Accessories')
 
-
+INSERT INTO [dbo].[ItemTypes] ([Id], [Name], [ClassId]) VALUES (1, N'Cardio Equipment', NULL);
+INSERT INTO [dbo].[ItemTypes] ([Id], [Name], [ClassId]) VALUES (2, N'Strength Equipment', NULL);
+INSERT INTO [dbo].[ItemTypes] ([Id], [Name], [ClassId]) VALUES (3, N'Accessories', NULL);
 
 SET IDENTITY_INSERT [dbo].[ItemTypes] OFF;
 
 ----------------------------------------------------
--- Items 
+-- Classes
 ----------------------------------------------------
-SET IDENTITY_INSERT [dbo].[Items] ON;
+SET IDENTITY_INSERT [dbo].[Classes] ON
+INSERT INTO [dbo].[Classes] ([Id], [Capacity], [Name], [Price], [Date]) VALUES (1, 10, N'Crossfit', CAST(30.00 AS Decimal(10, 2)), N'2025-10-20 10:00:00')
+INSERT INTO [dbo].[Classes] ([Id], [Capacity], [Name], [Price], [Date]) VALUES (2, 15, N'spinning', CAST(25.00 AS Decimal(10, 2)), N'2025-11-10 11:00:00')
+INSERT INTO [dbo].[Classes] ([Id], [Capacity], [Name], [Price], [Date]) VALUES (3, 8, N'firness', CAST(18.00 AS Decimal(10, 2)), N'2025-11-01 08:00:00')
+SET IDENTITY_INSERT [dbo].[Classes] OFF
 
-INSERT INTO [dbo].[Items] 
-    ([Id], [Description], [Name], [QuantityAvailableForPurchase], [QuantityForRestock], [RestockPrice], [PurchasePrice], [ItemTypeId], [BrandId]) 
-VALUES 
-    (1, N'Set of bands', N'Resistance band set', 20, 10, CAST(15.00 AS Decimal(10, 2)), CAST(22.00 AS Decimal(10, 2)), 1, 1);
-
-INSERT INTO [dbo].[Items] 
-    ([Id], [Description], [Name], [QuantityAvailableForPurchase], [QuantityForRestock], [RestockPrice], [PurchasePrice], [ItemTypeId], [BrandId]) 
-VALUES 
-    (2, N'Foam roller for muscle recovery and massage', N'Foam Roller', 18, 8, CAST(18.00 AS Decimal(10, 2)), CAST(25.00 AS Decimal(10, 2)), 3, 2);
-
-INSERT INTO [dbo].[Items] 
-    ([Id], [Description], [Name], [QuantityAvailableForPurchase], [QuantityForRestock], [RestockPrice], [PurchasePrice], [ItemTypeId], [BrandId]) 
-VALUES 
-    (3, N'Ideal for strength and endurance training', N'Kettlebell 10 kg', 15, 5, CAST(25.00 AS Decimal(10, 2)), CAST(35.00 AS Decimal(10, 2)), 2, 3);
-
-SET IDENTITY_INSERT [dbo].[Items] OFF;
 
 ----------------------------------------------------
 -- PaymentMethod 
@@ -106,35 +91,14 @@ VALUES
 
 SET IDENTITY_INSERT [dbo].[PaymentMethod] OFF;
 
-----------------------------------------------------
--- Purchases
-----------------------------------------------------
-SET IDENTITY_INSERT [dbo].[Purchases] ON;
 
-INSERT INTO [dbo].[Purchases] 
-    ([Id], [City], [Country], [Date], [Description], [Street], [Total_prices], [PaymentMethodId]) 
-VALUES 
-    (1, N'Cuenca', N'Spain', N'2025-10-10 00:00:00', N'Purchase of a foam roller', N'C/Plaza Mayor', CAST(10.00 AS Decimal(10, 2)), 1);
 
-INSERT INTO [dbo].[Purchases] 
-    ([Id], [City], [Country], [Date], [Description], [Street], [Total_prices], [PaymentMethodId]) 
-VALUES 
-    (2, N'Madrid', N'Spain', N'2025-10-06 00:00:00', N'Purchase of resistance band', N'C/Madrid', CAST(50.00 AS Decimal(10, 2)), 1);
-
-SET IDENTITY_INSERT [dbo].[Purchases] OFF;
 
 ----------------------------------------------------
--- PurchaseItems 
+-- PlanItems
 ----------------------------------------------------
-INSERT INTO [dbo].[PurchaseItems] 
-    ([ItemId], [PurchaseId], [Amount_bought], [Price]) 
-VALUES 
-    (1, 1, 10, CAST(50.00 AS Decimal(10, 2)));
-
-INSERT INTO [dbo].[PurchaseItems] 
-    ([ItemId], [PurchaseId], [Amount_bought], [Price]) 
-VALUES 
-    (2, 2, 60, CAST(60.00 AS Decimal(10, 2)));
-
+INSERT INTO [dbo].[PlanItems] ([ClassId], [PlanId], [Goal], [Price]) VALUES (1, 11, NULL, CAST(25.00 AS Decimal(10, 2)))
+INSERT INTO [dbo].[PlanItems] ([ClassId], [PlanId], [Goal], [Price]) VALUES (2, 15, NULL, CAST(26.00 AS Decimal(10, 2)))
+INSERT INTO [dbo].[PlanItems] ([ClassId], [PlanId], [Goal], [Price]) VALUES (3, 16, NULL, CAST(30.00 AS Decimal(10, 2)))
 
 COMMIT TRANSACTION;

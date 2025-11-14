@@ -14,6 +14,7 @@
             PurchaseItems = purchaseItems;
             TotalPrice = totalPrice;
         }
+      
 
 
         public int Id { get; set; }
