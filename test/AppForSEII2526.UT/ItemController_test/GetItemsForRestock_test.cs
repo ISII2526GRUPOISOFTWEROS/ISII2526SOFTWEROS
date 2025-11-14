@@ -56,14 +56,14 @@ namespace AppForSEII2526.UT.RestockController_test
             // Arrange
             List<ItemForRestockDTO> expectedItems = new List<ItemForRestockDTO>()
             {
-                new ItemForRestockDTO("Nike", "ItemA", 30, 25)
+                new ItemForRestockDTO("Nike", "ItemA", 25, 30)
             };
             var mock = new Mock<ILogger<ItemsController>>();
             ILogger<ItemsController> logger = mock.Object;
             ItemsController controller = new ItemsController(_context, logger);
 
             // Act
-            var result = await controller.GetItemsForRestock("prueba", 20);
+            var result = await controller.GetItemsForRestock("ItemA", null);
 
             // Assert
             var okresult = Assert.IsType<OkObjectResult>(result);
