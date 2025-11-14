@@ -37,6 +37,7 @@ namespace AppForSEII2526.API.Controllers
             var restock = await _context.Restock
                 .Where(r => r.Id == id)
                 .Include(r => r.RestockItems)
+                    .ThenInclude(ri => ri.Item)
                 .Include(ru => ru.RestockResponsible)
                 .Select(r => new RestockDetailDTO(
                     r.Id,
@@ -50,7 +51,8 @@ namespace AppForSEII2526.API.Controllers
                         .Select(ri => new RestockItemForCreateDTO(ri.Item.Name, 
                         ri.Item.Id, 
                         ri.Quantity, 
-                        ri.RestockPrice)).ToList<RestockItemForCreateDTO>(), r.RestockResponsible.Name,
+                        ri.RestockPrice)).ToList<RestockItemForCreateDTO>()
+                        , r.RestockResponsible.UserName,
                     r.RestockResponsible.Surname))
                 .FirstOrDefaultAsync();
 
