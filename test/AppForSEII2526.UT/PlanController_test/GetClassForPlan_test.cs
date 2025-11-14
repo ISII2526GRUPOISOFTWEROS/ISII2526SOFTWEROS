@@ -21,10 +21,11 @@ namespace AppForSEII2526.UT.Classes_test
         {
             var typeItems = new List<ItemType>
             {
-                new ItemType("Yoga Mat"),
-                new ItemType("Dumbbells"),
-                new ItemType("Resistance Bands"),
-               };
+              
+                new ItemType(){ Name="Yoga Mat"},
+                new ItemType(){ Name="Dumbbells"},
+            };
+
             _context.ItemTypes.AddRange(typeItems);
             _context.SaveChanges();
 
@@ -33,8 +34,8 @@ namespace AppForSEII2526.UT.Classes_test
             new Class(1, 15, "Morning Yoga", 15, DateTime.Today.AddDays(2), new List<PlanItem>(), new List<ItemType>()),
             new Class(2, 10, "HIIT Session", 20, DateTime.Today.AddDays(5), new List<PlanItem>(), new List<ItemType>()),
             };
-            classes[0].TypeItems.Add(typeItems[0]); // Yoga Mat
-            classes[1].TypeItems.Add(typeItems[1]); // Dumbbells
+            classes[0].TypeItems.Add(typeItems[0]); 
+            classes[1].TypeItems.Add(typeItems[1]); 
             var user = new ApplicationUser()
             {
                 Id = "3",
@@ -59,7 +60,7 @@ namespace AppForSEII2526.UT.Classes_test
             var ok = Assert.IsType<OkObjectResult>(result);
             var values = Assert.IsType<List<ClassForPlanDTO>>(ok.Value);
 
-            Assert.Equal(3, values.Count);
+            Assert.Equal(2, values.Count);
         }
 
         [Fact]
