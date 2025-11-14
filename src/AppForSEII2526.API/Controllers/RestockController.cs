@@ -85,27 +85,33 @@ namespace AppForSEII2526.API.Controllers
                 {
                     ModelState.AddModelError("DeliveryAddress", "Error! Delivery Address is required.");
                 }
-                if (restockForCreate.RestockItems.Count == 0)
+                if (restockForCreate.RestockItems == null || restockForCreate.RestockItems.Count == 0)
                 {
                     ModelState.AddModelError("RestockItems", "Error! At least one restock item is required.");
                 }
+                
 
 
-                //if (!ModelState.IsValid)
-                //{
-                //    return ValidationProblem(ModelState);
-                //}
+            //if (!ModelState.IsValid)
+            //{
+            //    return ValidationProblem(ModelState);
+            //}
 
-                // Verificar que el usuario responsable de la reposición existe
-                var admin = await _context.Users
+            // Verificar que el usuario responsable de la reposición existe
+            var admin = await _context.Users
                     .FirstOrDefaultAsync(user => user.UserName == restockForCreate.RestockResponsible);
                 if (admin == null)
                 {
-                    return Conflict("El responsable de reposición no existe.");
-                }
+                    ModelState.AddModelError("RestockResponsible", "The user responsible for the restock does not exist.");
+            }
 
-                // Obtenemos los Items de la base de datos y verificamos su disponibilidad para reposición
-                var itemsNames = restockForCreate.RestockItems.Select(ri => ri.ItemName).ToList<string>();
+                if (ModelState.ErrorCount > 0)
+                {
+                    return BadRequest(new ValidationProblemDetails(ModelState));
+            }
+
+            // Obtenemos los Items de la base de datos y verificamos su disponibilidad para reposición
+            var itemsNames = restockForCreate.RestockItems.Select(ri => ri.ItemName).ToList<string>();
 
                 var items = _context.Items.Include(i => i.RestockItems)
                     .ThenInclude(ri => ri.Restock)
@@ -129,12 +135,7 @@ namespace AppForSEII2526.API.Controllers
                     restockForCreate.RestockDate,
                     restockForCreate.Title,
                     restockForCreate.TotalPrice,
-                    restockForCreate.RestockItems.Select(ri => new RestockItem
-                    {
-                        ItemId = ri.ItemId,
-                        Quantity = ri.Quantity,
-                        RestockPrice = ri.RestockPrice
-                    }).ToList(),
+                    new List<RestockItem>(),
                     admin
                 );  
 
@@ -144,18 +145,9 @@ namespace AppForSEII2526.API.Controllers
                 {
                     var existingItem = items.FirstOrDefault(i => i.Name == restockItem.ItemName);
 
-                    if (existingItem == null)
+                    if (existingItem == null || existingItem.QuantityForRestock < restockItem.Quantity)
                     {
-                        ModelState.AddModelError("RestockItems", $"El ítem con nombre {restockItem.ItemName} no existe.");
-                    }
-                    if (existingItem.QuantityForRestock < restockItem.Quantity)
-                    {
-                        ModelState.AddModelError("RestockItems", $"No hay suficiente cantidad disponible para reposición del ítem con ID {restockItem.ItemId}.");
-                    }
-                    //asegurarse que item no este vacio
-                    if (restockForCreate.RestockItems == null || !restockForCreate.RestockItems.Any())
-                    {
-                        ModelState.AddModelError("RestockItems", "Debe especificar al menos un ítem para reposición.");
+                        ModelState.AddModelError("RestockItems", $"The Item with name {restockItem.ItemName} is not available for restock");
                     }
 
                 else
@@ -164,21 +156,18 @@ namespace AppForSEII2526.API.Controllers
                         {
                             ItemId = existingItem.Id,
                             Quantity = restockItem.Quantity,
-                            RestockId = restock.Id,
-                            RestockPrice = restockItem.RestockPrice,
-                            Restock = restock,
-                            Item = null! // Asignar el ítem correspondiente si es necesario
+                            RestockPrice = restockItem.RestockPrice
 
                         });
                     }
                 }
 
 
-                //Calcular el precio total del restock
-                restock.TotalPrice = restock.RestockItems.Sum(ri => ri.Quantity * ri.RestockPrice);
+            //Total price calculation
+            restock.TotalPrice = restock.RestockItems.Sum(ri => ri.Quantity * ri.RestockPrice);
 
-                //verificacion de errores
-                if (ModelState.ErrorCount > 0)
+            //looking for model errors
+            if (ModelState.ErrorCount > 0)
                 {
                     return BadRequest(new ValidationProblemDetails(ModelState));
                 }
@@ -193,6 +182,7 @@ namespace AppForSEII2526.API.Controllers
                     catch (Exception ex)
                     {
                         _logger.LogError(DateTime.Now+" : "+ ex.Message);
+                    ModelState.AddModelError("Restock", "An error occurred while saving the restock. Please try again later.");
                         return Conflict("An error occurred"+ ex.Message);
                     }
                 
