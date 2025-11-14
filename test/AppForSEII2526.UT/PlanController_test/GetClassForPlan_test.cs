@@ -16,12 +16,13 @@ namespace AppForSEII2526.UT.Classes_test
     {
         public GetClassForPlan_test()
         {
-            var typeItems = new List<ItemType>
+            var itemTypes = new List<ItemType>()
             {
-                 new ItemType() { Name = "Yoga Mat" },
-                new ItemType() { Name = "Dumbbells" }
-               };
-            _context.ItemTypes.AddRange(typeItems);
+                new ItemType(){ Name="Strength Equipment"},
+                new ItemType(){ Name="Cardio Equipment"},
+            };
+
+            _context.ItemTypes.AddRange(itemTypes);
             _context.SaveChanges();
 
             var classes = new List<Class>
@@ -29,8 +30,8 @@ namespace AppForSEII2526.UT.Classes_test
             new Class(1, 15, "Morning Yoga", 15, DateTime.Today.AddDays(2), new List<PlanItem>(), new List<ItemType>()),
             new Class(2, 10, "HIIT Session", 20, DateTime.Today.AddDays(5), new List<PlanItem>(), new List<ItemType>()),
             };
-            classes[0].TypeItems.Add(typeItems[0]); 
-            classes[1].TypeItems.Add(typeItems[1]); 
+            classes[0].TypeItems.Add(itemTypes[0]); 
+            classes[1].TypeItems.Add(itemTypes[1]); 
             
 
             _context.Classes.AddRange(classes);
