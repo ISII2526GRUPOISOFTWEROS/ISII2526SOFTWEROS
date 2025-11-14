@@ -31,6 +31,6 @@ namespace AppForSEII2526.API.Models
 
         public IList<PlanItem> PlanItems { get; set; }
 
-        public ICollection<ItemType> TypeItems { get; set; }
+        public ICollection<ItemType> TypeItems { get; set; } = new List<ItemType>();
     }
 }

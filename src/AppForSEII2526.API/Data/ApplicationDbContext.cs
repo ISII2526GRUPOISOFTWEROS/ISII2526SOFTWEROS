@@ -24,6 +24,6 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<ItemType> ItemTypes { get; set; }
     public DbSet<ApplicationUser> ApplicationUser { get; set; }
     public DbSet<PaymentMethod> PaymentMethod { get; set; }
-
    
+
 }

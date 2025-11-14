@@ -9,7 +9,7 @@ namespace AppForSEII2526.API.DTOs.PlanDTOs
         public PlanDetailDTO(int id, string userName, DateTime dateCreated, decimal totalPrice, string planName, string description, int numberOfWeeks, string healthIssues, IList<ClassForPlanDTO> classes)
         {
             Id = id;
-            this.userName = userName;
+            UserName = userName;
             DateCreated = dateCreated;
             TotalPrice = totalPrice;
             PlanName = planName;
@@ -19,7 +19,7 @@ namespace AppForSEII2526.API.DTOs.PlanDTOs
             Classes = classes;
         }
         public int Id { get; set; }
-        public string userName { get; set; }
+        public string UserName { get; set; }
         public DateTime DateCreated { get; set; }
         public decimal TotalPrice { get; set; }
         public string PlanName { get; set; }
@@ -30,22 +30,31 @@ namespace AppForSEII2526.API.DTOs.PlanDTOs
 
         public override bool Equals(object? obj)
         {
-            return obj is PlanDetailDTO dto &&
-                   base.Equals(obj) &&
-                   userName == dto.userName &&
-                   DateCreated == dto.DateCreated &&
-                   TotalPrice == dto.TotalPrice &&
-                   PlanName == dto.PlanName &&
-                   Description == dto.Description &&
-                   NumberOfWeeks == dto.NumberOfWeeks &&
-                   HealthIssues == dto.HealthIssues &&
-                   EqualityComparer<IList<ClassForPlanDTO>>.Default.Equals(Classes, dto.Classes);
+            return obj is PlanDetailDTO dTO &&
+                   Id == dTO.Id &&
+                   UserName == dTO.UserName &&
+                   DateCreated == dTO.DateCreated &&
+                   TotalPrice == dTO.TotalPrice &&
+                   PlanName == dTO.PlanName &&
+                   Description == dTO.Description &&
+                   NumberOfWeeks == dTO.NumberOfWeeks &&
+                   EqualityComparer<IList<ClassForPlanDTO>>.Default.Equals(Classes, dTO.Classes) &&
+                   HealthIssues == dTO.HealthIssues;
         }
-
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(userName, DateCreated, TotalPrice, PlanName, Description, NumberOfWeeks, HealthIssues, Classes);
+            HashCode hash = new HashCode();
+            hash.Add(Id);
+            hash.Add(UserName);
+            hash.Add(DateCreated);
+            hash.Add(TotalPrice);
+            hash.Add(PlanName);
+            hash.Add(Description);
+            hash.Add(NumberOfWeeks);
+            hash.Add(Classes);
+            hash.Add(HealthIssues);
+            return hash.ToHashCode();
         }
     }
 }
