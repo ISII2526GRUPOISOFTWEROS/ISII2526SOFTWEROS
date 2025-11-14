@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 
-namespace AppForSEII2526.UT.Plan_test
+namespace AppForSEII2526.UT.PlanController_test
 {
     public class CreatePlan_test : AppForSEII25264SqliteUT
     {

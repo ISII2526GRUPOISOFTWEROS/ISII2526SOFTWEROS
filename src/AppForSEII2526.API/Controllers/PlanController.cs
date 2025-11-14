@@ -164,7 +164,7 @@ namespace AppForSEII2526.API.Controllers
             .ThenInclude(c => c.TypeItems)
                    .Select(p => new PlanDetailDTO(
                     p.Id,
-                    "hduewi23@gmail.com", ///p.User.UserName,
+                    p.User.UserName,
                     p.CreatedDate,
                     p.Totalprice,
                     p.Name, //?? string.Empty,

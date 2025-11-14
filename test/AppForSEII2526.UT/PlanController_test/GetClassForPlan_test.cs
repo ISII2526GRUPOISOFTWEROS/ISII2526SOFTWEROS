@@ -10,7 +10,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace AppForSEII2526.UT.Classes_test
+namespace AppForSEII2526.UT.PlanController_test
+
 {
     public class GetClassForPlan_test : AppForSEII25264SqliteUT
     {
