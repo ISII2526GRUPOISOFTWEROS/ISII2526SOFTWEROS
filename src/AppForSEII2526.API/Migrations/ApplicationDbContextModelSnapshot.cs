@@ -214,6 +214,7 @@ namespace AppForSEII2526.API.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<decimal>("PurchasePrice")
@@ -237,8 +238,7 @@ namespace AppForSEII2526.API.Migrations
                     b.HasIndex("ItemTypeId");
 
                     b.HasIndex("Name")
-                        .IsUnique()
-                        .HasFilter("[Name] IS NOT NULL");
+                        .IsUnique();
 
                     b.ToTable("Items");
                 });
@@ -266,10 +266,15 @@ namespace AppForSEII2526.API.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int?>("ClassId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ClassId");
 
                     b.HasIndex("Name")
                         .IsUnique()
@@ -499,21 +504,6 @@ namespace AppForSEII2526.API.Migrations
                     b.ToTable("RestockItem");
                 });
 
-            modelBuilder.Entity("ClassItemType", b =>
-                {
-                    b.Property<int>("ClassesId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("TypeItemsId")
-                        .HasColumnType("int");
-
-                    b.HasKey("ClassesId", "TypeItemsId");
-
-                    b.HasIndex("TypeItemsId");
-
-                    b.ToTable("ClassItemType");
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
                     b.Property<string>("Id")
@@ -740,6 +730,13 @@ namespace AppForSEII2526.API.Migrations
                     b.Navigation("Item");
                 });
 
+            modelBuilder.Entity("AppForSEII2526.API.Models.ItemType", b =>
+                {
+                    b.HasOne("AppForSEII2526.API.Models.Class", null)
+                        .WithMany("TypeItems")
+                        .HasForeignKey("ClassId");
+                });
+
             modelBuilder.Entity("AppForSEII2526.API.Models.PaymentMethod", b =>
                 {
                     b.HasOne("AppForSEII2526.API.Models.ApplicationUser", "User")
@@ -839,21 +836,6 @@ namespace AppForSEII2526.API.Migrations
                     b.Navigation("Restock");
                 });
 
-            modelBuilder.Entity("ClassItemType", b =>
-                {
-                    b.HasOne("AppForSEII2526.API.Models.Class", null)
-                        .WithMany()
-                        .HasForeignKey("ClassesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("AppForSEII2526.API.Models.ItemType", null)
-                        .WithMany()
-                        .HasForeignKey("TypeItemsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -922,6 +904,8 @@ namespace AppForSEII2526.API.Migrations
             modelBuilder.Entity("AppForSEII2526.API.Models.Class", b =>
                 {
                     b.Navigation("PlanItems");
+
+                    b.Navigation("TypeItems");
                 });
 
             modelBuilder.Entity("AppForSEII2526.API.Models.Incident", b =>
