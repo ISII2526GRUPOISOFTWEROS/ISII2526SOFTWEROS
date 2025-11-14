@@ -11,7 +11,6 @@ namespace AppForSEII2526.UT.RestockController_test
 {
     public class GetRestockDetails_test : AppForSEII25264SqliteUT
     {
-        //private readonly int existingRestockId;
 
         public GetRestockDetails_test()
         {
@@ -24,8 +23,6 @@ namespace AppForSEII2526.UT.RestockController_test
                 Email = "admin@test.com",
             };
             
-
-            // Items en inventario
             var brands = new List<Brand>()
             {
                 new Brand() { Name = "Nike" },
