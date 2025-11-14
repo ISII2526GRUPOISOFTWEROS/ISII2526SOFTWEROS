@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 //using AppForSEII2526.DTOs
 
-namespace AppForSEII2526.UT.ItemController
+namespace AppForSEII2526.UT.RestockController_test
 {
     public class GetItemsForRestock_test : AppForSEII25264SqliteUT
     {
@@ -16,35 +16,60 @@ namespace AppForSEII2526.UT.ItemController
 
         public GetItemsForRestock_test() //constructor  
         {
-            var items = new List<Item>()
+            var brands = new List<Brand>()
             {
-                new Item(){ Id=1, Name="ItemA", QuantityForRestock=5, Brand=new Brand(){ Name="BrandA"}, QuantityAvailableForPurchase=10 },
-                new Item(){ Id=2, Name="ItemB", QuantityForRestock=15, Brand=new Brand(){ Name="BrandB"}, QuantityAvailableForPurchase=20 },
-                new Item(){ Id=3, Name="ItemC", QuantityForRestock=25, Brand=new Brand(){ Name="BrandC"}, QuantityAvailableForPurchase=30 },
+                new Brand(){ Name="Nike"},
+                new Brand(){ Name="Domyos"},
 
             };
+
+            var itemTypes = new List<ItemType>()
+            {
+                new ItemType(){ Name="Strength Equipment"},
+                new ItemType(){ Name="Cardio Equipment"},
+            };
+
+
+            var items = new List<Item>()
+            {
+                new Item(){ Name="ItemA", QuantityForRestock=30, Brand= brands[0], QuantityAvailableForPurchase=25 ,ItemType = itemTypes[0]},
+                new Item(){ Name="ItemB", QuantityForRestock=15, Brand=brands[1], QuantityAvailableForPurchase=20 ,ItemType = itemTypes[1]},
+                new Item(){ Name="ItemC", QuantityForRestock=25, Brand=brands[0], QuantityAvailableForPurchase=30 ,ItemType = itemTypes[0]},
+
+            };
+
+
+            _context.Items.AddRange(items);
+            _context.Brands.AddRange(brands);
+            _context.ItemTypes.AddRange(itemTypes);
+
+            _context.SaveChanges();
 
             //var itemsDTOsTc1 = new List<ItemForCreateRestockDTO>() { items[0], items[1] };
 
 
 
         }
-        //[Fact]
-        //public async Task GetItemsForRestock_ShouldReturnItemsMatchingCriteria()
-        //{
-        //    // Arrange
-        //    var controller = new ItemsController(_context, _logger);
-        //    string itemName = "ItemA";
-        //    int quantityForRestock = 10;
-        //    // Act
-        //    var result = await controller.GetItemsForRestock(itemName, quantityForRestock) as ActionResult;
-        //    // Assert
-        //    Assert.NotNull(result);
-        //    var okResult = Assert.IsType<OkObjectResult>(result);
-        //    var items = Assert.IsAssignableFrom<IList<ItemForRestockDTO>>(okResult.Value);
-        //    Assert.Single(items);
-        //    Assert.Equal("ItemA", items[0].Name);
-        //}
+        [Fact]
+        public async Task GetItemsForRestock_ShouldReturnItemsMatchingCriteria()
+        {
+            // Arrange
+            List<ItemForRestockDTO> expectedItems = new List<ItemForRestockDTO>()
+            {
+                new ItemForRestockDTO("Nike", "ItemA", 30, 25)
+            };
+            var mock = new Mock<ILogger<ItemsController>>();
+            ILogger<ItemsController> logger = mock.Object;
+            ItemsController controller = new ItemsController(_context, logger);
+
+            // Act
+            var result = await controller.GetItemsForRestock("prueba", 20);
+
+            // Assert
+            var okresult = Assert.IsType<OkObjectResult>(result);
+            var itemactualresult = Assert.IsType<List<ItemForRestockDTO>>(okresult.Value);
+            Assert.Equal(expectedItems, itemactualresult);
+        }
 
         //Theory made in class
         //[Theory]
@@ -68,6 +93,6 @@ namespace AppForSEII2526.UT.ItemController
         //    Assert.Equal("ItemA", items[0].Name);
         //}
 
-    
+
     }
 }
