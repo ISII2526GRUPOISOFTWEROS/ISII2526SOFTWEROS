@@ -1,7 +1,8 @@
-﻿using AppForSEII2526.API.DTOs.ItemDTOs;
+﻿using AppForSEII2526.API.DTOs.RestockDTOs;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Identity.Client;
+using System.Linq;
 
 namespace AppForSEII2526.API.Controllers
 {
@@ -18,6 +19,50 @@ namespace AppForSEII2526.API.Controllers
                 _context = context;
                 _logger = logger;
             }
+
+        [HttpGet]
+        [Route("[action]")]
+        [ProducesResponseType(typeof(RestockDetailDTO), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+
+        public async Task<ActionResult> GetRestockDetails(int id)
+        {
+            if(_context.Restock == null)
+            {
+                _logger.LogError("Error: Restock table does not exist");
+                return NotFound();
+            }
+
+
+            var restock = await _context.Restock
+                .Where(r => r.Id == id)
+                .Include(r => r.RestockItems)
+                .Include(ru => ru.RestockResponsible)
+                .Select(r => new RestockDetailDTO(
+                    r.Id,
+                    r.Title,
+                    r.DeliveryAddress,
+                    r.Description,
+                    r.ExpectedDate,
+                    r.RestockDate,
+                    r.TotalPrice,
+                    r.RestockItems
+                        .Select(ri => new RestockItemForCreateDTO(ri.Item.Name, 
+                        ri.Item.Id, 
+                        ri.Quantity, 
+                        ri.RestockPrice)).ToList<RestockItemForCreateDTO>(), r.RestockResponsible.Name,
+                    r.RestockResponsible.Surname))
+                .FirstOrDefaultAsync();
+
+
+            if (restock == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(restock);
+        }
+           
 
 
             [HttpPost]
