@@ -1,4 +1,6 @@
-﻿namespace AppForSEII2526.API.DTOs.PurchaseDTOs
+﻿
+
+namespace AppForSEII2526.API.DTOs.PurchaseDTOs
 {
     public class PurchaseDetailDTO 
     {
@@ -38,8 +40,33 @@
 
         public decimal TotalPrice { get; set; }
 
-   
+        public override bool Equals(object? obj)
+        {
+            return obj is PurchaseDetailDTO dTO &&
+                   Id == dTO.Id &&
+                   PaymentMethod == dTO.PaymentMethod &&
+                   DeliveryAddress == dTO.DeliveryAddress &&
+                   Street == dTO.Street &&
+                   City == dTO.City &&
+                   Country == dTO.Country &&
+                   Description == dTO.Description &&
+                   EqualityComparer<IList<PurchasedItemDTO>>.Default.Equals(PurchaseItems, dTO.PurchaseItems) &&
+                   TotalPrice == dTO.TotalPrice;
+        }
 
-     
+        public override int GetHashCode()
+        {
+            HashCode hash = new HashCode();
+            hash.Add(Id);
+            hash.Add(PaymentMethod);
+            hash.Add(DeliveryAddress);
+            hash.Add(Street);
+            hash.Add(City);
+            hash.Add(Country);
+            hash.Add(Description);
+            hash.Add(PurchaseItems);
+            hash.Add(TotalPrice);
+            return hash.ToHashCode();
+        }
     }
 }

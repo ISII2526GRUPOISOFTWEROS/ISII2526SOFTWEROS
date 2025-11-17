@@ -1,4 +1,5 @@
-﻿namespace AppForSEII2526.API.DTOs.PurchaseDTOs
+﻿
+namespace AppForSEII2526.API.DTOs.PurchaseDTOs
 {
            public class CreatePurchaseItemDTO
         {
@@ -14,5 +15,17 @@
             [Required(ErrorMessage = "Quantity is required")]
             [Range(1, int.MaxValue, ErrorMessage = "Quantity must be greater than zero.")]
             public int Quantity { get; set; }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is CreatePurchaseItemDTO dTO &&
+                   ItemId == dTO.ItemId &&
+                   Quantity == dTO.Quantity;
         }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(ItemId, Quantity);
+        }
+    }
     }
