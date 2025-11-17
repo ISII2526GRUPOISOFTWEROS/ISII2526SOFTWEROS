@@ -62,7 +62,7 @@ namespace AppForSEII2526.UT.RestockController_test
                 id: 0,
                 title: "",
                 deliveryAddress: "Warehouse",
-                description: "Description",
+                description: "Restock for",
                 expectedDate: DateTime.Now,
                 restockDate: DateTime.Now,
                 totalPrice: 0,
@@ -77,7 +77,7 @@ namespace AppForSEII2526.UT.RestockController_test
                 id: 0,
                 title: "Restock 1",
                 deliveryAddress: "",
-                description: "Description",
+                description: "Restock for",
                 expectedDate: DateTime.Now,
                 restockDate: DateTime.Now,
                 totalPrice: 0,
@@ -92,7 +92,7 @@ namespace AppForSEII2526.UT.RestockController_test
                 id: 0,
                 title: "Restock 1",
                 deliveryAddress: "Warehouse",
-                description: "Description",
+                description: "Restock for",
                 expectedDate: DateTime.Now,
                 restockDate: DateTime.Now,
                 totalPrice: 0,
@@ -104,7 +104,7 @@ namespace AppForSEII2526.UT.RestockController_test
                 id: 0,
                 title: "Restock 1",
                 deliveryAddress: "Warehouse",
-                description: "Description",
+                description: "Restock for",
                 expectedDate: DateTime.Now,
                 restockDate: DateTime.Now,
                 totalPrice: 0,
@@ -114,13 +114,28 @@ namespace AppForSEII2526.UT.RestockController_test
                 },
                 restockResponsible: "unknownUser"
             );
+            var incorrectDescription = new ItemForCreateRestockDTO(
+                id: 0,
+                title: "Restock 1",
+                deliveryAddress: "Warehouse",
+                description: "Description",
+                expectedDate: DateTime.Now,
+                restockDate: DateTime.Now,
+                totalPrice: 0,
+                restockItems: new List<RestockItemForCreateDTO>()
+                {
+                    new RestockItemForCreateDTO("Foam Roller", 1, 5, 2)
+                },
+                restockResponsible: "admin"
+            );
 
             return new List<object[]>
             {
                 new object[] { missingTitle, "Error! Title is required." },
                 new object[] { missingAddress, "Error! Delivery Address is required." },
                 new object[] { missingItems, "Error! At least one restock item is required." },
-                new object[] { invalidUser, "The user responsible for the restock does not exist." }
+                new object[] { invalidUser, "The user responsible for the restock does not exist." },
+                new object[] { incorrectDescription, "Error! You must start the Description with 'Restock for'" }
             };
         }
 
@@ -166,7 +181,7 @@ namespace AppForSEII2526.UT.RestockController_test
                 id: 0,
                 title: "Restock Test",
                 deliveryAddress: "Warehouse A",
-                description: "Restocking items",
+                description: "Restock for",
                 expectedDate: DateTime.UtcNow,
                 restockDate: DateTime.UtcNow,
                 totalPrice: 0,
