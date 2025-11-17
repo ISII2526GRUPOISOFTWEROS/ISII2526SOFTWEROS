@@ -122,7 +122,31 @@ namespace AppForSEII2526.UT.PurchaseController_test
                        new CreatePurchaseItemDTO(1, 2),
                    }
                 );
-
+            var purchasewrongDescription = new ItemForCreateDTO(
+                   customerUserName: "test",
+                   paymentMethodId: 1,
+                   street: "C/Plaza Mayor",
+                   city: "Albacete",
+                   country: "Spain",
+                   description: "First purchase",
+                   purchaseItems: new List<CreatePurchaseItemDTO>()
+                   {
+                       new CreatePurchaseItemDTO(1, 2),
+                   }
+                );
+            var purchasewrongitem404 = new ItemForCreateDTO(
+                   customerUserName: "test",
+                   paymentMethodId: 1,
+                   street: "C/Plaza Mayor",
+                   city: "Albacete",
+                   country: "Spain",
+                   description: "First purchase",
+                   purchaseItems: new List<CreatePurchaseItemDTO>()
+                   {
+                       new CreatePurchaseItemDTO(10, 2),
+                   }
+                );
+           
             var allTests = new List<object[]>
             {
                 new object[] { purchaseInvalidPaymentMethod, "Error!" },
@@ -130,6 +154,11 @@ namespace AppForSEII2526.UT.PurchaseController_test
                 new object[] { purchaseInsufficientStock,   "Error!" },
                 new object[] { purchaseInvalidUser,         "Error!" },
                 new object[] { purchasewrongPM,         "Error!" },
+                new object[] { purchasewrongDescription,         "Error!" },
+                new object[] { purchasewrongitem404,         "Error!" },
+
+
+
 
            };
             return allTests;
@@ -168,7 +197,7 @@ namespace AppForSEII2526.UT.PurchaseController_test
                    street: "C/Plaza Mayor",
                    city: "Albacete",
                    country: "Spain",
-                   description: "First purchase",
+                   description: "My purchase for holidays",
                    purchaseItems: new List<CreatePurchaseItemDTO>()
                    {
                        new CreatePurchaseItemDTO(1, 2),
@@ -181,7 +210,7 @@ namespace AppForSEII2526.UT.PurchaseController_test
                    street: "C/Plaza Mayor",
                    city: "Albacete",
                    country: "Spain",
-                   description: "First purchase",
+                   description: "My purchase for holidays",
                      purchaseItems: new List<PurchasedItemDTO>()
                      {
                           new PurchasedItemDTO( "Foam Roller", "Nike",10.0m, 2),
@@ -201,7 +230,66 @@ namespace AppForSEII2526.UT.PurchaseController_test
             Assert.Equal("C/Plaza Mayor", actual.Street);
             Assert.Equal("Albacete", actual.City);
             Assert.Equal("Spain", actual.Country);
-            Assert.Equal("First purchase", actual.Description);
+            Assert.Equal("My purchase for holidays", actual.Description);
+            Assert.Equal(20.0m, actual.TotalPrice);
+
+            var items = actual.PurchaseItems;
+            Assert.Single(items);
+
+            var item = items[0];
+            Assert.Equal("Foam Roller", item.Name);
+            Assert.Equal("Nike", item.Brand);
+            Assert.Equal(10.0m, item.Price);
+            Assert.Equal(2, item.Quantity);
+        }
+        [Fact]
+        [Trait("PostPurchase", "Unit Testing")]
+        public async Task PostPurchase_ReturnsCreatedDescriptionNull()
+        {
+            var mock = new Mock<ILogger<PurchaseController>>();
+            ILogger<PurchaseController> logger = mock.Object;
+            PurchaseController controller = new PurchaseController(_context, logger);
+
+            var input = new ItemForCreateDTO(
+                    customerUserName: "test",
+                   paymentMethodId: 1,
+                   street: "C/Plaza Mayor",
+                   city: "Albacete",
+                   country: "Spain",
+                   description: "",
+                   purchaseItems: new List<CreatePurchaseItemDTO>()
+                   {
+                       new CreatePurchaseItemDTO(1, 2),
+                   }
+                );
+
+            var expected = new PurchaseDetailDTO(
+                   id: 1,
+                   paymentMethod: "Bizum",
+                   street: "C/Plaza Mayor",
+                   city: "Albacete",
+                   country: "Spain",
+                   description: "",
+                     purchaseItems: new List<PurchasedItemDTO>()
+                     {
+                          new PurchasedItemDTO( "Foam Roller", "Nike",10.0m, 2),
+                     }
+                     , totalPrice: 20.0m
+                );
+
+
+            var result = await controller.CreateItemForPurchase(input);
+
+            var created = Assert.IsType<CreatedAtActionResult>(result);
+            var actual = Assert.IsType<PurchaseDetailDTO>(created.Value);
+
+            Assert.True(actual.Id > 0);
+
+            Assert.Equal("Bizum", actual.PaymentMethod);
+            Assert.Equal("C/Plaza Mayor", actual.Street);
+            Assert.Equal("Albacete", actual.City);
+            Assert.Equal("Spain", actual.Country);
+            Assert.Equal("", actual.Description);
             Assert.Equal(20.0m, actual.TotalPrice);
 
             var items = actual.PurchaseItems;
