@@ -91,6 +91,12 @@ namespace AppForSEII2526.API.Controllers
                 {
                     ModelState.AddModelError("RestockItems", "Error! At least one restock item is required.");
                 }
+                if(!string.IsNullOrEmpty(restockForCreate.Description) && 
+                   !restockForCreate.Description.StartsWith("Restock for"))
+                {
+                //return BadRequest("Error! You must start the Description with 'Restock for'");
+                   ModelState.AddModelError("Description", "Error! You must start the Description with 'Restock for'");
+            }
                 
 
 

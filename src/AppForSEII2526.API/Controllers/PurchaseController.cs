@@ -36,7 +36,7 @@ namespace AppForSEII2526.API.Controllers
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.Conflict)]
         public async Task<ActionResult> CreateItemForPurchase(ItemForCreateDTO itemForCreate)
         {
-   if (!ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 return BadRequest(ValidationProblem(ModelState));
             }
@@ -67,9 +67,14 @@ namespace AppForSEII2526.API.Controllers
                 ModelState.AddModelError("PaymentMethod", "ERROR! The selected payment method is not registered for this user.");
                 return BadRequest(ValidationProblem(ModelState));
             }
+            string sentence = "My purchase for";
+
+            if (itemForCreate.Description != "" && !itemForCreate.Description.StartsWith(sentence)) {
+                ModelState.AddModelError("Description", "Error! You must start the Description with My purchase for.");
+                return BadRequest(ValidationProblem(ModelState));
+            }
 
             
-
             var requestedItemsIds = itemForCreate.PurchaseItems.Select(pi => pi.ItemId).ToList();
 
             var dbItems = await _context.Items

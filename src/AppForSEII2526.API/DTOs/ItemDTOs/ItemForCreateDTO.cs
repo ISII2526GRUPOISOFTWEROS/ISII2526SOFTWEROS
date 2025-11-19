@@ -8,6 +8,7 @@ namespace AppForSEII2526.API.DTOs.ItemDTOs
         public ItemForCreateDTO()
         {
         }
+         
 
         public ItemForCreateDTO(string customerUserName, int paymentMethodId, string street, string city, string country, string description, IList<CreatePurchaseItemDTO> purchaseItems)
         {
