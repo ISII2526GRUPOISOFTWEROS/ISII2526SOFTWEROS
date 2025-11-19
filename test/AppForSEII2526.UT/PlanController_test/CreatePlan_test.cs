@@ -82,7 +82,7 @@ namespace AppForSEII2526.UT.PlanController_test
 
                 var planNoClasses = new PlanForCreateDTO
                 {
-                    UserName = "elena@uclm.es",
+                    UserName = "test",
                     Name = "Plan 2",
                     Weeks = 4,
                     PaymentMethodId = 1,
