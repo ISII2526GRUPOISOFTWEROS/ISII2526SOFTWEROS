@@ -2,7 +2,7 @@ using AppForSEII2526.Web;
 using AppForSEII2526.Web.Components;
 using AppForSEII2526.Web.Components.Account;
 using AppForSEII2526.Web.Data;
-using AppForSEII2526.Web.KairosAPI;
+using AppForSEII2526.Web.API;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
