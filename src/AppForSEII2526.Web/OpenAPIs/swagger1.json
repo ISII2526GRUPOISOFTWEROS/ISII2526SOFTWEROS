@@ -2,8 +2,8 @@
 {
   "openapi": "3.0.1",
   "info": {
-    "title": "AppForMovies.API",
-    "description": "This API provides services for renting and purchasing movies",
+    "title": "AppForSEII2526.API",
+    "description": "This API provides services for a gym",
     "contact": {
       "name": "Software Engineering II Team",
       "email": "isii@on.uclm.es"
