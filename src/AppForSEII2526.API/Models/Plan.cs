@@ -1,15 +1,30 @@
-﻿namespace AppForSEII2526.API.Models
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
+
+namespace AppForSEII2526.API.Models
 {
     [Index(nameof(Name), IsUnique = true)]
     public class Plan
     {
-        
+        public Plan()
+        {
+            PlanItems = new List<PlanItem>();
+            User = null!;
+        }
+
         public int Id { get; set; }
+
+        public string? UserId { get; set; }
+
+        [ForeignKey(nameof(UserId))]
+        public ApplicationUser User { get; set; }
+
+        
         public int Weeks { get; set; }
         public string? HealthIssues { get; set; }
         public string? Description { get; set; }
         public string? Name { get; set; }
-        [Precision (10,2)]
+        [Precision(10, 2)]
         public decimal Totalprice { get; set; }
         public DateTime CreatedDate { get; set; }
         public IList<PlanItem> PlanItems { get; set; }
