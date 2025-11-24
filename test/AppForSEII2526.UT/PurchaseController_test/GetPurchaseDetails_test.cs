@@ -101,20 +101,7 @@ namespace AppForSEII2526.UT.PurchaseController_test
         [Trait("GetPurchaseDetails", "Unit Testing")]
         public async Task GetPurchaseDetails_Successful_Test()
         {
-            var expectedDetails = new PurchaseDetailDTO(
-                existingPurchaseId,
-                "Bizum",
-                "C/Plaza Mayor",
-                "Albacete",
-                "Spain",
-                "First Purchase",
-                new List<PurchasedItemDTO>()
-                {
-                    new PurchasedItemDTO( "Foam Roller", "Nike", 50.0m, 1),
-                    new PurchasedItemDTO( "Bands", "Domyos", 30.0m, 1),
-                },
-                80.0m
-            );
+          
 
             var mock = new Mock<ILogger<PurchaseController>>();
             ILogger<PurchaseController> logger = mock.Object;
@@ -129,25 +116,20 @@ namespace AppForSEII2526.UT.PurchaseController_test
         
             var detail = Assert.Single(purchaseDetail);
 
-            Assert.Equal(expectedDetails.Id, detail.Id);
-            Assert.Equal(expectedDetails.PaymentMethod, detail.PaymentMethod);
-            Assert.Equal(expectedDetails.DeliveryAddress, detail.DeliveryAddress);
-            Assert.Equal(expectedDetails.Description, detail.Description);
-            Assert.Equal(expectedDetails.TotalPrice, detail.TotalPrice);
-            Assert.Equal(expectedDetails.PurchaseItems.Count, detail.PurchaseItems.Count);
+            var expectedDetails = new PurchaseDetailDTO(
+              existingPurchaseId,
+              "Bizum",
+              "C/Plaza Mayor",
+              "Albacete",
+              "Spain",
+              "First Purchase",
+              detail.PurchaseItems,
+              80.0m
+          );
 
-            var expectedItem = expectedDetails.PurchaseItems.OrderBy(i => i.Name).ToList();
-            var actualItem = detail.PurchaseItems.OrderBy(i => i.Name).ToList();
+            Assert.Equal(expectedDetails, detail);
 
-            Assert.Equal(expectedItem.Count, actualItem.Count);
-
-            for (int i = 0; i < expectedDetails.PurchaseItems.Count; i++)
-            {
-                Assert.Equal(expectedDetails.PurchaseItems[i].Name, detail.PurchaseItems[i].Name);
-                Assert.Equal(expectedDetails.PurchaseItems[i].Brand, detail.PurchaseItems[i].Brand);
-                Assert.Equal(expectedDetails.PurchaseItems[i].Price, detail.PurchaseItems[i].Price);
-                Assert.Equal(expectedDetails.PurchaseItems[i].Quantity, detail.PurchaseItems[i].Quantity);
-            }
+            
         }
 
     }
