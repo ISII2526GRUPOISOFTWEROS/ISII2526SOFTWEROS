@@ -2,7 +2,8 @@
 
 @using AppForSEII2526.Web.API
 @inject AppForKairosAPIClient apiclient
-@inject ILogger<SelectItemsForPurchase> logger                                                                  
+@inject ILogger<SelectItemsForPurchase> logger   
+@inject PurchaseStateContainer purchaseState
 
 <h3>SelectItemsForPurchase</h3>
 
@@ -61,6 +62,21 @@
     private string itemBrand { get; set; }
     private DateTime _from;
     private DateTime _to;
+
+
+    private ItemForCreateDTO itemToCreate => purchaseState.Purchase;
+
+    private bool hiddenHi
+
+
+
+
+
+
+
+
+
+
 
     public async void SearchItem()
     {
