@@ -139,8 +139,7 @@ namespace AppForSEII2526.UT.PlanController_test
             var result = await controller.CreatePlan(planDTO);
 
             var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
-            var problemDetails = Assert.IsType<ValidationProblemDetails>(badRequestResult.Value);
-            var errorActual = problemDetails.Errors.First().Value[0];
+            var errorActual = badRequestResult.Value.ToString();
             Assert.StartsWith(errorExpected, errorActual);
         }
 
@@ -186,13 +185,21 @@ namespace AppForSEII2526.UT.PlanController_test
             var result = await controller.CreatePlan(planDTO);
 
             var createdResult = Assert.IsType<CreatedAtActionResult>(result);
-            dynamic response = createdResult.Value;
+            var response = Assert.IsType<PlanResponseDTO>(createdResult.Value);
 
+            Assert.Equal(planDTO.Name, response.Name);
+            Assert.Equal(planDTO.Weeks, response.Weeks);
+            Assert.Equal(50m, response.Totalprice);
+            Assert.Equal(planDTO.SelectedClasses.Count, response.Classes.Count);
+
+<<<<<<< Updated upstream
             Assert.Equal(planDTO.Name, (string)response.Name);
             Assert.Equal(planDTO.Weeks, (int)response.Weeks);
             decimal expectedTotal = planDTO.SelectedClasses.Sum(c => c.Price) * planDTO.Weeks;
             Assert.Equal(expectedTotal, (decimal)response.Totalprice);
             Assert.Equal(planDTO.SelectedClasses.Count, ((IEnumerable<dynamic>)response.Classes).Count());
+=======
+>>>>>>> Stashed changes
         }
     }
 }
