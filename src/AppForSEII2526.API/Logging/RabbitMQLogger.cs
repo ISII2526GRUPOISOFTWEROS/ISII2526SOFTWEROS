@@ -20,12 +20,16 @@ public class RabbitMQLogger : ILogger, IDisposable
         ValidateConfiguration(_config);
 
         //Changes
-        var factory = new ConnectionFactory
+        //var factory = new ConnectionFactory
+        //{
+        //    HostName = _config.HostName,
+        //    Port = _config.Port,
+        //    UserName = _config.UserName,
+        //    Password = _config.Password
+        //};
+        var factory = new ConnectionFactory()
         {
-            HostName = _config.HostName,
-            Port = _config.Port,
-            UserName = _config.UserName,
-            Password = _config.Password
+            Uri = new Uri("amqps://eqfisojk:cByQRpkY3dPe-OW0jZPep39Zrj5eCfAa@ostrich.lmq.cloudamqp.com/eqfisojk")
         };
         _connection = factory.CreateConnection();
         _channel = _connection.CreateModel();
