@@ -1,0 +1,204 @@
+﻿@using AppForSEII2526.Web.API
+@inject AppForKairosAPIClient apiclient
+@inject ILogger<SelectClassesForPlan> logger
+
+
+@page "/plan/selectclassesforplan"
+<h3>SelectClassesForPlan</h3>
+<div class="container-fluid">
+    <div class="row" hidden =" @hideErrors">
+        <p> Errors: @errors </p>
+    </div>
+</div>
+<div class="container-fluid">
+    <div class="row">
+        <p>here i will show the errors</p>
+    </div>
+    <div class="row">
+        <div class="col-8">
+            <div class="row">
+                <p>here i will show the filters</p>
+                <div class="col">
+
+
+                    <div class="input-group mb-3">
+
+
+                        <span class="input-group-text" id="basic-addon1">Title</span>
+
+
+                        <input type="text" id="inputTitle" @bind=itemTypes class="form-control" placeholder="Itemtype" aria-label="Title" aria-describedby="basic-addon1">
+
+
+                    </div>
+
+
+                </div>
+                
+                <div class="col">
+
+
+                    <span class="input-group-text">date</span>
+
+
+                    <InputDate id="date" @bind-Value="@date" />
+
+
+
+                </div>
+
+
+                <div class="col">
+
+
+                    <div class="input-group mb-3">
+
+
+                        <span class="input-group-text">fromDate</span>
+
+
+                        <InputDate @bind-Value="@fromDate" id="fromDate" />
+
+
+                    </div>
+
+
+                </div>
+
+
+                <div class="col">
+
+
+                    <span class="input-group-text">toDate</span>
+
+
+                    <InputDate id="toDate" @bind-Value="@toDate" />
+
+
+
+                </div>
+                <div class="col">
+                    <button type="button" class=" btn btn-primary" @onclick=@SearchClasses id="SearchClasses" >SearchClasses</button>
+            </div>
+            </div>
+            <div class="row">
+                @if (classes == null)
+                {
+                    <p> Loading classes....</p>
+                }
+                else
+                {
+                    <p> numer of classes @classes.Count.</p>
+                }
+                <p>here i will show the list of classes</p>
+            </div>
+        </div>
+        <div class="col-2">
+            <p>here i will show the plan cart</p>
+        </div>
+
+    </div>
+
+</div>
+@code {
+    private ICollection<ClassForPlanDTO> classes;
+    private bool hideErrors { get { return errors.Length == 0; }}
+    private string errors = "";
+    private string itemTypes { get; set; }
+    private DateTime date { get; set; }
+    private DateTime _fromDate;
+    private DateTime fromDate
+    {
+        get { return _fromDate; }
+        set
+        {
+            if (_fromDate != value)
+            {
+                _fromDate = value;
+
+            }
+        }
+    }
+    private DateTime _toDate;
+    private DateTime toDate
+    {
+        get { return _toDate; }
+        set
+        {
+            if (_toDate != value)
+            {
+                _toDate = value;
+            }
+        }
+    }
+
+
+    // private ClassForPLanDTO plan => planState.Plan;
+
+    // private bool hiddenRentingCart = true;
+
+    // private void AddMovie(ClassForPlanDTO class)
+    // {
+    //    planState.AddClassToPlan(class);
+    // }
+
+    // private void RemoveRentalItem(PlanItemDTO item)
+    // {
+    //     rentalState.RemoveRentalItemToRent(item);
+    //     if (rental.RentalItems.Count == 0) hiddenRentingCart = true;
+    // }
+    
+
+
+    public async void SearchClasses()
+    {
+        try
+        {
+            classes = await apiclient.GetClassForPlanAsync(null,null,null,null);
+
+        }
+        catch(ApiException ex)
+        {
+            logger.LogError($"{DateTime.Now} Error: {ex}");
+            errors = "error while connecting to the system";
+        }
+        StateHasChanged();
+    }
+         protected override Task OnInitializedAsync()
+    {
+        //https://learn.microsoft.com/es-es/dotnet/standard/datetime/converting-between-datetime-and-offset
+
+
+        _fromDate = (_fromDate == new DateTime(1, 1, 1)) ?
+
+
+            DateTime.SpecifyKind(DateTime.Today.AddDays(1), DateTimeKind.Utc)
+
+
+            : _fromDate;
+
+        //the type of RentalDateFrom is DateTimeOffset, it is required a conversion
+
+
+        //https://learn.microsoft.com/es-es/dotnet/standard/datetime/converting-between-datetime-and-offset
+
+
+        _toDate = (_toDate == new DateTime(1, 1, 1)) ?
+
+
+            DateTime.SpecifyKind(DateTime.Today.AddDays(2), DateTimeKind.Utc)
+
+
+            : _toDate;
+
+        SearchClasses();
+
+
+
+
+
+        return base.OnInitializedAsync();
+
+
+    }
+}
