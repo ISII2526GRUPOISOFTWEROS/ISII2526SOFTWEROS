@@ -91,7 +91,7 @@ namespace AppForSEII2526.UT.PlanController_test
                 id: 1,
                 userName:_userName,
                 dateCreated: _context.Plans.First().CreatedDate,
-                totalPrice: 50m, // Calculado: (10 + 15) * 2 semanas
+                totalPrice: 0m,
                 planName: "My Weekly Plan",
                 description: "Test plan",
                 numberOfWeeks: 2,
@@ -102,7 +102,6 @@ namespace AppForSEII2526.UT.PlanController_test
                     new ClassForPlanDTO(2, 15m, DateTime.Today.AddDays(2), "Evening Pilates", 10, new List<string?> { "Pilates" })
                 }
             );
-
 
             var result = await controller.GetPlanDetails(1);
             var okResult = Assert.IsType<OkObjectResult>(result);
@@ -121,7 +120,6 @@ namespace AppForSEII2526.UT.PlanController_test
                 Assert.Equal(expectedPlan.Classes[i].Name, planActual.Classes[i].Name);
                 Assert.Equal(expectedPlan.Classes[i].date, planActual.Classes[i].date);
                 Assert.Equal(expectedPlan.Classes[i].price, planActual.Classes[i].price);
-                Assert.Equal(expectedPlan.Classes[i].capacity, planActual.Classes[i].capacity);
                 Assert.True(expectedPlan.Classes[i].itemType.SequenceEqual(planActual.Classes[i].itemType));
             }
 

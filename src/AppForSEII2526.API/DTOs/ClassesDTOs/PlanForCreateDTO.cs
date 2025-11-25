@@ -78,4 +78,26 @@ namespace AppForSEII2526.API.DTOs.ClassesDTOs
 
         public string? Goal { get; set; }
     }
+    public class PlanResponseDTO
+    {
+        public int Id { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public string? Description { get; set; }
+        public int Weeks { get; set; }
+        public string? HealthIssues { get; set; }
+        public decimal Totalprice { get; set; }
+        public List<ClassResponseDTO> Classes { get; set; } = new();
+    }
+
+    public class ClassResponseDTO
+    {
+        public int ClassId { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public decimal Price { get; set; }
+        public DateTime Date { get; set; }
+        public List<string> Types { get; set; } = new();
+        public string? Goal { get; set; }
+    }
+
+
 }
