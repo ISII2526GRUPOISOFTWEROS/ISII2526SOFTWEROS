@@ -1,111 +1,128 @@
-﻿//using AppForSEII2526.API.Controllers;
-//using AppForSEII2526.API.DTOs.ClassesDTOs;
-//using AppForSEII2526.API.DTOs.PlanDTOs;
-//using AppForSEII2526.API.Models;
-//using Microsoft.AspNetCore.Mvc;
-//using Microsoft.EntityFrameworkCore;
-//using Moq;
+﻿using AppForSEII2526.API.Controllers;
+using AppForSEII2526.API.DTOs.ClassesDTOs;
+using AppForSEII2526.API.DTOs.PlanDTOs;
+using AppForSEII2526.API.Models;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Moq;
+using System.Numerics;
 
-//namespace AppForSEII2526.UT.PlanController_test
-//{
-//    public class GetPlanDetails_test : AppForSEII25264SqliteUT
-//    {
-//        public GetPlanDetails_test()
-//        {
-//            var user = new ApplicationUser()
-//            {
-//                Id = "1",
-//                UserName = "test",
-//                Surname = "user",
-//                Email = "test@test.com",
-//            };
-//            _context.Users.AddRange(user);
+namespace AppForSEII2526.UT.PlanController_test
+{
+    public class GetPlanDetails_test : AppForSEII25264SqliteUT
+    {
 
-//            var types = new List<ItemType>()
-//            {
-//                new ItemType { Name = "Yoga" },
-//                new ItemType { Name = "Pilates" }
-//            };
+        private const string _userName = "Pepe.Gomez";
+        private const string _surname = "Gomez";
 
-//            var classes = new List<Class>()
-//            {
-//                new Class { Id = 1, Name = "Morning Yoga", Price = 10.0m, Date = DateTime.Today.AddDays(1), TypeItems = new List<ItemType> { types[0] } },
-//                new Class { Id = 2, Name = "Evening Pilates", Price = 15.0m, Date = DateTime.Today.AddDays(2), TypeItems = new List<ItemType> { types[1] } }
-//            };
+        public GetPlanDetails_test()
+        {
+            var user = new ApplicationUser()
+            {
+                Id = "1",
+                UserName =_userName,
+                Surname = _surname,
+                Email = "test@test.com",
+            };
+            _context.Users.AddRange(user);
 
-//            _context.AddRange(types);
-//            _context.AddRange(classes);
-        
-//        var plan = new Plan
-//            {
-//                Name = "My Weekly Plan",
-//                Description = "Test plan",
-//                Weeks = 2,
-//                HealthIssues = "None",
-//                Totalprice = 0m,
-//                CreatedDate = DateTime.UtcNow,
-//                User = user,
-//                PlanItems = new List<PlanItem>
-//                {
-//                    new PlanItem(classes[0].Price) { Class = classes[0] },
-//                    new PlanItem(classes[1].Price) { Class = classes[1]  }
-//                }
-//            };
+            var types = new List<ItemType>()
+            {
+                new ItemType { Name = "Yoga" },
+                new ItemType { Name = "Pilates" }
+            };
 
-//            plan.Totalprice = plan.PlanItems.Sum(pi => pi.Price * plan.Weeks);
+            var classes = new List<Class>()
+            {
+                new Class { Id = 1, Name = "Morning Yoga", Price = 10.0m, Date = DateTime.Today.AddDays(1), TypeItems = new List<ItemType> { types[0] } },
+                new Class { Id = 2, Name = "Evening Pilates", Price = 15.0m, Date = DateTime.Today.AddDays(2), TypeItems = new List<ItemType> { types[1] } }
+            };
 
-//            _context.Plans.Add(plan);
-//            _context.SaveChanges();
-//        }
+            _context.AddRange(types);
+            _context.AddRange(classes);
 
-//        [Fact]
-//        public async Task GetPlanDetails_NotFound_test()
-//        {
-//            // Arrange
-//            var mock = new Mock<ILogger<PlanController>>();
-//            var logger = mock.Object;
+            var plan = new Plan
+            {
+                Name = "My Weekly Plan",
+                Description = "Test plan",
+                Weeks = 2,
+                HealthIssues = "None",
+                Totalprice = 0m,
+                CreatedDate = DateTime.UtcNow,
+                User = user,
+                PlanItems = new List<PlanItem>
+                {
+                    new PlanItem(classes[0].Price) { Class = classes[0] },
+                    new PlanItem(classes[1].Price) { Class = classes[1]  }
+                }
+            };
 
-//            var controller = new PlanController(_context, logger);
+            plan.Totalprice = plan.PlanItems.Sum(pi => pi.Price * plan.Weeks);
 
-//            // Act
-//            var result = await controller.GetPlanDetails(0);
+            _context.Plans.Add(plan);
+            _context.SaveChanges();
+        }
 
-//            // Assert
-//            Assert.IsType<NotFoundResult>(result);
-//        }
+        [Fact]
+        public async Task GetPlanDetails_NotFound_test()
+        {
+            // Arrange
+            var mock = new Mock<ILogger<PlanController>>();
+            var logger = mock.Object;
 
-//        [Fact]
-//        public async Task GetPlanDetails_Found_test()
-//        {
+            var controller = new PlanController(_context, logger);
 
-//            var mock = new Mock<ILogger<PlanController>>();
-//            ILogger<PlanController> logger = mock.Object;
+            // Act
+            var result = await controller.GetPlanDetails(0);
 
-//            var controller = new PlanController(_context, logger);
-//            var expectedPlan = new PlanDetailDTO(
-//                id: 1,
-//                userName: "elena@uclm.es",
-//                dateCreated: _context.Plans.First().CreatedDate,
-//                totalPrice: 50m, // Calculado: (10 + 15) * 2 semanas
-//                planName: "My Weekly Plan",
-//                description: "Test plan",
-//                numberOfWeeks: 2,
-//                healthIssues: "None",
-//                classes: new List<ClassForPlanDTO>
-//                {
-//                    new ClassForPlanDTO(1, 10m, DateTime.Today.AddDays(1), "Morning Yoga", 5, new List<string?> { "Yoga" }),
-//                    new ClassForPlanDTO(2, 15m, DateTime.Today.AddDays(2), "Evening Pilates", 10, new List<string?> { "Pilates" })
-//                }
-//            );
+            // Assert
+            Assert.IsType<NotFoundResult>(result);
+        }
 
-//            // Act
-//            var result = await controller.GetPlanDetails(1);
+        [Fact]
+        public async Task GetPlanDetails_Found_test()
+        {
 
-//            // Assert
-//            var okResult = Assert.IsType<OkObjectResult>(result);
-//            var planActual = Assert.IsType<PlanDetailDTO>(okResult.Value);
+            var mock = new Mock<ILogger<PlanController>>();
+            ILogger<PlanController> logger = mock.Object;
 
-//            Assert.Equal(expectedPlan, planActual);
-//        }
-//    }
-//}
+            var controller = new PlanController(_context, logger);
+            var expectedPlan = new PlanDetailDTO(
+                id: 1,
+                userName:_userName,
+                dateCreated: _context.Plans.First().CreatedDate,
+                totalPrice: 0m,
+                planName: "My Weekly Plan",
+                description: "Test plan",
+                numberOfWeeks: 2,
+                healthIssues: "None",
+                classes: new List<ClassForPlanDTO>
+                {
+                    new ClassForPlanDTO(1, 10m, DateTime.Today.AddDays(1), "Morning Yoga", 5, new List<string?> { "Yoga" }),
+                    new ClassForPlanDTO(2, 15m, DateTime.Today.AddDays(2), "Evening Pilates", 10, new List<string?> { "Pilates" })
+                }
+            );
+
+            var result = await controller.GetPlanDetails(1);
+            var okResult = Assert.IsType<OkObjectResult>(result);
+            var planActual = Assert.IsType<PlanDetailDTO>(okResult.Value);
+            Assert.Equal(expectedPlan.Id, planActual.Id);
+            Assert.Equal(expectedPlan.UserName, planActual.UserName);
+            Assert.Equal(expectedPlan.PlanName, planActual.PlanName);
+            Assert.Equal(expectedPlan.NumberOfWeeks, planActual.NumberOfWeeks);
+            Assert.Equal(expectedPlan.TotalPrice, planActual.TotalPrice);
+            Assert.Equal(expectedPlan.Description, planActual.Description);
+            Assert.Equal(expectedPlan.HealthIssues, planActual.HealthIssues);
+            Assert.Equal(expectedPlan.Classes.Count, planActual.Classes.Count);
+            for (int i = 0; i < expectedPlan.Classes.Count; i++)
+            {
+                Assert.Equal(expectedPlan.Classes[i].Id, planActual.Classes[i].Id);
+                Assert.Equal(expectedPlan.Classes[i].Name, planActual.Classes[i].Name);
+                Assert.Equal(expectedPlan.Classes[i].date, planActual.Classes[i].date);
+                Assert.Equal(expectedPlan.Classes[i].price, planActual.Classes[i].price);
+                Assert.True(expectedPlan.Classes[i].itemType.SequenceEqual(planActual.Classes[i].itemType));
+            }
+
+        }
+    }
+}

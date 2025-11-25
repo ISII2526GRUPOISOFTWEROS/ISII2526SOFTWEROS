@@ -3,6 +3,11 @@ using System.Data.Common;
 
 var builder = WebApplication.CreateBuilder(args);
 
+//Adding the builder for rabbit
+//”RabbitMQ” coincide con el nombre del bloque de propiedades en appsettings.json 
+
+
+
 // Add services to the container.
 
 builder.Services.AddControllers()
