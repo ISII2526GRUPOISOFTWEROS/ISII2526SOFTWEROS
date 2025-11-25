@@ -4,12 +4,13 @@
 @inject AppForKairosAPIClient apiclient
 @inject ILogger<SelectItemsForPurchase> logger   
 @inject PurchaseStateContainer purchaseState
+@inject NavigationManager navigation
 
 <h3>SelectItemsForPurchase</h3>
 
 <div class="container-fluid">
-    <div class="row" hidden = "@hideErrors">
-        <p>Errors: @errors</p>
+    <div class="row alert alert-danger" hidden = "@hideErrors">
+        <p id="ErrorsShown">Errors: @errors</p>
     </div>
     <div class="row">
         <div class="col-8">
@@ -45,16 +46,27 @@
 
             </div>
         </div>
-            <div class="col-2">
-                <p>here i will show the renting cart</p>
+        <div class="col-2" hidden="@hideRentingCart">
+                <div class="row">
+                    <h3> Shopping Cart</h3>
+                </div>
+            @foreach (var item in itemToCreate.PurchaseItems)
+            {
+                <div class="row">
+                    <button type="button" class="btn btn-light" id="removeItem_@item.ItemId" @onclick="@(() => RemoveItem(item.ItemId))">x @item.ItemId - @item.Quantity€</button>
+                </div>
+            }
+            <div class="row">
+                <button type="button" class=" btn btn-primary" id="purchaseItemButton" @onclick="PurchaseItem">Purchase Item </button>
             </div>
+        </div>
 
     </div>
     
 </div>
 
 @code {
-
+    private bool hideRentingCart { get { return hiddenPurchaseCart; } }
     private ICollection<ItemForPurchaseDTO> items;
     private bool hideErrors {get{ return errors.Length == 0; }}
     private string errors = "";
@@ -67,28 +79,25 @@
     private ItemForCreateDTO itemToCreate => purchaseState.Purchase;
 
     private bool hiddenPurchaseCart = true;
+
     private void AddItem(ItemForPurchaseDTO item)
     {
         purchaseState.AddPurchaseItem(item);
     }
+
     private void RemoveItem(int item)
     {
-        purchaseState.RemovePurchaseItem(item);
-        if(purchaseState.PurchaseItems.Count == 0)
+         purchaseState.RemovePurchaseItem(item);
+
+        if(purchaseState.Purchase.PurchaseItems.Count == 0)
         {
             hiddenPurchaseCart = true;
         }
     }
-
-
-
-
-
-
-
-
-
-
+        private void PurchaseItem()
+        {
+            navigation.NavigateTo("/item/createrental");
+        }
 
     public async void SearchItem()
     {
