@@ -192,14 +192,7 @@ namespace AppForSEII2526.UT.PlanController_test
             Assert.Equal(50m, response.Totalprice);
             Assert.Equal(planDTO.SelectedClasses.Count, response.Classes.Count);
 
-<<<<<<< Updated upstream
-            Assert.Equal(planDTO.Name, (string)response.Name);
-            Assert.Equal(planDTO.Weeks, (int)response.Weeks);
-            decimal expectedTotal = planDTO.SelectedClasses.Sum(c => c.Price) * planDTO.Weeks;
-            Assert.Equal(expectedTotal, (decimal)response.Totalprice);
-            Assert.Equal(planDTO.SelectedClasses.Count, ((IEnumerable<dynamic>)response.Classes).Count());
-=======
->>>>>>> Stashed changes
+
         }
     }
 }
