@@ -1,18 +1,53 @@
-﻿@page "/rental/selectitemforrestock"
+﻿@page "/restock/selectitemsforrestock"
+
+@using AppForSEII2526.Web.API
+@inject AppForKairosAPIClient apiclient
+@inject ILogger<selectItemForRestock> Logger
+
 
 <h3> Select items for restock</h3>
 
 <div class="container-fluid">
     <div class="row">
-        <p>here i will show the errors</p>
+        <p> Errors: @errors</p>
     </div>
     <div class="row">
         <div class="col-8">
             <div class="row">
-                <p>here i will show the filters</p>
+
+                @* Cajas de texto para los atributos de Restock*@
+                <div class="col">
+                    <div class="input-group mb-3">
+                        <span class="input-group-text" id="basic-addon1">Title</span>
+                        <input type="text" id="inputName" @bind=itemName class="form-control" placeholder="item Name" aria-label="item Name" aria-describedby="basic-addon1">
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="input-group mb-3">
+                        <span class="input-group-text" id="basic-addon1">Genre</span>
+                        <input type="text" id="inputQuantity" @bind=quantity class="form-control" placeholder="quantity" aria-label="quantity" aria-describedby="basic-addon1">
+                    </div>
+                </div>           
+               
+
+                @* <!--boton para enviar la informacion--> *@
+
+
+                <div class="col">
+                    <button type="button" class="btn btn-primary" @onclick=@searchItems id="searchItems">Search Items</button>
+                </div>
+
             </div>
             <div class="row">
-                <p>here i will show the list of items</p>
+                @if (items == null)
+                {
+                    <p>Loading items...</p>
+                }
+                else
+                {
+                    <p>number of items @items.Count </p>
+                }
+                
             </div>
         </div>
         <div class="col-2">
@@ -25,4 +60,50 @@
 
 @code {
 
+    private ICollection<ItemForRestockDTO> items ;
+
+    private bool hideError { get { return errors.Length == 0; } }
+    private string errors = "";
+    private string itemName { get; set; }
+    private int quantity { get; set; }
+    private DateTime _from;
+    private DateTime _to;
+
+
+    public async void searchItems()
+    {
+        
+        try
+        {
+            items = await apiclient.GetItemsForRestockAsync(itemName, quantity);
+        }
+        catch (Exception ex) // Cambiado de ApiException a Exception
+        {
+            Logger.LogError("Error getting items for restock: {0}", ex.Message);
+            errors = "Error while connecting to the system";
+        }
+
+        StateHasChanged();
+    }
+
+
+    protected override Task OnInitializedAsync()
+    {
+        //the type of RentalDateFrom is DateTimeOffset, it is required a conversion
+        //https://learn.microsoft.com/es-es/dotnet/standard/datetime/converting-between-datetime-and-offset
+        _from = (_from == new DateTime(1, 1, 1)) ?
+            DateTime.SpecifyKind(DateTime.Today.AddDays(1), DateTimeKind.Utc)
+            : _from;
+
+
+        //the type of RentalDateFrom is DateTimeOffset, it is required a conversion
+        //https://learn.microsoft.com/es-es/dotnet/standard/datetime/converting-between-datetime-and-offset
+        _to = (_to == new DateTime(1, 1, 1)) ?
+            DateTime.SpecifyKind(DateTime.Today.AddDays(2), DateTimeKind.Utc)
+            : _to;
+
+        searchItems();
+
+        return base.OnInitializedAsync();
+    }
 }
