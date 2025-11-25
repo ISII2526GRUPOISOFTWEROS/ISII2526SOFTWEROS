@@ -1,11 +1,12 @@
 ﻿@page "/purchase/selectitemsforpurchase"
-
+@using Microsoft.AspNetCore.Authorization
 @using AppForSEII2526.Web.API
 @inject AppForKairosAPIClient apiclient
 @inject ILogger<SelectItemsForPurchase> logger   
 @inject PurchaseStateContainer purchaseState
 @inject NavigationManager navigation
 
+@attribute [Authorize]
 <h3>SelectItemsForPurchase</h3>
 
 <div class="container-fluid">
