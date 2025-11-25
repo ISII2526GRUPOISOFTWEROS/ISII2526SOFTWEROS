@@ -59,6 +59,7 @@ namespace AppForSEII2526.API.Controllers
 
                 var query = _context.Classes
                     .Include(c => c.TypeItems)
+                    .Where(c => c.Date.Date >= DateTime.Today && c.Capacity > 0)
                     .AsQueryable();
 
                 if (!itemTypes?.Any() == true && !date.HasValue && !fromDate.HasValue && !toDate.HasValue)
