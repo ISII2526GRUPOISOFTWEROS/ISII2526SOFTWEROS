@@ -152,6 +152,9 @@ namespace AppForSEII2526.UT.PlanController_test
             ILogger<PlanController> logger = mock.Object;
 
             var controller = new PlanController(_context, logger);
+            var class1 = _context.Classes.First(c => c.Name == "Morning Yoga");
+            var class2 = _context.Classes.First(c => c.Name == "Evening Pilates");
+
 
             var planDTO = new PlanForCreateDTO
             {
@@ -160,23 +163,24 @@ namespace AppForSEII2526.UT.PlanController_test
                 Weeks = 2,
                 PaymentMethodId = 1,
                 SelectedClasses = new List<ClassSelectionDTO>
-{
-    new ClassSelectionDTO
-    {
-        Id = 1,
-        Name = "Morning Yoga",
-        Price = 10m,
-        Date = DateTime.Today.AddDays(1),
-        ItemType = new List<string?> { "Yoga" }
-    },
-    new ClassSelectionDTO
-    {
-        Id = 2,
-        Name = "Evening Pilates",
-        Price = 15m,
-        Date = DateTime.Today.AddDays(2),
-        ItemType = new List<string?> { "Pilates" }
-    } }
+        {
+            new ClassSelectionDTO
+            {
+                Id = class1.Id,
+                Name = class1.Name,
+                Price = class1.Price,
+                Date = class1.Date,
+                ItemType = class1.TypeItems.Select(t => t.Name).ToList()
+            },
+            new ClassSelectionDTO
+            {
+                Id = class2.Id,
+                Name = class2.Name,
+                Price = class2.Price,
+                Date = class2.Date,
+                ItemType = class2.TypeItems.Select(t => t.Name).ToList()
+            }
+        }
             };
 
             var result = await controller.CreatePlan(planDTO);
@@ -186,7 +190,8 @@ namespace AppForSEII2526.UT.PlanController_test
 
             Assert.Equal(planDTO.Name, (string)response.Name);
             Assert.Equal(planDTO.Weeks, (int)response.Weeks);
-            Assert.Equal(50m, (decimal)response.Totalprice);
+            decimal expectedTotal = planDTO.SelectedClasses.Sum(c => c.Price) * planDTO.Weeks;
+            Assert.Equal(expectedTotal, (decimal)response.Totalprice);
             Assert.Equal(planDTO.SelectedClasses.Count, ((IEnumerable<dynamic>)response.Classes).Count());
         }
     }
