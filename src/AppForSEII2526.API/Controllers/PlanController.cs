@@ -24,14 +24,18 @@ namespace AppForSEII2526.API.Controllers
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.Conflict)]
         public async Task<ActionResult> CreatePlan(PlanForCreateDTO planForCreate)
         {
+            if (planForCreate == null)
+            {
+                return BadRequest("No plan data provided.");
+            }
 
             var user = _context.ApplicationUser.FirstOrDefault(au => au.UserName == planForCreate.UserName);
 
             if (user == null)
             {
-                ModelState.AddModelError("UserNotFound", $"Error! Username is not registred");
-                return BadRequest(ValidationProblem(ModelState));
+                return BadRequest("Error! Username is not registered");
             }
+
             var checkPM = await _context.Set<PaymentMethod>()
                 .AnyAsync(pm => pm.Id == planForCreate.PaymentMethodId && pm.User.Id == user.Id);
 
@@ -43,10 +47,7 @@ namespace AppForSEII2526.API.Controllers
 
             }
 
-            if (planForCreate == null)
-            {
-                return BadRequest("No plan data provided.");
-            }
+
 
             if (string.IsNullOrWhiteSpace(planForCreate.Name))
             {
@@ -55,7 +56,7 @@ namespace AppForSEII2526.API.Controllers
 
             if (planForCreate.Weeks <= 0)
             {
-                ModelState.AddModelError("Weeks", "Weeks must be greater than 0.");
+                return BadRequest("Weeks must be greater than 0.");
             }
 
             if (planForCreate.PaymentMethodId <= 0)
@@ -65,9 +66,8 @@ namespace AppForSEII2526.API.Controllers
 
             if (planForCreate.SelectedClasses == null || !planForCreate.SelectedClasses.Any())
             {
-                ModelState.AddModelError("SelectedClasses", "At least one class must be selected.");
+                return BadRequest("At least one class must be selected.");
             }
-
             if (ModelState.ErrorCount > 0)
             {
                 return BadRequest(ValidationProblem(ModelState));
@@ -115,11 +115,11 @@ namespace AppForSEII2526.API.Controllers
                 });
 
                 totalCost += dbClass.Price * planForCreate.Weeks;
-            
 
+            }
+            plan.Totalprice = totalCost;
             _context.Plans.Add(plan);
-            await _context.SaveChangesAsync();
-        }
+
 
             if (ModelState.ErrorCount > 0)
             {
@@ -136,35 +136,35 @@ namespace AppForSEII2526.API.Controllers
                 return Conflict("There was a problem saving your plan. Please try again later.");
             }
 
-            var response = new
+            var response = new PlanResponseDTO
             {
-                plan.Id,
-                plan.Name,
-                plan.Description,
-                plan.Weeks,
-                plan.HealthIssues,
-                plan.Totalprice,
+                Id = plan.Id,
+                Name = plan.Name,
+                Description = plan.Description,
+                Weeks = plan.Weeks,
+                HealthIssues = plan.HealthIssues,
+                Totalprice = plan.Totalprice,
                 Classes = plan.PlanItems.Select(pi =>
                 {
                     var dbClass = dbClasses[pi.ClassId];
-                    return new
+                    return new ClassResponseDTO
                     {
-                        pi.ClassId,
-                        dbClass.Name,
-                        dbClass.Price,
-                        dbClass.Date,
+                        ClassId = pi.ClassId,
+                        Name = dbClass.Name,
+                        Price = dbClass.Price,
+                        Date = dbClass.Date,
                         Types = dbClass.TypeItems.Select(t => t.Name).ToList(),
                         Goal = pi.Goal
                     };
-                })
+                }).ToList()
             };
+
             return CreatedAtAction("GetPlanDetails", new { id = plan.Id }, response);
         }
 
+            //details
 
-        //details
-
-        [HttpGet]
+            [HttpGet]
         [Route("[action]")]
         [ProducesResponseType(typeof(IList<PlanDetailDTO>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
