@@ -10,7 +10,7 @@ namespace AppForSEII2526.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ClassesController : ControllerBase
+    public cass ClassesController : ControllerBase
     {
         private ApplicationDbContext _context;
         private ILogger<ClassesController> _logger;
