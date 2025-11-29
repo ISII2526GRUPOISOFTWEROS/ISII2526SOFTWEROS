@@ -8,7 +8,7 @@
 @inject NavigationManager navigation
 
  @attribute [Authorize]
- <h3>Select Items For Purchase</h3>
+ <h3>Items For Purchase</h3>
 
 <div class="container-fluid">
     <div class="row alert alert-danger" hidden = "@hideErrors">
@@ -49,16 +49,18 @@
                                     <th>Name</th>
                                     <th>Brand</th>
                                     <th>Description</th>
-                                    <th>Price For Purchase</th>
+                                    <th>Price</th>
                                     <th>Quantity available</th>
+                                    <th>Add</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach (var item in items) {
-                                    <tr id="MovieData_@item.Name">
+                                    <tr id="ItemData_@item.Name">
                                         <td>@item.Name</td>
+                                        <td>@item.Brand</td>
                                         <td>@item.Description</td>
-                                        <td>@item.Price</td>
+                                        <td>@item.Price €</td>
                                         <td>@item.QuantityAvailableForPurchase</td>
                                         <td>
                                             <button class="btn btn-outline-secondary" id="itemforpurchase_@item.Name" @onclick="@(() => AddItem(item))">Add</button>
@@ -91,7 +93,7 @@
 </div>
 
 @code {
-    private bool hideRentingCart { get { return hiddenPurchaseCart; } }
+    private bool hideRentingCart => itemToCreate.PurchaseItems.Count == 0;
     private ICollection<ItemForPurchaseDTO> items;
     private bool hideErrors {get{ return errors.Length == 0; }}
     private string errors = "";
@@ -106,18 +108,15 @@
     private bool hiddenPurchaseCart = true;
 
     private void AddItem(ItemForPurchaseDTO item)
+    
     {
-        purchaseState.AddPurchaseItem(item);
+
+            purchaseState.AddPurchaseItem(item);
     }
 
     private void RemoveItem(int item)
     {
          purchaseState.RemovePurchaseItem(item);
-
-        if(purchaseState.Purchase.PurchaseItems.Count == 0)
-        {
-            hiddenPurchaseCart = true;
-        }
     }
         private void PurchaseItem()
         {
@@ -136,6 +135,7 @@
             logger.LogError($"{DateTime.Now} Error: {ex}");
             errors = "Error while connecting to the system";
         }
+        StateHasChanged();
     }
     protected override Task OnInitializedAsync()
     {

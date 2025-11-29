@@ -21,7 +21,9 @@ namespace AppForSEII2526.Web
         private void NotifyStateChanged() => OnChange?.Invoke();
         public void AddPurchaseItem(ItemForPurchaseDTO item)
         {
-            if (!Purchase.PurchaseItems.Any(i => i.ItemId == item.Id))
+            var existing = Purchase.PurchaseItems.FirstOrDefault(i => i.ItemId == item.Id);
+
+            if (existing is null)
             {
                 Purchase.PurchaseItems.Add(new CreatePurchaseItemDTO
                 {
@@ -30,6 +32,10 @@ namespace AppForSEII2526.Web
                     //Price = item.Price
 
                 });
+            }
+            else
+            {
+                existing.Quantity++;
             }
 
         }

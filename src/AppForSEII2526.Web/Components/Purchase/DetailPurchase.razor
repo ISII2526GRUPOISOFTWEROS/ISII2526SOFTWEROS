@@ -9,7 +9,7 @@
 
 @attribute [Authorize]
 
-@if(purchaseDetail != null)
+@if(purchaseDetail == null)
 {
     <p>@errorMessage</p>
 }
@@ -47,11 +47,10 @@ else
         <table class="table" id="PurchaseItems">
             <thead>
                 <tr>
-                    <th scope="col">Id</th>
-                    <th scope="col">Purchase item</th>
-                    <th scope="col">Delivery address</th>
-                    <th scope="col">Price for purchase</th>
-                    <th scope="col">Description</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Brand</th>
+                    <th scope="col">Quantity</th>
+                    <th scope="col">Price</th>
                 </tr>
             </thead>
             <tbody>
@@ -109,7 +108,7 @@ else
         }
         try
         {
-            //purchaseDetail = await apiclient.GetPurchaseDetailsAsync(PurchaseId);
+            var purchases = await apiclient.GetPurchaseDetailsAsync(PurchaseId);
         }
         catch (Exception ex)
         {
