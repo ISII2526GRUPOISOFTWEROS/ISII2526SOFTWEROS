@@ -36,4 +36,4 @@ namespace AppForSEII2526.API.DTOs.PurchaseDTOs
             return HashCode.Combine(ItemId, Quantity,Price);
         }
     }
-    }
+}
