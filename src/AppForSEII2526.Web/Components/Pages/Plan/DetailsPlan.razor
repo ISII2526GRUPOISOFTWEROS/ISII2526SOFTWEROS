@@ -1,0 +1,127 @@
+﻿﻿
+@using AppForSEII2526.Web.API
+@using Microsoft.AspNetCore.Authorization
+@inject AppForKairosAPIClient apiclient
+
+@page "/plan/detailsplan"
+<h3>DetailsPlan</h3>
+
+
+    @attribute [Authorize]
+
+@if (plan==null)
+{
+    <p>@error</p>
+}else
+{
+        <table class="table table-borderless table-sm">
+        <tr>
+            <th>Username</th>
+            <td id="Username">@plan.UserName</td>
+        </tr>
+        <tr>
+            <th>Plan Name</th>
+            <td id="PlannName">@plan.PlanName</td>
+        </tr>
+        <tr>
+            <th>Description</th>
+            <td id="Description">@plan.Description</td>
+        </tr>
+        <tr>
+            <th>Created Date</th>
+            <td id="CreatedDate">@plan.DateCreated.ToString("dd/MM/yyyy hh:mm:ss")</td>
+        </tr>
+        <tr>
+            <th>Total Price</th>
+            <td id="TotalPrice">@plan.TotalPrice</td>
+        </tr>
+        <tr>
+            <th>Number of Weeks</th>
+            <td id="NumberOfWeeks">@plan.NumberOfWeeks</td>
+        </tr>
+        <tr>
+            <th>Health Issues</th>
+            <td id="HealthIssues">@plan.HealthIssues</td>
+        </tr>
+        <tr>
+            <th>Classes</th>
+            <td id="Classess">@plan.Classes</td>
+        </tr>
+      
+    </table>
+
+       <h4>Selected Classes</h4>
+
+    <table class="table" id="SelectedClasses">
+        <thead>
+            <tr>
+                <th scope="col">Name</th>
+                <th scope="col">Capacity</th>
+                <th scope="col">Price</th>
+                <th scope="col">Date </th>
+                <th scope="col">PlanItems </th>
+                <th scope="col">TypeItems </th>
+            </tr>
+        </thead>
+@*         <tbody>
+            @foreach (PlanItemDTO item in plan.PlanItems)
+            {
+                <tr id="PlanItem_@item.Title">
+                    <td>@item.Title</td>
+                    <td>@item.Genre</td>
+                    <td>@item.PriceForRenting €</td>
+                    <td>@item.Description</td>
+                </tr>
+            }
+        </tbody> *@
+        <tfoot>
+              @*colspan is used to state that TWO columns are collapsed*@
+            <th scope="row" colspan="2" class="text-end">Total Price</th>
+            <td id="TotalPrice">@plan.TotalPrice €</td>
+        </tfoot>
+
+    </table>
+
+}
+
+@code {
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public int PlanID { get; set; }
+    private PlanDetailDTO plan;
+    private string error = "";
+
+    [CascadingParameter]
+    private Task<AuthenticationState>? authenticationState { get; set; }
+
+
+    protected override async Task OnInitializedAsync() {
+
+        //we check the user is logged in
+        string userName = "";
+        if (authenticationState is not null) {
+            var authState = await authenticationState;
+            var user = authState?.User;
+
+            //we retrieve the id of the user logged in
+            if (user is not null) {
+                if (user.Identity is not null && user.Identity.IsAuthenticated && user.IsInRole("User")) {
+                    userName = user.Identity.Name;
+                }
+            }
+        }
+
+        // try {
+        //     plan = await apiclient.GetDetailsPlanAsync(PlanID);
+        // }
+        // catch (ApiException exception) {
+        //     plan = null;
+        // }
+        // if ((plan == null) || (plan.UserName != userName)) {
+        //     error = $"Error! You are not authorized to see this rental or there is not a rental with id={planID}";
+        // }
+
+
+    }
+
+}
