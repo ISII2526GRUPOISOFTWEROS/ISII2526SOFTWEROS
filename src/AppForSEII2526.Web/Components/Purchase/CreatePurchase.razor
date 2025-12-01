@@ -1,0 +1,184 @@
+﻿@page "/purchase/create"
+
+@using AppForSEII2526.Web.Components.Shared
+@using AppForSEII2526.Web.API
+@using Microsoft.AspNetCore.Authorization
+@inject AppForKairosAPIClient apiclient
+@inject ILogger<CreatePurchase> logger
+@inject PurchaseStateContainer purchaseStateContainer
+@inject NavigationManager navigation
+
+@attribute [Authorize]
+<h3>Create Purchase</h3>
+
+
+<EditForm Model="purchase" OnValidSubmit="OpenDialog">
+   <div class="row">
+        <DataAnnotationsValidator />
+        <ValidationSummary class="row alert alert-danger"/>
+        <div>
+            <div class="row alert-danger" role="alert" hidden="@hideErrors">
+                <p id="ErrorShown">Errors: @messageError</p>
+            </div>
+            <div class="row g-3">
+                <div class="col-md">
+                    <div class="form-floating mb-3">
+                        <InputText @bind-Value="purchase.Street" class="form-control" id="Street" placeholder="Street" />
+                        <label for="Description">Street</label>
+                    </div>
+                </div>
+                <div class="col-md">
+                    <div class="form-floating mb-3">
+                        <InputText @bind-Value="purchase.City" class="form-control" id="City" placeholder="City" />
+                        <label for="Description">City</label>
+                    </div>
+                </div>
+                <div class="col-md">
+                    <div class="form-floating mb-3">
+                        <InputText @bind-Value="purchase.Country" class="form-control" id="Country" placeholder="Country" />
+                        <label for="Description">Country</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row g-2">
+            <div class="col-md">
+                <div class="form-floating">
+                    <InputSelect @bind-Value="purchase.PaymentMethodId" class="form-select" id="PaymentMethod">
+                        <option value="1">Bizum</option>
+                        <option value="2">Credit Card</option>
+                        <option value="3">PayPal</option>
+                    </InputSelect>
+                    <label for="PaymentMethod">Payment Method</label>
+                </div>
+            </div>
+        </div>
+       <div class="col.md">
+           <div class="form-floating">
+               <button class="btn btm-primary" type="submit" id="Submit">
+                   Purchase your items
+               </button>
+           </div>
+       </div>
+   </div>
+   <p>
+@*        <b>Total price:</b>@purchase.PurchaseItems €
+ *@   </p>
+   <div class="mh-100 table-responsive">
+       <table class="table table-condensed table-hover" id="TableOfPurchaseItems">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Brand</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                </tr>
+            </thead>
+            <tbody>
+              @*   @foreach (var item in purchase.PurchaseItems)
+                {
+                    <tr id="ItemData_@item.ItemId">
+                        <td>@item.Name</td>
+                        <td>@item.Brand</td>
+                        <td>@item.Quantity</td>
+                        <td>@item.Price €</td>
+                    </tr>
+                } *@
+            </tbody>
+       </table>
+   </div>
+</EditForm>
+
+@if (DialogIsOpen)
+{
+    <Dialog Caption ="Purchase Items"
+        Message="Do you want to proceed to purchase the selected items?"
+            OnClose="OnDialogClose" 
+            Type=Dialog.Category.SaveNot>
+    </Dialog>
+}
+
+
+<h3>CreatePurchase</h3>
+
+@code {
+    private ItemForCreateDTO purchase => purchaseStateContainer.Purchase;
+    private bool DialogIsOpen;
+    private object? errors;
+    private string messageError = "";
+    private bool hideErrors { get { return messageError.Length == 0; } }
+    private void OpenDialog()
+    {
+        DialogIsOpen = true;
+
+    }
+    private async Task OnDialogClose(bool isOk)
+    {
+        DialogIsOpen = false;
+        if (isOk)
+        {
+            if(purchase.PurchaseItems.Count > 0)
+            {
+                try
+                {
+                    var purchased = await apiclient.CreateItemForPurchaseAsync(purchase);
+                    purchaseStateContainer.PurchaseProcessed();
+                    navigation.NavigateTo($"/purchase/detail/?PurchaseId={purchased.Id}");
+
+                }catch(ApiException<ValidationProblemDetails> apiexceptionvalidation)
+                {
+                    if(apiexceptionvalidation.Result.Errors.Values != null)
+                    {
+                        messageError = "";
+                        foreach (var errors in apiexceptionvalidation.Result.Errors.Values)
+                        {
+                            messageError = string.Join("(*) ", messageError, string.Join(" (*) ", errors));
+                        }
+                    }
+                }
+                catch (ApiException apiexception)
+                {
+                    messageError = "Error while processing your request, please try again later!";
+                }
+
+            }
+        }
+    }
+    private decimal TotalCost
+    {
+        get{
+            decimal total = 0;
+            foreach (var item in purchase.PurchaseItems)
+            {
+                // total += item.Price * item.Quantity;
+                total = 10000000;
+            }
+            return total;
+        }
+    }
+    private void ModifyPurchaseItem()
+    {
+        navigation.NavigateTo("/purchase/selectitemsforpurchase");
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        if (authenticationState is not null)
+        {
+            var authState = await authenticationState;
+            var user = authState.User;
+            if (user is not null)
+            {
+                if (user.Identity is not null && user.Identity.IsAuthenticated)
+                {
+                    // purchase. = user.Identity.Name;
+                }
+            }
+            // rental.NameCustomer = rental.NameCustomer == null ? "" : rental.NameCustomer;
+            // rental.SurnameCustomer = rental.SurnameCustomer == null ? "" : rental.SurnameCustomer;
+            // rental.DeliveryAddress = rental.DeliveryAddress == null ? "" : rental.DeliveryAddress;
+
+        }
+    }
+    [CascadingParameter]
+    private Task<AuthenticationState>? authenticationState { get; set; }
+}

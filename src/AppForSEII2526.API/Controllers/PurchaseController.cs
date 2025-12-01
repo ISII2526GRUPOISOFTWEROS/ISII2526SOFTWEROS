@@ -17,7 +17,6 @@ namespace AppForSEII2526.API.Controllers
             _context = context;
             _logger = logger;
         }
-
         private static string GetPaymentMethodName(PaymentMethod? paymentMethod)
         {
             return paymentMethod switch
