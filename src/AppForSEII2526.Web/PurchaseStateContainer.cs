@@ -10,17 +10,20 @@ namespace AppForSEII2526.Web
         };
         public decimal TotalPrice
         {
-            get { 
-               // return Convert.ToDecimal(Purchase.PurchaseItems.Sum(i=> i.Price * i.Quantity));
-               return 0m;
-            }   
-            
+            get
+            {
+                // return Convert.ToDecimal(Purchase.PurchaseItems.Sum(i=> i.Price * i.Quantity));
+                return 0m;
+            }
+
         }
         private event Action? OnChange;
         private void NotifyStateChanged() => OnChange?.Invoke();
         public void AddPurchaseItem(ItemForPurchaseDTO item)
         {
-            if (!Purchase.PurchaseItems.Any(i => i.ItemId == item.Id))
+            var existing = Purchase.PurchaseItems.FirstOrDefault(i => i.ItemId == item.Id);
+
+            if (existing is null)
             {
                 Purchase.PurchaseItems.Add(new CreatePurchaseItemDTO
                 {
@@ -29,6 +32,10 @@ namespace AppForSEII2526.Web
                     //Price = item.Price
 
                 });
+            }
+            else
+            {
+                existing.Quantity++;
             }
 
         }
@@ -46,7 +53,8 @@ namespace AppForSEII2526.Web
             Purchase.PurchaseItems.Clear();
             NotifyStateChanged();
         }
-        public void PurchaseProcessed() {  
+        public void PurchaseProcessed()
+        {
             Purchase = new ItemForCreateDTO()
             {
                 PurchaseItems = new List<CreatePurchaseItemDTO>()

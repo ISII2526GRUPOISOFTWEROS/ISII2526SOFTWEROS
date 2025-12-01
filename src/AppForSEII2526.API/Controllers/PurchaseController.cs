@@ -49,22 +49,22 @@ namespace AppForSEII2526.API.Controllers
                 ModelState.AddModelError("UserNotFound", $"Error! Username is not registred");
                 return BadRequest(ValidationProblem(ModelState));
             }
-            var checkPM = await _context.Set<PaymentMethod>()
-                .AnyAsync(pm => pm.Id == itemForCreate.PaymentMethodId && pm.User.Id == user.Id);
+            //var checkPM = await _context.Set<PaymentMethod>()
+            //    .AnyAsync(pm => pm.Id == itemForCreate.PaymentMethodId && pm.User.Id == user.Id);
 
 
-            if (!checkPM)
-            {
-                ModelState.AddModelError("PaymentMethod", "Error! The selected payment method is not registered for this user.");
-                return BadRequest(ValidationProblem(ModelState));
+            //if (!checkPM)
+            //{
+            //    ModelState.AddModelError("PaymentMethod", "Error! The selected payment method is not registered for this user.");
+            //    return BadRequest(ValidationProblem(ModelState));
 
-            }
+            //}
 
-            var paymentMethod = await _context.Set<PaymentMethod>().FirstOrDefaultAsync(pm => pm.Id == itemForCreate.PaymentMethodId);
+            var paymentMethod = await _context.Set<PaymentMethod>().FirstOrDefaultAsync(pm => pm.Id == itemForCreate.PaymentMethodId && pm.User.Id == user.Id);
 
             if (paymentMethod == null || paymentMethod.User.Id != user.Id)
             {
-                ModelState.AddModelError("PaymentMethod", "ERROR! The selected payment method is not registered for this user.");
+                ModelState.AddModelError("PaymentMethod", "Error! The selected payment method is not registered for this user.");
                 return BadRequest(ValidationProblem(ModelState));
             }
             string sentence = "My purchase for";
