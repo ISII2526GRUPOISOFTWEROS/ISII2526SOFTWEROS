@@ -1,4 +1,6 @@
-﻿﻿@page "/rentals/createplan"
+﻿@page "/plan/createplan"
+
+
 @inject NavigationManager navigation
 @using AppForSEII2526.Web.Components.Shared
 @using AppForSEII2526.Web.API
@@ -8,9 +10,189 @@
 @inject PlanStateContainer planState
 
 @attribute [Authorize]
+<h3>Create Plan</h3>
 
-<h3>CreatePlan</h3>
 
+@* <EditForm Model="plan" OnValidSubmit="OpenDialog">
+    <div class="row">
+
+
+
+
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+           <ValidationSummary class="row alert alert-danger" />
+    </div>
+       <div class="row alert alert-danger" role="alert" hidden="@hideErrors">
+        <p id="ErrorsShown">Errors: @messageError</p>
+    </div>
+    <div class="row g-3">
+        <div class="col-md">
+            <div class="form-floating mb-3">
+                <InputText @bind-Value="plan.Name" class="form-control" id="Name" /> *@
+                <label for="Name">Name </label>
+           @*  </div>
+        </div> *@
+@*         <div class="col-md">
+            <div class="form-floating mb-3">
+                <InputText @bind-Value="plan.Weeks" class="form-control" id="Weeks" />
+                <label for="Weeks">Weeks </label>
+            </div>
+        </div>
+        <div class="col-md">
+            <div class="form-floating mb-3">
+                <InputText @bind-Value="rental.DeliveryAddress" class="form-control" id="DeliveryAddress" />
+                <label for="DeliveryAddress">Delivery Address</label>
+            </div>
+        </div> *@
+@*     </div> *@
+
+
+      <div class="row g-2">
+        <div class="col-md">
+                <InputSelect class="form-select" @bind-Value="@plan.PaymentMethodId" id="PaymentMethod">
+                    <option value="CreditCard"> CreditCard</option>
+                    <option value="PayPal"> PayPal</option>
+                    <option value="Bizum"> Bizum</option>
+                </InputSelect>
+                <label for="PaymentMethod">Payment Method</label>
+            </div>
+        </div>
+
+
+        <div class="col-md">
+            <div class="form-floating">
+                <button class="btn btn-primary" type="submit" id="Submit">
+                    Select your classes
+                </button>
+            </div>
+        </div>
+@*     </div> *@
+
+    <h4>Plan detail</h4>
+    <p><b>Created Date:</b> @plan..ToString("dd/MM/yyyy hh:mm:ss")</p>
+    <p>
+        <b>Total price:</b> @TotalPrice €
+        <button class="btn btn-outline-primary" type="submit" @onclick="ModifyPlanItems" id="ModifyClasses">
+            Modify classess
+        </button>
+    </p>
+
+
+
+
+    <div class="mh-100 table-responsive">
+        <table class="table table-condensed table-hover" id="TableOfPlanItems">
+            <thead>
+                <tr>
+                    <th>ClassID</th>
+                    <th>PlanID</th>
+                    <th>Goal</th>
+                    <th>Price</th>
+                    <th>Plan</th>
+                    <th>Class</th>
+                </tr>
+            </thead>
+            <tbody>
+                @* @foreach (var item in plan.PlanItem)
+                {
+                    <tr id="ClassData_@item.Title">
+                        <td>@item.Title</td>
+                        <td>@item.Genre</td>
+                        <td>@item.PriceForRenting</td>
+                        <td><InputText @bind-Value="item.Description" class="form-control" id="@($"description_{item.MovieID}")" /></td>
+                    </tr>
+                } *@
+            </tbody>
+        </table>
+    </div>
+</EditForm>
+
+private string messageError = "";
+    private bool hideErrors { get { return messageError.Length == 0; } } 
+@if (DialogIsOpen)
+{
+    <Dialog Caption="Select classes"
+    Message="Do you want to proceed to select the classes?"
+    OnClose="@OnDialogClose"
+    Type=Dialog.Category.SaveNot>
+    </Dialog>
+}
 @code {
 
+    private bool DialogIsOpen;
+    private object? errors;
+    private decimal TotalPrice
+    {
+        get
+        {
+            int days = (plan.DateCreated).Days;
+            double price = plan.PlanItem.Sum(ri => ri.TotalPrice * days);
+            return Convert.ToDecimal(price);
+        }
+    }
+    private void ModifyPlanItems()
+    {
+        navigation.NavigateTo("/rental/selectmoviesforrental");
+    }
+    private PlanForCreateDTO plan => planState.Plan;
+    private void OpenDialog()
+    {
+        DialogIsOpen = true;
+    }
+
+    private async Task OnDialogClose(bool isOk)
+    {
+
+        DialogIsOpen = false;
+        if (isOk)
+        {
+
+            if (plan.planItems.Count > 0)
+            {
+                try
+                {
+                    var rented = await apiclient.CreateRentalAsync(plan);
+                    planState.RentalProcessed();
+                    navigation.NavigateTo($"/rental/detailsplan/?PlanID={selected.Id}");
+                }
+                catch (ApiException<ValidationProblemDetails> apiexceptionvalidation)
+                {
+
+                    if (apiexceptionvalidation.Result.Errors.Values != null)
+                    {
+                        messageError = "";
+                        foreach (var errors in apiexceptionvalidation.Result.Errors.Values)
+                            //https://learn.microsoft.com/en-us/dotnet/api/system.string.join?view=net-7.0
+                            messageError = string.Join("(*) ", messageError, string.Join(" (*) ", errors));
+                    }
+                }
+            }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        if (authenticationState is not null)
+        {
+            var authState = await authenticationState;
+            var user = authState?.User;
+
+            if (user is not null)
+            {
+                if (user.Identity is not null && user.Identity.IsAuthenticated)
+                {
+                    plan.= user.Identity.Name;
+                }
+            }
+            plan.NameCustomer = plan.NameCustomer == null ? "" : plan.NameCustomer;
+            plan.SurnameCustomer = plan.SurnameCustomer == null ? "" : plan.SurnameCustomer;
+            plan.DeliveryAddress = plan.DeliveryAddress == null ? "" : plan.DeliveryAddress;
+
+        }
+    }
+
+
+    [CascadingParameter]
+    private Task<AuthenticationState>? authenticationState { get; set; }
 }
