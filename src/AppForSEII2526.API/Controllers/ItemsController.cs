@@ -39,6 +39,7 @@ namespace AppForSEII2526.API.Controllers
                 .OrderBy(Item => Item.Name)
 
                 .Select(Item => new ItemForRestockDTO(
+                                                    Item.Id, 
                                                     Item.Brand.Name,
                                                     Item.Name ?? string.Empty,
                                                     Item.QuantityAvailableForPurchase,
