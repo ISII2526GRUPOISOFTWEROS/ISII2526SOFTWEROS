@@ -18,31 +18,19 @@ else
     <table class="table table-borderless table-sm">
         <tr>
             <th>Purchase Id</th>
-            <td id="NameSurname">@purchaseDetail.Id</td>
-        </tr>
-        <tr>
-            <th>Purchase Items</th>
-            <td>
-                <ul>
-                    @foreach (var item in purchaseDetail.PurchaseItems)
-                    {
-                        <td>@item.Name (@item.Quantity) – @item.Price €</td>
-                    }
-                </ul>
-            </td>
-        </tr>
-        <tr>
-            <th>Description</th>
-            <td id="NameSurname">@purchaseDetail.Description</td>
-        </tr>
-        
-        <tr>
-            <th>Total price</th>
-            <td id="NameSurname">@purchaseDetail.TotalPrice</td>
+            <td id="PurchaseId">@purchaseDetail.Id</td>
         </tr>
         <tr>
             <th>Delivery Address</th>
             <td id="DeliveryAddress">@purchaseDetail.DeliveryAddress</td>
+        </tr>
+        <tr>
+            <th>Total price</th>
+            <td id="TotalPriceHeader">@purchaseDetail.TotalPrice</td>
+        </tr>
+        <tr>
+            <th>Description</th>
+            <td id="Description">@purchaseDetail.Description</td>
         </tr>
         <tr>
             <th>Payment Method</th>
@@ -64,7 +52,7 @@ else
             <tbody>
                 @foreach (PurchasedItemDTO item in purchaseDetail.PurchaseItems)
                 {
-                    <tr id="RentalItem_@item.Name">
+                    <tr id="PurchaseItem_@item.Name">
                         <td>@item.Name</td>
                         <td>@item.Brand</td>
                         <td>@item.Quantity</td>
@@ -73,9 +61,10 @@ else
                 }
             </tbody>
             <tfoot>
-                @*colspan is used to state that TWO columns are collapsed*@
-            <th scope="row" colspan="2" class="text-end">Total Price</th>
-            <td id="TotalPrice">@purchaseDetail.TotalPrice €</td>
+               <tr>
+                    <th scope="row" colspan="3" class="text-end">Total Price</th>
+                    <td id="TotalPriceFooter">@purchaseDetail.TotalPrice €</td>
+            </tr>
             </tfoot>    
     </table>
 }

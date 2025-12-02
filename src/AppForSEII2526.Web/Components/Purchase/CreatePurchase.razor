@@ -22,68 +22,80 @@
             </div>
             <div class="row g-3">
                 <div class="col-md">
-                    <div class="form-floating mb-3">
+                    <div class="form-floating mb-4">
                         <InputText @bind-Value="purchase.Street" class="form-control" id="Street" placeholder="Street" />
-                        <label for="Description">Street</label>
+                        <label for="Street">Street</label>
                     </div>
                 </div>
                 <div class="col-md">
-                    <div class="form-floating mb-3">
+                    <div class="form-floating mb-4">
                         <InputText @bind-Value="purchase.City" class="form-control" id="City" placeholder="City" />
-                        <label for="Description">City</label>
+                        <label for="City">City</label>
                     </div>
                 </div>
                 <div class="col-md">
-                    <div class="form-floating mb-3">
+                    <div class="form-floating mb-4">
                         <InputText @bind-Value="purchase.Country" class="form-control" id="Country" placeholder="Country" />
-                        <label for="Description">Country</label>
+                        <label for="Country">Country</label>
                     </div>
+                    
                 </div>
             </div>
         </div>
-        <div class="row g-2">
-            <div class="col-md">
-                <div class="form-floating">
-                    <InputSelect @bind-Value="purchase.PaymentMethodId" class="form-select" id="PaymentMethod">
+        <div class="row g-3">
+            <div class="col-md-8">
+                <div class="form-floating mb-3">
+                    <InputText @bind-Value="purchase.Description" class="form-control" id="Description" placeholder="Description" />
+                    <label for="Description">Description</label>
+
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="form-floating mb-3">
+                    <InputSelect @bind-Value="purchase.PaymentMethodId"
+                                 class="form-select"
+                                 id="PaymentMethod">
                         <option value="1">Bizum</option>
                         <option value="2">Credit Card</option>
                         <option value="3">PayPal</option>
                     </InputSelect>
                     <label for="PaymentMethod">Payment Method</label>
+                    <ValidationMessage For="@(() => purchase.PaymentMethodId)" />
                 </div>
             </div>
         </div>
-       <div class="col.md">
-           <div class="form-floating">
-               <button class="btn btm-primary" type="submit" id="Submit">
-                   Purchase your items
-               </button>
-           </div>
-       </div>
+        <div class="col-md">
+            <div class="form-floating">
+                <button class="btn btn-primary" type="submit" id="Submit">
+                    Purchase your items
+                </button>
+            </div>
+        </div>
    </div>
    <p>
-@*        <b>Total price:</b>@purchase.PurchaseItems €
- *@   </p>
+       <b>Total price:</b>@purchaseStateContainer.TotalPrice €
+    </p>
    <div class="mh-100 table-responsive">
        <table class="table table-condensed table-hover" id="TableOfPurchaseItems">
             <thead>
                 <tr>
-                    <th>Name</th>
-                    <th>Brand</th>
+                    <th>Item id</th>
                     <th>Quantity</th>
-                    <th>Price</th>
+                    <th>Unit price</th>
+                    <th>Subtotal</th>
                 </tr>
             </thead>
             <tbody>
-              @*   @foreach (var item in purchase.PurchaseItems)
+                 @foreach (var item in purchase.PurchaseItems)
                 {
                     <tr id="ItemData_@item.ItemId">
-                        <td>@item.Name</td>
-                        <td>@item.Brand</td>
+                        <td>@item.ItemId</td>
                         <td>@item.Quantity</td>
                         <td>@item.Price €</td>
+                        <td>@(item.Price * item.Quantity) €</td>
                     </tr>
-                } *@
+                } 
             </tbody>
        </table>
    </div>
@@ -99,7 +111,7 @@
 }
 
 
-<h3>CreatePurchase</h3>
+
 
 @code {
     private ItemForCreateDTO purchase => purchaseStateContainer.Purchase;

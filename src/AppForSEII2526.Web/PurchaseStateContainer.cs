@@ -12,8 +12,7 @@ namespace AppForSEII2526.Web
         {
             get
             {
-                // return Convert.ToDecimal(Purchase.PurchaseItems.Sum(i=> i.Price * i.Quantity));
-                return 0m;
+                 return Convert.ToDecimal(Purchase.PurchaseItems.Sum(i=> i.Price * i.Quantity));
             }
 
         }
@@ -29,7 +28,7 @@ namespace AppForSEII2526.Web
                 {
                     ItemId = item.Id,
                     Quantity = 1,
-                    //Price = item.Price
+                    Price = item.Price
 
                 });
             }
