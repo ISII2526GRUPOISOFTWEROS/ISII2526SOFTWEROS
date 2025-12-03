@@ -14,10 +14,15 @@ namespace AppForSEII2526.UIT.UC_Purchase
         protected SelectItemsForPurchase_P0(IWebDriver driver, ITestOutputHelper output) : base(driver, output)
         {
         }
-        public void SearchItems(string name)
+        public void SearchItems(string name, string brand)
         { // wait for the web element to be clickable
             WaitForBeingClickable(inputName);
             _driver.FindElement(inputName).SendKeys(name);
+
+
+            WaitForBeingClickable(inputBrand);
+            _driver.FindElement(inputBrand).SendKeys(brand);
+
             _driver.FindElement(buttonSearchItems).Click();
         }
     }
