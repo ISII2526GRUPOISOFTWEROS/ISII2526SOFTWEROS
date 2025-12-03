@@ -20,7 +20,13 @@
             <div class="row alert-danger" role="alert" hidden="@hideErrors">
                 <p id="ErrorShown">Errors: @messageError</p>
             </div>
-            <div class="row g-3">
+            <div class="row g-4">
+                <div class="col-md">
+                    <div class="form-floating mb-4">
+                        <InputText @bind-Value="purchase.CustomerUserName" class="form-control" id="CustomerUserName" placeholder="CustomerUserName" />
+                        <label for="CustomerUserName">Email</label>
+                    </div>
+                </div>
                 <div class="col-md">
                     <div class="form-floating mb-4">
                         <InputText @bind-Value="purchase.Street" class="form-control" id="Street" placeholder="Street" />
@@ -124,50 +130,97 @@
         DialogIsOpen = true;
 
     }
+    // private async Task OnDialogClose(bool isOk)
+    // {
+    //     DialogIsOpen = false;
+    //     if (isOk)
+    //     {
+    //         if(purchase.PurchaseItems.Count > 0)
+    //         {
+    //             try
+    //             {
+    //                 var purchased = await apiclient.CreateItemForPurchaseAsync(purchase);
+    //                 purchaseStateContainer.PurchaseProcessed();
+    //                 navigation.NavigateTo($"/purchase/detail/?PurchaseId={purchased.Id}");
+
+    //             }
+    //             catch(ApiException<ValidationProblemDetails> apiexceptionvalidation){
+    //                 if(apiexceptionvalidation?.Result.Errors != null && apiexceptionvalidation.Result.Errors.Any())
+    //                 {
+    //                     messageError = "";
+    //                     foreach (var errors in apiexceptionvalidation.Result.Errors.Values)
+    //                     {
+    //                         messageError = string.Join("(*) ", messageError, string.Join(" (*) ", errors));
+    //                     }
+    //                 }
+    //             }
+    //             catch (ApiException apiexception)
+    //             {
+    //                 messageError = "Error while processing your request, please try again later!";
+    //             }
+
+    //         }
+    //     }
+    // }
     private async Task OnDialogClose(bool isOk)
     {
         DialogIsOpen = false;
-        if (isOk)
+
+        if (!isOk)
+            return;
+
+        if (purchase.PurchaseItems == null || purchase.PurchaseItems.Count == 0)
         {
-            if(purchase.PurchaseItems.Count > 0)
+            messageError = "Your cart is empty. Please add items before purchasing.";
+            return;
+        }
+
+        try
+        {
+            // ⚠️ Cambia este método por el correcto si en tu cliente se llama distinto:
+            // var purchased = await apiclient.CreatePurchaseAsync(purchase);
+            var purchased = await apiclient.CreateItemForPurchaseAsync(purchase);
+
+            if (purchased == null)
             {
-                try
-                {
-                    var purchased = await apiclient.CreateItemForPurchaseAsync(purchase);
-                    purchaseStateContainer.PurchaseProcessed();
-                    navigation.NavigateTo($"/purchase/detail/?PurchaseId={purchased.Id}");
+                messageError = "The API did not return a purchase. Check the create endpoint.";
+                return;
+            }
 
-                }catch(ApiException<ValidationProblemDetails> apiexceptionvalidation)
-                {
-                    if(apiexceptionvalidation.Result.Errors.Values != null)
-                    {
-                        messageError = "";
-                        foreach (var errors in apiexceptionvalidation.Result.Errors.Values)
-                        {
-                            messageError = string.Join("(*) ", messageError, string.Join(" (*) ", errors));
-                        }
-                    }
-                }
-                catch (ApiException apiexception)
-                {
-                    messageError = "Error while processing your request, please try again later!";
-                }
+            // Comprueba qué Id está viniendo aquí cuando depuras
+            var id = purchased.Id;
 
+            purchaseStateContainer.PurchaseProcessed();
+
+            navigation.NavigateTo($"/purchase/detail?PurchaseId={id}");
+        }
+        catch (ApiException<ValidationProblemDetails> apiexceptionvalidation)
+        {
+            var validation = apiexceptionvalidation.Result;
+
+            if (validation?.Errors != null && validation.Errors.Any())
+            {
+                messageError = "";
+
+                // Muestra campo + mensajes de error
+                foreach (var kvp in validation.Errors)
+                {
+                    var field = kvp.Key;
+                    var errorsForField = kvp.Value; // string[]
+
+                    messageError += $"{field}: {string.Join(", ", errorsForField)} (*) ";
+                }
+            }
+            else
+            {
+                // Si por lo que sea no vienen errores, mostramos algo más útil que antes
+                messageError = validation?.Title
+                               ?? apiexceptionvalidation.Response
+                               ?? "There was a validation error while processing your request.";
             }
         }
     }
-    private decimal TotalCost
-    {
-        get{
-            decimal total = 0;
-            foreach (var item in purchase.PurchaseItems)
-            {
-                // total += item.Price * item.Quantity;
-                total = 10000000;
-            }
-            return total;
-        }
-    }
+
     private void ModifyPurchaseItem()
     {
         navigation.NavigateTo("/purchase/selectitemsforpurchase");
@@ -182,12 +235,18 @@
             {
                 if (user.Identity is not null && user.Identity.IsAuthenticated)
                 {
-                    // purchase. = user.Identity.Name;
+                    purchase.CustomerUserName = user.Identity.Name ?? "";
                 }
             }
-            // rental.NameCustomer = rental.NameCustomer == null ? "" : rental.NameCustomer;
-            // rental.SurnameCustomer = rental.SurnameCustomer == null ? "" : rental.SurnameCustomer;
-            // rental.DeliveryAddress = rental.DeliveryAddress == null ? "" : rental.DeliveryAddress;
+            purchase.Street = purchase.Street == null ? "" : purchase.Street;
+            purchase.City = purchase.City == null ? "" : purchase.City;
+            purchase.Country = purchase.Country == null ? "" : purchase.Country;
+
+            if(purchase.PaymentMethodId == 0)
+            {
+                purchase.PaymentMethodId = 1;
+            }
+
 
         }
     }
