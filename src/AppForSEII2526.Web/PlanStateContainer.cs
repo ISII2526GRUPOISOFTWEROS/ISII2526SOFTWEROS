@@ -1,68 +1,69 @@
 ﻿using AppForSEII2526.Web.API;
 
-//namespace AppForSEII2526.Web
-//{
-//    public class PlanStateContainer
-//    {
 
-//        public PlanForCreateDTO Plan { get; private set; } = new PlanForCreateDTO()
-//        {
-//            PlanItems = new List<PlanItemDTO>()
-//        };
+namespace AppForSEII2526.Web
+{
+    public class PlanStateContainer
+    {
 
-//        public decimal TotalPrice
-//        {
-//            get
-//            {
-//                // Total depends on the price of each class multiplied by the number of classes
-//                return Convert.ToDecimal(Plan.PlanItems.Sum(pi => pi.PriceForEnrolling));
-//            }
-//        }
+        public PlanForCreateDTO Plan { get; private set; } = new PlanForCreateDTO()
+        {
+            PlanItems = new List<PlanItemDTO>()
+        };
 
-//        public event Action? OnChange;
-//        private void NotifyStateChanged() => OnChange?.Invoke();
+        public decimal TotalPrice
+        {
+            get
+            {
+                // Total depends on the price of each class multiplied by the number of classes
+                return Convert.ToDecimal(Plan.PlanItems.Sum(pi => pi.PriceForEnrolling));
+            }
+        }
 
-//        // Add a class to the plan
-//        public void AddClassToPlan(ClassForPlanDTO classDto)
-//        {
-//            // Check if the class is already added
-//            if (!Plan.PlanItems.Any(pi => pi.ClassID == classDto.Id))
-//            {
-//                Plan.PlanItems.Add(new PlanItemDTO()
-//                {
-//                    ClassID = classDto.Id,
-//                    Name = classDto.Name,
-//                    Type = classDto.Type,
-//                    PriceForEnrolling = classDto.PriceForEnrolling,
-//                    Day = classDto.Day,
-//                    Time = classDto.Time
-//                });
-//                NotifyStateChanged();
-//            }
-//        }
+        public event Action? OnChange;
+        private void NotifyStateChanged() => OnChange?.Invoke();
 
-//        // Remove a class from the selected planning
-//        public void RemovePlanItem(PlanItemDTO item)
-//        {
-//            Plan.PlanItems.Remove(item);
-//            NotifyStateChanged();
-//        }
+        // Add a class to the plan
+        public void AddClassToPlan(ClassForPlanDTO classDto)
+        {
+            // Check if the class is already added
+            if (!Plan.PlanItems.Any(pi => pi.ClassID == classDto.Id))
+            {
+                Plan.PlanItems.Add(new PlanItemDTO()
+                {
+                    ClassID = classDto.Id,
+                    Name = classDto.Name,
+                    Type = classDto.Type,
+                    PriceForEnrolling = classDto.PriceForEnrolling,
+                    Day = classDto.Day,
+                    Time = classDto.Time
+                });
+                NotifyStateChanged();
+            }
+        }
 
-//        // Clear all the selected classes
-//        public void ClearPlanningCart()
-//        {
-//            Plan.PlanItems.Clear();
-//            NotifyStateChanged();
-//        }
+        // Remove a class from the selected planning
+        public void RemovePlanItem(PlanItemDTO item)
+        {
+            Plan.PlanItems.Remove(item);
+            NotifyStateChanged();
+        }
 
-//        // Once the plan has been completed, we create a new one
-//        public void PlanProcessed()
-//        {
-//            Plan = new PlanForCreateDTO()
-//            {
-//                PlanItems = new List<PlanItemDTO>()
-//            };
-//            NotifyStateChanged();
-//        }
-//    }
-//}
+        // Clear all the selected classes
+        public void ClearPlanningCart()
+        {
+            Plan.PlanItems.Clear();
+            NotifyStateChanged();
+        }
+
+        // Once the plan has been completed, we create a new one
+        public void PlanProcessed()
+        {
+            Plan = new PlanForCreateDTO()
+            {
+                PlanItems = new List<PlanItemDTO>()
+            };
+            NotifyStateChanged();
+        }
+    }
+}
