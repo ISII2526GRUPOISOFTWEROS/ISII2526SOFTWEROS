@@ -48,10 +48,10 @@ namespace AppForSEII2526.API.Controllers
                     r.RestockDate,
                     r.TotalPrice,
                     r.RestockItems
-                        .Select(ri => new RestockItemForCreateDTO(ri.Item.Name, 
+                        .Select(ri => new RestockItemDTO(ri.Item.Name, 
                         ri.Item.Id, 
                         ri.Quantity, 
-                        ri.RestockPrice)).ToList<RestockItemForCreateDTO>()
+                        ri.RestockPrice)).ToList<RestockItemDTO>()
                         , r.RestockResponsible.UserName,
                     r.RestockResponsible.Surname))
                 .FirstOrDefaultAsync();
@@ -71,10 +71,10 @@ namespace AppForSEII2526.API.Controllers
             [Route("[action]")]
             [ProducesResponseType(typeof(ValidationProblemDetails), (int)HttpStatusCode.BadRequest)]
             [ProducesResponseType(typeof(string), (int)HttpStatusCode.Conflict)]
-            [ProducesResponseType(typeof(ItemForCreateRestockDTO), (int)HttpStatusCode.Created)]
+            [ProducesResponseType(typeof(RestockForCreateDTO), (int)HttpStatusCode.Created)]
 
             
-            public async Task<ActionResult> CreateRestock(ItemForCreateRestockDTO restockForCreate)
+            public async Task<ActionResult> CreateRestock(RestockForCreateDTO restockForCreate)
             {
 
                 // Validar las condiciones obligatorias iniciales
@@ -139,36 +139,47 @@ namespace AppForSEII2526.API.Controllers
                     restockForCreate.DeliveryAddress,
                     restockForCreate.Description,
                     restockForCreate.ExpectedDate,
-                    restockForCreate.Id,
+                   // restockForCreate.Id,
                     restockForCreate.RestockDate,
                     restockForCreate.Title,
                     restockForCreate.TotalPrice,
                     new List<RestockItem>(),
                     admin
-                );  
+                );
+
+            restock.RestockResponsibleId = admin.Id;
 
 
+            foreach (var restockItem in restockForCreate.RestockItems)
+            {
+                var existingItem = items.FirstOrDefault(i => i.Name == restockItem.ItemName);
 
-                foreach (var restockItem in restockForCreate.RestockItems)
+                // ❌ Item no existe → lo CREO automáticamente
+                if (existingItem == null)
                 {
-                    var existingItem = items.FirstOrDefault(i => i.Name == restockItem.ItemName);
-
-                    if (existingItem == null || existingItem.QuantityForRestock < restockItem.Quantity)
+                    var newItem = new Item
                     {
-                        ModelState.AddModelError("RestockItems", $"The Item with name {restockItem.ItemName} is not available for restock");
-                    }
+                        Name = restockItem.ItemName,
+                        QuantityForRestock = 0 ,  // puedes ajustar si quieres
+                        BrandId = 1, 
+                        ItemTypeId = 1
+                    };
 
-                else
-                {
-                        restock.RestockItems.Add(new RestockItem
-                        {
-                            ItemId = existingItem.Id,
-                            Quantity = restockItem.Quantity,
-                            RestockPrice = restockItem.RestockPrice
+                    _context.Items.Add(newItem);
+                    await _context.SaveChangesAsync(); // guardar para obtener su ID
 
-                        });
-                    }
+                    existingItem = new { Id = newItem.Id, Name = newItem.Name, QuantityForRestock = newItem.QuantityForRestock };
                 }
+
+                // ✔ Añadir siempre el RestockItem apuntando al item existente o recién creado
+                restock.RestockItems.Add(new RestockItem
+                {
+                    ItemId = existingItem.Id,
+                    Quantity = restockItem.Quantity,
+                    RestockPrice = restockItem.RestockPrice
+                });
+            }
+
 
 
             //Total price calculation
@@ -189,13 +200,17 @@ namespace AppForSEII2526.API.Controllers
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError(DateTime.Now+" : "+ ex.Message);
-                    ModelState.AddModelError("Restock", "An error occurred while saving the restock. Please try again later.");
-                        return Conflict("An error occurred"+ ex.Message);
-                    }
+
+                    var message = ex.InnerException?.Message ?? ex.Message;
+                    _logger.LogError("SAVE ERROR: " + message);
+                    return Conflict("Error: " + message);
+                //    _logger.LogError(DateTime.Now+" : "+ ex.Message);
+                //ModelState.AddModelError("Restock", "An error occurred while saving the restock. Please try again later.");
+                //    return Conflict("An error occurred"+ ex.Message);
+            }
                 
-                var restockDetail = new ItemForCreateRestockDTO(
-                    restock.Id,
+                var restockDetail = new RestockForCreateDTO(
+                    //restock.Id,
                     restock.Title,
                     restock.DeliveryAddress,
                     restock.Description,
@@ -207,7 +222,7 @@ namespace AppForSEII2526.API.Controllers
                     );
 
 
-                return CreatedAtAction("GetRestock",new { id = restock.Id }, restockForCreate);
+                return CreatedAtAction("GetRestockDetails", new { id = restock.Id }, restockForCreate);
             }
 
 
