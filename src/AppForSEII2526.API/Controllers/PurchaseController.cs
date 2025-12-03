@@ -41,11 +41,10 @@ namespace AppForSEII2526.API.Controllers
             }
 
 
-            var user = _context.ApplicationUser.FirstOrDefault(au => au.UserName == itemForCreate.CustomerUserName);
-
+            var user = _context.ApplicationUser.FirstOrDefault(au => au.UserName == itemForCreate.CustomerUserName || au.Email == itemForCreate.CustomerUserName );
             if (user == null)
             {
-                ModelState.AddModelError("UserNotFound", $"Error! Username is not registred");
+                ModelState.AddModelError("UserNotFound", $"Error! Username or email is not registred");
                 return BadRequest(ValidationProblem(ModelState));
             }
             //var checkPM = await _context.Set<PaymentMethod>()
