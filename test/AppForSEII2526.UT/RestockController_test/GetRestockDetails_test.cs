@@ -109,10 +109,10 @@ namespace AppForSEII2526.UT.RestockController_test
                 expectedDate: DateTime.Today.AddDays(2),
                 restockDate: DateTime.Today.AddDays(5),
                 totalPrice: 0,
-                restockItems: new List<RestockItemForCreateDTO>()
+                restockItems: new List<RestockItemDTO>()
                 {
-                    new RestockItemForCreateDTO("Foam Roller", 1, 10, 5),
-                    new RestockItemForCreateDTO("Bands", 2, 20, 10)
+                    new RestockItemDTO("Foam Roller", 1, 10, 5),
+                    new RestockItemDTO("Bands", 2, 20, 10)
                 },
                 restockResponsible: "admin",
                 adminSurname: "responsable"
@@ -121,28 +121,16 @@ namespace AppForSEII2526.UT.RestockController_test
             //Act
             var result = await controller.GetRestockDetails(1);
 
+            
 
             //Assert
             var okResult = Assert.IsType<OkObjectResult>(result);
+
+
             var restockDTOActual = Assert.IsType<RestockDetailDTO>(okResult.Value);
-            var restockDTOExpected = expectedRestock.Equals(restockDTOActual);
 
-            Assert.Equal(expectedRestock.Id, restockDTOActual.Id);
-            Assert.Equal(expectedRestock.Title, restockDTOActual.Title);
-            Assert.Equal(expectedRestock.DeliveryAddress, restockDTOActual.DeliveryAddress);
-            Assert.Equal(expectedRestock.Description, restockDTOActual.Description);
-            Assert.Equal(expectedRestock.TotalPrice, restockDTOActual.TotalPrice);
-            Assert.Equal(expectedRestock.RestockResponsible, restockDTOActual.RestockResponsible);
-            Assert.Equal(expectedRestock.AdminSurname, restockDTOActual.AdminSurname);
 
-            // Comparar items
-            Assert.Equal(expectedRestock.RestockItems.Count, restockDTOActual.RestockItems.Count);
-            for (int i = 0; i < expectedRestock.RestockItems.Count; i++)
-            {
-                Assert.Equal(expectedRestock.RestockItems[i].ItemName, restockDTOActual.RestockItems[i].ItemName);
-                Assert.Equal(expectedRestock.RestockItems[i].Quantity, restockDTOActual.RestockItems[i].Quantity);
-                Assert.Equal(expectedRestock.RestockItems[i].RestockPrice, restockDTOActual.RestockItems[i].RestockPrice);
-            }
+            Assert.Equal(expectedRestock, restockDTOActual);
 
 
         }
