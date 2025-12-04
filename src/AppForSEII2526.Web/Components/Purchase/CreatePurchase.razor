@@ -1,5 +1,6 @@
 ﻿@page "/purchase/create"
 
+@using AppForSEII2526.Web.Component
 @using AppForSEII2526.Web.Components.Shared
 @using AppForSEII2526.Web.API
 @using Microsoft.AspNetCore.Authorization
@@ -59,12 +60,11 @@
 
             <div class="col-md-4">
                 <div class="form-floating mb-3">
-                    <InputSelect @bind-Value="purchase.PaymentMethodId"
-                                 class="form-select"
-                                 id="PaymentMethod">
-                        <option value="1">Bizum</option>
-                        <option value="2">Credit Card</option>
-                        <option value="3">PayPal</option>
+                    <InputSelect @bind-Value="purchase.PaymentMethodId" class="form-select" id="PaymentMethod">
+                        @foreach (var method in Enum.GetValues(typeof(PaymentMethodType)))
+                        {
+                            <option value="@((int)method))">@method.ToString()</option>
+                        }
                     </InputSelect>
                     <label for="PaymentMethod">Payment Method</label>
                     <ValidationMessage For="@(() => purchase.PaymentMethodId)" />
@@ -189,7 +189,7 @@
 
             if(purchase.PaymentMethodId == 0)
             {
-                purchase.PaymentMethodId = 1;
+                purchase.PaymentMethodId = (int)PaymentMethodType.Bizum;
             }
 
 
