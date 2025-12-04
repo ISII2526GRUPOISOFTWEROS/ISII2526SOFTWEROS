@@ -12,7 +12,7 @@ namespace AppForSEII2526.UIT.UC_Purchase
          By inputBrand = By.Id("inputBrand");
          By buttonSearchItems = By.Id("searchItems");
         By tableOfItemsBy = By.Id("TableOfItems");
-        protected SelectItemsForPurchase_P0(IWebDriver driver, ITestOutputHelper output) : base(driver, output)
+        public SelectItemsForPurchase_P0(IWebDriver driver, ITestOutputHelper output) : base(driver, output)
         {
         }
         public void SearchItems(string name, string brand)
