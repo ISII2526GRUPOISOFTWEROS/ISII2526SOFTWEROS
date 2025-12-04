@@ -3,8 +3,9 @@ namespace AppForSEII2526.API.DTOs.ItemDTOs
 {
     public class ItemForRestockDTO
     {
-        public ItemForRestockDTO(string brand, string name, int quantityavailablerestock, decimal restockprice)
+        public ItemForRestockDTO(int id, string brand, string name, int quantityavailablerestock, decimal restockprice)
         {
+            Id = id;
             Name = name;
             Brand = brand;
             QuantityAvailableForRestock = quantityavailablerestock;

@@ -125,101 +125,46 @@
     private object? errors;
     private string messageError = "";
     private bool hideErrors { get { return messageError.Length == 0; } }
+    private int selectedPMid;
+
     private void OpenDialog()
     {
         DialogIsOpen = true;
 
     }
-    // private async Task OnDialogClose(bool isOk)
-    // {
-    //     DialogIsOpen = false;
-    //     if (isOk)
-    //     {
-    //         if(purchase.PurchaseItems.Count > 0)
-    //         {
-    //             try
-    //             {
-    //                 var purchased = await apiclient.CreateItemForPurchaseAsync(purchase);
-    //                 purchaseStateContainer.PurchaseProcessed();
-    //                 navigation.NavigateTo($"/purchase/detail/?PurchaseId={purchased.Id}");
-
-    //             }
-    //             catch(ApiException<ValidationProblemDetails> apiexceptionvalidation){
-    //                 if(apiexceptionvalidation?.Result.Errors != null && apiexceptionvalidation.Result.Errors.Any())
-    //                 {
-    //                     messageError = "";
-    //                     foreach (var errors in apiexceptionvalidation.Result.Errors.Values)
-    //                     {
-    //                         messageError = string.Join("(*) ", messageError, string.Join(" (*) ", errors));
-    //                     }
-    //                 }
-    //             }
-    //             catch (ApiException apiexception)
-    //             {
-    //                 messageError = "Error while processing your request, please try again later!";
-    //             }
-
-    //         }
-    //     }
-    // }
     private async Task OnDialogClose(bool isOk)
     {
         DialogIsOpen = false;
-
-        if (!isOk)
-            return;
-
-        if (purchase.PurchaseItems == null || purchase.PurchaseItems.Count == 0)
+        if (isOk)
         {
-            messageError = "Your cart is empty. Please add items before purchasing.";
-            return;
-        }
-
-        try
-        {
-            // ⚠️ Cambia este método por el correcto si en tu cliente se llama distinto:
-            // var purchased = await apiclient.CreatePurchaseAsync(purchase);
-            var purchased = await apiclient.CreateItemForPurchaseAsync(purchase);
-
-            if (purchased == null)
+            if(purchase.PurchaseItems.Count > 0)
             {
-                messageError = "The API did not return a purchase. Check the create endpoint.";
-                return;
-            }
-
-            // Comprueba qué Id está viniendo aquí cuando depuras
-            var id = purchased.Id;
-
-            purchaseStateContainer.PurchaseProcessed();
-
-            navigation.NavigateTo($"/purchase/detail?PurchaseId={id}");
-        }
-        catch (ApiException<ValidationProblemDetails> apiexceptionvalidation)
-        {
-            var validation = apiexceptionvalidation.Result;
-
-            if (validation?.Errors != null && validation.Errors.Any())
-            {
-                messageError = "";
-
-                // Muestra campo + mensajes de error
-                foreach (var kvp in validation.Errors)
+                try
                 {
-                    var field = kvp.Key;
-                    var errorsForField = kvp.Value; // string[]
+                    var purchased = await apiclient.CreateItemForPurchaseAsync(purchase);
+                    purchaseStateContainer.PurchaseProcessed();
+                    navigation.NavigateTo($"/purchase/detail/?PurchaseId={purchased.Id}");
 
-                    messageError += $"{field}: {string.Join(", ", errorsForField)} (*) ";
                 }
-            }
-            else
-            {
-                // Si por lo que sea no vienen errores, mostramos algo más útil que antes
-                messageError = validation?.Title
-                               ?? apiexceptionvalidation.Response
-                               ?? "There was a validation error while processing your request.";
+                catch(ApiException<ValidationProblemDetails> apiexceptionvalidation){
+                    if(apiexceptionvalidation?.Result.Errors != null && apiexceptionvalidation.Result.Errors.Any())
+                    {
+                        messageError = "";
+                        foreach (var errors in apiexceptionvalidation.Result.Errors.Values)
+                        {
+                            messageError = string.Join("(*) ", messageError, string.Join(" (*) ", errors));
+                        }
+                    }
+                }
+                catch (ApiException apiexception)
+                {
+                    messageError = "Error while processing your request, please try again later!";
+                }
+
             }
         }
     }
+
 
     private void ModifyPurchaseItem()
     {

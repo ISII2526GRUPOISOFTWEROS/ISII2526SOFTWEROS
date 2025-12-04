@@ -39,5 +39,8 @@
 
         public ItemType ItemType { get; set; }
         public Brand Brand { get; set; }
+        public int ItemTypeId { get; internal set; }
+        public int BrandId { get; set; }
+
     }
 }
