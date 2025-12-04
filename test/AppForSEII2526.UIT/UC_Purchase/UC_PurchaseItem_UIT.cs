@@ -26,7 +26,17 @@ namespace AppForSEII2526.UIT.UC_Purchase
         private const string itemPrice2 = "35 €";
         private const string itemDescription2 = "Ideal for strength and endurance training";
         private const string itemQuantity2 = "15";
-        private const string itemAdd2 = "Add to cart (35€)";
+        private const string itemAdd2 = "Add to cart (35 €)";
+
+        private const int itemId3 = 1;
+        private const string itemName3 = "Resistance band set";
+        private const string itemBrand3 = "Nike";
+        private const string itemPrice3 = "22 €";
+        private const string itemDescription3 = "Set of bands";
+        private const string itemQuantity3 = "20";
+        private const string itemAdd3 = "Add to cart (22 €)";
+
+    
 
         public UC_PurchaseItem_UIT(ITestOutputHelper output) : base(output)
         {
@@ -56,7 +66,7 @@ namespace AppForSEII2526.UIT.UC_Purchase
         }
         [Theory]
         [Trait("LevelTesting", "Functional Testing")]
-        [InlineData(itemName1,itemBrand1,itemDescription1,itemPrice1,itemQuantity1,itemAdd1,"Foam","")]
+        [InlineData(itemName1,itemBrand1,itemDescription1,itemPrice1,itemQuantity1,itemAdd1,"Foam","Adidas")]
         public void UC8_Scen3_2_Filtering(string name, string brand, string description, string price, string quantity, string add, string searchName, string searchBrand)
         {
             InitialStepsForPurchaseItem();
@@ -66,6 +76,24 @@ namespace AppForSEII2526.UIT.UC_Purchase
             };
             selectItemsforpurchase_P0.SearchItems(searchName, searchBrand);
             Assert.True(selectItemsforpurchase_P0.CheckListOfItems(expectedItems));
+        }
+
+        //Testear no items available in the item1 
+        //[Fact(Skip ="first run the dto.Items")]
+        [Fact]
+        [Trait("LevelTesting", "Functional Testing")]
+        public void UC_NoItemsAvailable()
+        {
+            InitialStepsForPurchaseItem();
+            var expectedItems = new List<string[]>
+            {
+                  new string[]{ itemName1,itemBrand1, itemDescription1, itemPrice1, itemQuantity1, itemAdd1 },
+                new string[]{ itemName2,itemBrand2, itemDescription2, itemPrice2, itemQuantity2, itemAdd2 }
+              
+            };   
+            selectItemsforpurchase_P0.SearchItems("", "");
+
+            Assert.True(selectItemsforpurchase_P0.CheckListOfItems(expectedItems));  
         }
 
     }
