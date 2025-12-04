@@ -1,8 +1,8 @@
-﻿namespace AppForSEII2526.API.DTOs.ItemDTOs
+﻿namespace AppForSEII2526.API.DTOs.RestockDTOs
 {
-    public class RestockItemForCreateDTO
+    public class RestockItemDTO
     {
-        public RestockItemForCreateDTO(string itemName, int itemId, int quantity, decimal restockPrice)
+        public RestockItemDTO(string itemName, int itemId, int quantity, decimal restockPrice)
         {
             ItemName = itemName;
             ItemId = itemId;
@@ -19,7 +19,7 @@
 
         public override bool Equals(object? obj)
         {
-            return obj is RestockItemForCreateDTO dTO &&
+            return obj is RestockItemDTO dTO &&
                    ItemName == dTO.ItemName &&
                    ItemId == dTO.ItemId &&
                    Quantity == dTO.Quantity &&
