@@ -67,7 +67,7 @@ namespace AppForSEII2526.API.Controllers
             //}
             string sentence = "My purchase for";
 
-            if (itemForCreate.Description != "" && !itemForCreate.Description.StartsWith(sentence)) {
+            if (!string.IsNullOrEmpty(itemForCreate.Description) && !itemForCreate.Description.StartsWith(sentence)) {
                 ModelState.AddModelError("Description", "Error! You must start the Description with My purchase for.");
                 return BadRequest(ValidationProblem(ModelState));
             }
