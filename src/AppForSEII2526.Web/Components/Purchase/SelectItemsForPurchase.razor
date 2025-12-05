@@ -84,7 +84,7 @@
                 <div class="row mb-1">
                     <button type="button" class="btn btn-light" 
                     id="removeItem_@item.ItemId"
-                    @onclick="@(() => RemoveItem(item.ItemId))">x @item.ItemId @(item.Price *item.Quantity)€</button>
+                    @onclick="@(() => RemoveItem(item.ItemId))">x @item.Quantity u @(item.Price *item.Quantity)€</button>
                 </div>
             }
             @if (purchaseState.Purchase.PurchaseItems.Count > 0)
@@ -124,20 +124,28 @@
     private bool hiddenPurchaseCart = true;
 
     private void AddItem(ItemForPurchaseDTO item)
-    
-    {
 
-            purchaseState.AddPurchaseItem(item);
+    {
+        var itemInCart = purchaseState.Purchase.PurchaseItems.FirstOrDefault(i => i.ItemId == item.Id);
+        int currentQuantityInCart = itemInCart != null ? itemInCart.Quantity : 0;
+
+        if (item.QuantityAvailableForPurchase < currentQuantityInCart + 1)
+        {
+            errors = $"There are not more stock for the item {item.Name}";
+            return;
+        }
+        errors = "";
+        purchaseState.AddPurchaseItem(item);
     }
 
     private void RemoveItem(int item)
     {
-         purchaseState.RemovePurchaseItem(item);
+        purchaseState.RemovePurchaseItem(item);
     }
-        private void PurchaseItem()
-        {
-            navigation.NavigateTo("/purchase/create");
-        }
+    private void PurchaseItem()
+    {
+        navigation.NavigateTo("/purchase/create");
+    }
 
     public async void SearchItem()
     {
@@ -145,7 +153,15 @@
         {
             items = await apiclient.GetItemsForPurchaseAsync(itemName, itemBrand);
 
+            if(items == null || items.Count == 0)
+            {
+                errors = "No items available";
+                StateHasChanged();
+                navigation.NavigateTo("/");
 
+                return;
+            }
+          
         }catch(ApiException ex)
         {
             logger.LogError($"{DateTime.Now} Error: {ex}");
