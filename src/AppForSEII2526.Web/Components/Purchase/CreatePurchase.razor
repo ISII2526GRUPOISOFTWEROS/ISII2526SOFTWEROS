@@ -63,7 +63,7 @@
                     <InputSelect @bind-Value="purchase.PaymentMethodId" class="form-select" id="PaymentMethod">
                         @foreach (var method in Enum.GetValues(typeof(PaymentMethodType)))
                         {
-                            <option value="@((int)method))">@method.ToString()</option>
+                            <option value="@((int)method)">@method.ToString()</option>
                         }
                     </InputSelect>
                     <label for="PaymentMethod">Payment Method</label>
@@ -158,7 +158,8 @@
                 }
                 catch (ApiException apiexception)
                 {
-                    messageError = "Error while processing your request, please try again later!";
+                    //messageError = "Error while processing your request, please try again later!";
+                    messageError = $"Error {apiexception.StatusCode}: {apiexception.Response}";
                 }
 
             }
