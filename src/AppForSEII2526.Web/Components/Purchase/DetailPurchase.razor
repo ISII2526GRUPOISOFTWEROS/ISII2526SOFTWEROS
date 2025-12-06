@@ -4,12 +4,13 @@
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
 @inject AppForKairosAPIClient apiclient
+@inject PurchaseStateContainer purchaseStateContainer
 
 <h3>Purchase Detail</h3>
 
 @attribute [Authorize]
 
-@if(purchaseDetail == null)
+@if (purchaseDetail == null)
 {
     <p>@errorMessage</p>
 }
@@ -18,65 +19,54 @@ else
     <table class="table table-borderless table-sm">
         <tr>
             <th>Purchase Id</th>
-            <td id="NameSurname">@purchaseDetail.Id</td>
-        </tr>
-        <tr>
-            <th>Purchase Items</th>
-            <td>
-                <ul>
-                    @foreach (var item in purchaseDetail.PurchaseItems)
-                    {
-                        <td>@item.Name (@item.Quantity) – @item.Price €</td>
-                    }
-                </ul>
-            </td>
-        </tr>
-        <tr>
-            <th>Description</th>
-            <td id="NameSurname">@purchaseDetail.Description</td>
-        </tr>
-        
-        <tr>
-            <th>Total price</th>
-            <td id="NameSurname">@purchaseDetail.TotalPrice</td>
+            <td id="PurchaseId">@purchaseDetail.Id</td>
         </tr>
         <tr>
             <th>Delivery Address</th>
             <td id="DeliveryAddress">@purchaseDetail.DeliveryAddress</td>
         </tr>
         <tr>
+            <th>Total price</th>
+            <td id="TotalPriceHeader">@purchaseDetail.TotalPrice €</td>
+        </tr>
+        <tr>
+            <th>Description</th>
+            <td id="Description">@purchaseDetail.Description</td>
+        </tr>
+        <tr>
             <th>Payment Method</th>
             <td id="PaymentMethod">@purchaseDetail.PaymentMethod</td>
         </tr>
     </table>
-        <h4>Purchased Items</h4>
+    <h4>Purchased Items</h4>
 
-        <table class="table" id="PurchaseItems">
-            <thead>
-                <tr>
-                    <th scope="col">Name</th>
-                    <th scope="col">Brand</th>
-                    <th scope="col">Quantity</th>
-                    <th scope="col">Price</th>
+    <table class="table" id="PurchaseItems">
+        <thead>
+            <tr>
+                <th scope="col">Name</th>
+                <th scope="col">Brand</th>
+                <th scope="col">Quantity</th>
+                <th scope="col">Price</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (PurchasedItemDTO item in purchaseDetail.PurchaseItems)
+            {
+                <tr id="PurchaseItem_@item.Name">
+                    <td>@item.Name</td>
+                    <td>@item.Brand</td>
+                    <td>@item.Quantity</td>
+                    <td>@item.Price €</td>
                 </tr>
-            </thead>
-        
-            <tbody>
-                @foreach (PurchasedItemDTO item in purchaseDetail.PurchaseItems)
-                {
-                    <tr id="RentalItem_@item.Name">
-                        <td>@item.Name</td>
-                        <td>@item.Brand</td>
-                        <td>@item.Quantity</td>
-                        <td>@item.Price €</td>
-                    </tr>
-                }
-            </tbody>
-            <tfoot>
-                @*colspan is used to state that TWO columns are collapsed*@
-            <th scope="row" colspan="2" class="text-end">Total Price</th>
-            <td id="TotalPrice">@purchaseDetail.TotalPrice €</td>
-            </tfoot>    
+            }
+        </tbody>
+        <tfoot>
+            <tr>
+                <th scope="row" colspan="3" class="text-end">Total Price</th>
+                <td id="TotalPriceFooter">@purchaseDetail.TotalPrice €</td>
+            </tr>
+        </tfoot>
     </table>
 }
 
@@ -85,14 +75,14 @@ else
     [SupplyParameterFromQuery]
     public int PurchaseId { get; set; }
     private PurchaseDetailDTO purchaseDetail;
-    private string errorMessage = "";
+    private string errorMessage = "Loading ...";
+    private string currentUserName ;
 
     [CascadingParameter]
     private Task<AuthenticationState>? authenticationState { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        string userName = "";
         if (authenticationState is not null)
         {
             var authState = await authenticationState;
@@ -102,7 +92,7 @@ else
             {
                 if (user.Identity is not null && user.Identity.IsAuthenticated && user.IsInRole("User"))
                 {
-                    userName = user.Identity.Name;
+                    currentUserName = user.Identity.Name;
                 }
 
             }
@@ -110,15 +100,22 @@ else
         try
         {
             var purchases = await apiclient.GetPurchaseDetailsAsync(PurchaseId);
-            purchaseDetail = purchases.FirstOrDefault();
+            purchaseDetail = purchases?.FirstOrDefault();
         }
         catch (Exception ex)
         {
             purchaseDetail = null;
         }
-        if ((purchaseDetail == null) /* ||  (purchaseDetail.User != userName) */ )
+        if(purchaseDetail == null)
         {
-            errorMessage = $"Error! You are not authorized to see this purchase or there is not a purchase with id {PurchaseId}."; 
+            errorMessage = $"Error! There is not a purchase with id {PurchaseId}.";
+        } 
+        else {
+            if ((string.IsNullOrEmpty(currentUserName)) || (purchaseDetail.Username != currentUserName))
+            {
+                purchaseDetail = null;
+                errorMessage = $"Error! You are not authorized to see this purchase or there is not a purchase with id {PurchaseId}.";
+            }
         }
     }
 
