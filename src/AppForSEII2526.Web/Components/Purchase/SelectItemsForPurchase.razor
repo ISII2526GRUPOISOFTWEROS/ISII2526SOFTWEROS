@@ -147,16 +147,18 @@
         navigation.NavigateTo("/purchase/create");
     }
 
-    public async void SearchItem()
+    public async Task SearchItem()
     {
         try
         {
             items = await apiclient.GetItemsForPurchaseAsync(itemName, itemBrand);
 
-            if(items == null || items.Count == 0)
+            if(items == null || items.Count == 0 || items.All(i=> i.QuantityAvailableForPurchase <= 0))
             {
                 errors = "No items available";
+           
                 StateHasChanged();
+                await Task.Delay(3000);
                 navigation.NavigateTo("/");
 
                 return;
@@ -169,7 +171,7 @@
         }
         StateHasChanged();
     }
-    protected override Task OnInitializedAsync()
+    protected override async Task OnInitializedAsync()
     {
         //the type of PurchaseDateFrom is DateTimeOffset, it is required a conversion
         //https://learn.microsoft.com/es-es/dotnet/standard/datetime/converting-between-datetime-and-offset
@@ -184,8 +186,8 @@
             DateTime.SpecifyKind(DateTime.Today.AddDays(2), DateTimeKind.Utc)
             : _to;
 
-        SearchItem();
+        await SearchItem();
 
-        return base.OnInitializedAsync();
+        await base.OnInitializedAsync();
     }
 }
