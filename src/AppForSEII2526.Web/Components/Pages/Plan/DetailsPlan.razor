@@ -1,127 +1,160 @@
-﻿﻿
-@using AppForSEII2526.Web.API
-@using Microsoft.AspNetCore.Authorization
+﻿@page "/plan/detailsplan/{PlanID:int}"
 @inject AppForKairosAPIClient apiclient
+@inject ILogger<DetailsPlan> logger
+@using Microsoft.AspNetCore.Authorization
+@using AppForSEII2526.Web.API
+@using Microsoft.AspNetCore.Components.Authorization
+@attribute [Authorize]
 
-@page "/plan/detailsplan"
-<h3>DetailsPlan</h3>
+<h3>Details Plan</h3>
 
-
-    @attribute [Authorize]
-
-@if (plan==null)
+@if (error != "")
 {
-    <p>@error</p>
-}else
+    <div class="alert alert-danger">@error</div>
+}
+else if (plan == null)
 {
-        <table class="table table-borderless table-sm">
-        <tr>
-            <th>Username</th>
-            <td id="Username">@plan.UserName</td>
-        </tr>
-        <tr>
-            <th>Plan Name</th>
-            <td id="PlannName">@plan.PlanName</td>
-        </tr>
-        <tr>
-            <th>Description</th>
-            <td id="Description">@plan.Description</td>
-        </tr>
-        <tr>
-            <th>Created Date</th>
-            <td id="CreatedDate">@plan.DateCreated.ToString("dd/MM/yyyy hh:mm:ss")</td>
-        </tr>
-        <tr>
-            <th>Total Price</th>
-            <td id="TotalPrice">@plan.TotalPrice</td>
-        </tr>
-        <tr>
-            <th>Number of Weeks</th>
-            <td id="NumberOfWeeks">@plan.NumberOfWeeks</td>
-        </tr>
-        <tr>
-            <th>Health Issues</th>
-            <td id="HealthIssues">@plan.HealthIssues</td>
-        </tr>
-        <tr>
-            <th>Classes</th>
-            <td id="Classess">@plan.Classes</td>
-        </tr>
-      
-    </table>
-
-       <h4>Selected Classes</h4>
-
-    <table class="table" id="SelectedClasses">
-        <thead>
-            <tr>
-                <th scope="col">Name</th>
-                <th scope="col">Capacity</th>
-                <th scope="col">Price</th>
-                <th scope="col">Date </th>
-                <th scope="col">PlanItems </th>
-                <th scope="col">TypeItems </th>
-            </tr>
-        </thead>
-@*         <tbody>
-            @foreach (PlanItemDTO item in plan.PlanItems)
-            {
-                <tr id="PlanItem_@item.Title">
-                    <td>@item.Title</td>
-                    <td>@item.Genre</td>
-                    <td>@item.PriceForRenting €</td>
-                    <td>@item.Description</td>
+    <p>Loading plan details...</p>
+}
+else
+{
+    <div class="card mb-3">
+        <div class="card-header">
+            <h4>@plan.PlanName</h4>
+        </div>
+        <div class="card-body">
+            <table class="table table-borderless table-sm">
+                <tr>
+                    <th style="width: 200px;">Username</th>
+                    <td>@plan.UserName</td>
                 </tr>
-            }
-        </tbody> *@
-        <tfoot>
-              @*colspan is used to state that TWO columns are collapsed*@
-            <th scope="row" colspan="2" class="text-end">Total Price</th>
-            <td id="TotalPrice">@plan.TotalPrice €</td>
-        </tfoot>
+                <tr>
+                    <th>Description</th>
+                    <td>@plan.Description</td>
+                </tr>
+                <tr>
+                    <th>Created Date</th>
+                    <td>@plan.DateCreated.ToString("dd/MM/yyyy HH:mm:ss")</td>
+                </tr>
+                <tr>
+                    <th>Number of Weeks</th>
+                    <td>@plan.NumberOfWeeks</td>
+                </tr>
+                <tr>
+                    <th>Health Issues</th>
+                    <td>@plan.HealthIssues</td>
+                </tr>
+                <tr>
+                    <th>Total Price</th>
+                    <td>@plan.TotalPrice.ToString("C")</td>
+                </tr>
+            </table>
+        </div>
+    </div>
 
-    </table>
-
+    <h4>Selected Classes</h4>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">Name</th>
+                    <th scope="col">Capacity</th>
+                    <th scope="col">Price</th>
+                    <th scope="col">Date</th>
+                    <th scope="col">Types</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (plan.Classes != null)
+                {
+                    @foreach (var item in plan.Classes)
+                    {
+                        <tr>
+                            <td>@item.Name</td>
+                            <td>@item.Capacity</td>
+                            <td>@item.Price.ToString("C")</td>
+                            <td>@item.Date.ToString("g")</td> 
+                            <td>
+                                @if (item.ItemType != null)
+                                {
+                                    @string.Join(", ", item.ItemType)
+                                }
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+            <tfoot>
+                <tr class="table-primary">
+                    <th scope="row" colspan="2" class="text-end">Total Price</th>
+                    <td colspan="3">@plan.TotalPrice.ToString("C")</td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
 }
 
 @code {
     [Parameter]
-    [SupplyParameterFromQuery]
     public int PlanID { get; set; }
+
     private PlanDetailDTO plan;
     private string error = "";
 
     [CascadingParameter]
     private Task<AuthenticationState>? authenticationState { get; set; }
 
+    protected override async Task OnInitializedAsync()
+    {
+        error = "";
+        string currentUserName = "";
 
-    protected override async Task OnInitializedAsync() {
-
-        //we check the user is logged in
-        string userName = "";
-        if (authenticationState is not null) {
+        if (authenticationState is not null)
+        {
             var authState = await authenticationState;
             var user = authState?.User;
 
-            //we retrieve the id of the user logged in
-            if (user is not null) {
-                if (user.Identity is not null && user.Identity.IsAuthenticated && user.IsInRole("User")) {
-                    userName = user.Identity.Name;
-                }
+            if (user is not null && user.Identity is not null && user.Identity.IsAuthenticated)
+            {
+                currentUserName = user.Identity.Name ?? "";
             }
         }
 
-        // try {
-        //     plan = await apiclient.GetDetailsPlanAsync(PlanID);
-        // }
-        // catch (ApiException exception) {
-        //     plan = null;
-        // }
-        // if ((plan == null) || (plan.UserName != userName)) {
-        //     error = $"Error! You are not authorized to see this rental or there is not a rental with id={planID}";
-        // }
+        try{
+            var response = await apiclient.GetPlanDetailsAsync(PlanID);
 
+            plan = response?.FirstOrDefault();
 
+            if (plan == null)
+            {
+                error = $"Plan with ID {PlanID} not found.";
+            }
+            else if (!string.IsNullOrEmpty(currentUserName) && !plan.UserName.Equals(currentUserName, StringComparison.OrdinalIgnoreCase))
+            {
+                if (!string.Equals(plan.UserName, currentUserName, StringComparison.OrdinalIgnoreCase))
+                {
+                    error = "Error! You are not authorized to see this plan.";
+                    plan = null;
+                }
+            }
+        }
+        catch (ApiException ex)
+        {
+            logger.LogError($"API Error: {ex.Message}");
+            if (ex.StatusCode == 404)
+            {
+                error = "Plan not found.";
+            }
+            else
+            {
+                error = "Error loading plan details.";
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError($"Unexpected Error: {ex.Message}");
+            error = "An unexpected error occurred.";
+        }
     }
-
 }
+

@@ -48,44 +48,37 @@ namespace AppForSEII2526.API.Controllers
         {
             try
             {
-                if ((date.HasValue && date.Value.Date < DateTime.Today) ||
-                    (fromDate.HasValue && fromDate.Value.Date < DateTime.Today) ||
-                    (toDate.HasValue && toDate.Value.Date < DateTime.Today))
-                {
-                    string error = "The selected date cannot be before today.";
-                    _logger.LogWarning($"{DateTime.Now} {error}");
-                    return BadRequest(error);
-                }
-
                 var query = _context.Classes
                     .Include(c => c.TypeItems)
-                    .Where(c => c.Date.Date >= DateTime.Today && c.Capacity > 0)
+                    .Where(c => c.Capacity > 0)
                     .AsQueryable();
 
-                if (!itemTypes?.Any() == true && !date.HasValue && !fromDate.HasValue && !toDate.HasValue)
-                {
-                    DateTime start = DateTime.Today;
-                    DateTime end = DateTime.Today.AddDays(7);
-
-                    query = query.Where(c => c.Date.Date >= start && c.Date.Date <= end);
-                }
-
-                if (itemTypes != null && itemTypes.Count > 0)
+               
+                if (itemTypes != null && itemTypes.Any())
                 {
                     var normalized = itemTypes.Select(t => t.ToLower()).ToList();
-                    query = query.Where(c => c.TypeItems.Any(t => normalized.Contains(t.Name.ToLower())));
+                    query = query.Where(c => c.TypeItems.Any(t => t.Name != null && normalized.Contains(t.Name.ToLower())));
                 }
 
                 if (date.HasValue)
                 {
-                    query = query.Where(c => c.Date.Date == date.Value.Date);
+                    var start = date.Value;
+                    var end = start.AddSeconds(1); 
+                    query = query.Where(c => c.Date >= start && c.Date < end);
                 }
 
                 if (fromDate.HasValue && toDate.HasValue)
                 {
-                    query = query.Where(c =>
-                        c.Date.Date >= fromDate.Value.Date &&
-                        c.Date.Date <= toDate.Value.Date);
+                    var start = fromDate.Value.Date;
+                    var end = toDate.Value.Date.AddDays(1); 
+                    query = query.Where(c => c.Date >= start && c.Date < end);
+                }
+
+                if ((itemTypes == null || !itemTypes.Any()) && !date.HasValue && !fromDate.HasValue && !toDate.HasValue)
+                {
+                    var start = DateTime.Today;
+                    var end = start.AddDays(7);
+                    query = query.Where(c => c.Date >= start && c.Date < end);
                 }
 
                 var classes = await query
@@ -99,19 +92,15 @@ namespace AppForSEII2526.API.Controllers
                         c.TypeItems.Select(t => t.Name).ToList()))
                     .ToListAsync();
 
-                if (classes.Count == 0)
-                {
-                    string error = "No classes available.";
-                    _logger.LogWarning($"{DateTime.Now} {error}");
-                    return BadRequest(error);
-                }
+                if (!classes.Any())
+                    return Ok("There are no classes available.");
 
                 return Ok(classes);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error getting classes for plan");
-                return BadRequest("An error occurred while retrieving classes.");
+                return Ok("There are no classes available.");
             }
         }
     }

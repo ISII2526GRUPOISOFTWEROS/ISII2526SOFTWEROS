@@ -1,204 +1,198 @@
-﻿@using AppForSEII2526.Web.API
+﻿@page "/plan/selectclassesforplan"
 @inject AppForKairosAPIClient apiclient
 @inject ILogger<SelectClassesForPlan> logger
+@inject PlanStateContainer planState
+@using AppForSEII2526.Web.API
+@using AppForSEII2526.API.DTOs.ClassesDTOs
 
-
-@page "/plan/selectclassesforplan"
-<h3>SelectClassesForPlan</h3>
+<h3>Select Classes For Plan</h3>
 <div class="container-fluid">
-    <div class="row" hidden =" @hideErrors">
-        <p> Errors: @errors </p>
+    <div class="row" hidden="@hideErrors">
+        <div class="alert alert-danger">
+            Errors: @errors
+        </div>
     </div>
 </div>
+
 <div class="container-fluid">
     <div class="row">
-        <p>here i will show the errors</p>
-    </div>
-    <div class="row">
-        <div class="col-8">
-            <div class="row">
-                <p>here i will show the filters</p>
-                <div class="col">
-
-
-                    <div class="input-group mb-3">
-
-
-                        <span class="input-group-text" id="basic-addon1">Title</span>
-
-
-                        <input type="text" id="inputTitle" @bind=itemTypes class="form-control" placeholder="Itemtype" aria-label="Title" aria-describedby="basic-addon1">
-
-
-                    </div>
-
-
+        <div class="col-md-9">
+            <h4>Filters</h4>
+            <div class="row g-3 align-items-center mb-4">
+                <div class="col-auto">
+                    <label class="col-form-label">Title/Type</label>
                 </div>
-                
-                <div class="col">
-
-
-                    <span class="input-group-text">date</span>
-
-
-                    <InputDate id="date" @bind-Value="@date" />
-
-
-
+                <div class="col-auto">
+                    <input type="text" id="inputTitle" @bind="itemTypes" class="form-control" placeholder="Item Type">
                 </div>
 
-
-                <div class="col">
-
-
-                    <div class="input-group mb-3">
-
-
-                        <span class="input-group-text">fromDate</span>
-
-
-                        <InputDate @bind-Value="@fromDate" id="fromDate" />
-
-
-                    </div>
-
-
+                <div class="col-auto">
+                    <label class="col-form-label">Date</label>
+                </div>
+                <div class="col-auto">
+                    <InputDate id="date" @bind-Value="@date" class="form-control" />
                 </div>
 
-
-                <div class="col">
-
-
-                    <span class="input-group-text">toDate</span>
-
-
-                    <InputDate id="toDate" @bind-Value="@toDate" />
-
-
-
+                <div class="col-auto">
+                    <label class="col-form-label">From</label>
                 </div>
-                <div class="col">
-                    <button type="button" class=" btn btn-primary" @onclick=@SearchClasses id="SearchClasses" >SearchClasses</button>
+                <div class="col-auto">
+                    <InputDate @bind-Value="@fromDate" id="fromDate" class="form-control" />
+                </div>
+
+                <div class="col-auto">
+                    <label class="col-form-label">To</label>
+                </div>
+                <div class="col-auto">
+                    <InputDate id="toDate" @bind-Value="@toDate" class="form-control" />
+                </div>
+
+                <div class="col-auto">
+                    <button type="button" class="btn btn-primary" @onclick="@SearchClasses">Search Classes</button>
+                </div>
             </div>
-            </div>
+
             <div class="row">
+                <h4>Available Classes</h4>
                 @if (classes == null)
                 {
-                    <p> Loading classes....</p>
+                    <p>Loading classes...</p>
+                }
+                else if (!classes.Any())
+                {
+                    <p>No classes found.</p>
                 }
                 else
                 {
-                    <p> numer of classes @classes.Count.</p>
+                    <p>Number of classes found: @classes.Count</p>
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Price</th>
+                                    <th>Date</th>
+                                    <th>Capacity</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var cls in classes)
+                                {
+                                    <tr>
+                                        <td>@cls.Name</td>
+                                        <td>@cls.Price</td>
+                                        <td>@cls.Date.ToString("g")</td>
+                                        <td>@cls.Capacity</td>
+                                        <td>
+                                            <button class="btn btn-sm btn-success" @onclick="@(() => AddClass(cls))">Add</button>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
                 }
-                <p>here i will show the list of classes</p>
             </div>
         </div>
-        <div class="col-2">
-            <p>here i will show the plan cart</p>
+
+        <!-- Plan Cart Section -->
+        <div class="col-md-3 border-start">
+            <h4>Selected Classes</h4>
+            @if (plan.SelectedClasses.Any())
+            {
+                <ul class="list-group mb-3">
+                    @foreach (var item in plan.SelectedClasses)
+                    {
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6>@item.Name</h6>
+                                <small class="text-muted">@item.Price €</small>
+                            </div>
+                            <button class="btn btn-sm btn-danger" @onclick="@(() => RemoveClass(item))">X</button>
+                        </li>
+                    }
+                </ul>
+                <p><b>Total:</b> @plan.SelectedClasses.Sum(x => x.Price) €</p>
+                <a href="/plan/createplan" class="btn btn-primary w-100">Proceed to Plan</a>
+            }
+            else
+            {
+                <p class="text-muted">No classes selected.</p>
+            }
         </div>
-
     </div>
-
 </div>
+
 @code {
-    private ICollection<ClassForPlanDTO> classes;
-    private bool hideErrors { get { return errors.Length == 0; }}
+    // Client DTOs for the list from API
+    private ICollection<AppForSEII2526.Web.API.ClassForPlanDTO> classes;
+
+    private bool hideErrors => string.IsNullOrEmpty(errors);
     private string errors = "";
-    private string itemTypes { get; set; }
-    private DateTime date { get; set; }
-    private DateTime _fromDate;
+
+    private string itemTypes { get; set; } = "";
+    // Initialize dates to avoid 0001-01-01 issues with UI inputs if needed, or handle nulls
+    private DateTime date { get; set; } = DateTime.Today;
+
+    private DateTime _fromDate = DateTime.Today;
     private DateTime fromDate
     {
         get { return _fromDate; }
-        set
-        {
-            if (_fromDate != value)
-            {
-                _fromDate = value;
-
-            }
-        }
+        set { _fromDate = value; }
     }
-    private DateTime _toDate;
+
+    private DateTime _toDate = DateTime.Today.AddDays(7);
     private DateTime toDate
     {
         get { return _toDate; }
-        set
-        {
-            if (_toDate != value)
-            {
-                _toDate = value;
-            }
-        }
+        set { _toDate = value; }
     }
 
+    private AppForSEII2526.API.DTOs.ClassesDTOs.PlanForCreateDTO plan => planState.Plan;
 
-    // private ClassForPLanDTO plan => planState.Plan;
-
-    // private bool hiddenRentingCart = true;
-
-    // private void AddMovie(ClassForPlanDTO class)
-    // {
-    //    planState.AddClassToPlan(class);
-    // }
-
-    // private void RemoveRentalItem(PlanItemDTO item)
-    // {
-    //     rentalState.RemoveRentalItemToRent(item);
-    //     if (rental.RentalItems.Count == 0) hiddenRentingCart = true;
-    // }
-
-
-
-    public async void SearchClasses()
+    private void AddClass(AppForSEII2526.Web.API.ClassForPlanDTO clientClassDto)
     {
+        planState.AddClassToPlan(clientClassDto);
+    }
+
+    private void RemoveClass(AppForSEII2526.API.DTOs.ClassesDTOs.ClassSelectionDTO item)
+    {
+        planState.RemovePlanItem(item);
+    }
+
+    public async Task SearchClasses()
+    {
+        errors = "";
         try
         {
-            classes = await apiclient.GetClassForPlanAsync(null,null,null,null);
+            var typesList = string.IsNullOrWhiteSpace(itemTypes) ? null : new List<string> { itemTypes };
 
+
+            classes = await apiclient.GetClassForPlanAsync(typesList, date, fromDate, toDate);
         }
-        catch(ApiException ex)
+        catch (ApiException ex)
+        {
+            logger.LogError($"{DateTime.Now} Error: {ex.Message}");
+            if (ex.StatusCode == 400)
+            {
+                errors = $"Bad Request (400): {ex.Message}";
+            }
+            else
+            {
+                errors = $"Error connecting to system ({ex.StatusCode}): {ex.Message}";
+            }
+        }
+        catch (Exception ex)
         {
             logger.LogError($"{DateTime.Now} Error: {ex}");
-            errors = "error while connecting to the system";
+            errors = $"Unexpected error: {ex.Message}";
         }
         StateHasChanged();
     }
-         protected override Task OnInitializedAsync()
+
+    protected override async Task OnInitializedAsync()
     {
-        //https://learn.microsoft.com/es-es/dotnet/standard/datetime/converting-between-datetime-and-offset
-
-
-        _fromDate = (_fromDate == new DateTime(1, 1, 1)) ?
-
-
-            DateTime.SpecifyKind(DateTime.Today.AddDays(1), DateTimeKind.Utc)
-
-
-            : _fromDate;
-
-        //the type of RentalDateFrom is DateTimeOffset, it is required a conversion
-
-
-        //https://learn.microsoft.com/es-es/dotnet/standard/datetime/converting-between-datetime-and-offset
-
-
-        _toDate = (_toDate == new DateTime(1, 1, 1)) ?
-
-
-            DateTime.SpecifyKind(DateTime.Today.AddDays(2), DateTimeKind.Utc)
-
-
-            : _toDate;
-
-        SearchClasses();
-
-
-
-
-
-        return base.OnInitializedAsync();
-
-
+        await SearchClasses();
     }
 }

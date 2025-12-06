@@ -38,6 +38,15 @@ namespace AppForSEII2526.API.DTOs.ClassesDTOs
             return HashCode.Combine(Id, price, itemType, date, Name, capacity);
         }
     }
+    public class PlanItemDTO
+    {
+        public int ClassID { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public string Type { get; set; } = string.Empty;
+        public decimal PriceForEnrolling { get; set; }
+        public string Day { get; set; } = string.Empty;
+        public string Time { get; set; } = string.Empty;
+    }
 }
 
         
