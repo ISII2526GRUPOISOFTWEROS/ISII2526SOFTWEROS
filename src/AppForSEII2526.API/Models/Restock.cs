@@ -10,18 +10,33 @@ namespace AppForSEII2526.API.Models
 
     public class Restock
     {
+        private ApplicationUser? admin;
+
         public Restock()
         {}
 
-        public Restock(string? deliveryAddress, string description, DateTime? expectedDate, int id, DateTime restockDate, string title, decimal totalPrice, IList<RestockItem> restockItems, ApplicationUser restockResponsible)
+        public Restock(string deliveryAddress, string? description, DateTime? expectedDate, DateTime restockDate, string title, decimal totalPrice, List<RestockItem> restockItems, ApplicationUser? admin)
         {
             DeliveryAddress = deliveryAddress;
             Description = description;
             ExpectedDate = expectedDate;
-            Id = id;
             RestockDate = restockDate;
             Title = title;
             TotalPrice = totalPrice;
+            RestockItems = restockItems;
+            this.admin = admin;
+        }
+
+        public Restock(ApplicationUser? admin, string? deliveryAddress, string description, DateTime? expectedDate, DateTime restockDate, string title, decimal totalPrice, string restockResponsibleId, IList<RestockItem> restockItems, ApplicationUser restockResponsible)
+        {
+            this.admin = admin;
+            DeliveryAddress = deliveryAddress;
+            Description = description;
+            ExpectedDate = expectedDate;
+            RestockDate = restockDate;
+            Title = title;
+            TotalPrice = totalPrice;
+            RestockResponsibleId = restockResponsibleId;
             RestockItems = restockItems;
             RestockResponsible = restockResponsible;
         }
@@ -34,11 +49,14 @@ namespace AppForSEII2526.API.Models
         public string Title { get; set; }
         [Precision(5, 2)]
         public Decimal TotalPrice { get; set; }
+        
+
 
         //References
         public IList<RestockItem> RestockItems { get; set; }
         public ApplicationUser RestockResponsible { get; set; }
-        
+        public string RestockResponsibleId { get; set; }  // FK obligatoria
+
 
 
     }

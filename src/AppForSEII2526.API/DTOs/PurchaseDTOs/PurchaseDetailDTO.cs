@@ -5,7 +5,7 @@ namespace AppForSEII2526.API.DTOs.PurchaseDTOs
     public class PurchaseDetailDTO 
     {
 
-        public PurchaseDetailDTO(int id, string paymentMethod, string street, string city, string country, string description, IList<PurchasedItemDTO> purchaseItems, decimal totalPrice) 
+        public PurchaseDetailDTO(int id ,string paymentMethod, string street, string city, string country, string description, IList<PurchasedItemDTO> purchaseItems, decimal totalPrice) 
         {
             Id = id;
             PaymentMethod = paymentMethod;
@@ -20,6 +20,7 @@ namespace AppForSEII2526.API.DTOs.PurchaseDTOs
 
 
         public int Id { get; set; }
+        public string Username { get; set; }
 
         public string PaymentMethod { get; set; }
 

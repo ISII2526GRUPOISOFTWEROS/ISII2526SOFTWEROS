@@ -55,9 +55,9 @@ namespace AppForSEII2526.UT.RestockController_test
         {
             var itemDTOs = new List<ItemForRestockDTO>()
             {
-                new ItemForRestockDTO("Nike", "Foam Roller", 25, 30),
-                new ItemForRestockDTO("Domyos", "Bands", 15, 20),
-                new ItemForRestockDTO("Nike", "Kettlebell", 25, 30),
+                new ItemForRestockDTO(1, "Nike", "Foam Roller", 25, 30),
+                new ItemForRestockDTO(2, "Domyos", "Bands", 15, 20),
+                new ItemForRestockDTO(3, "Nike", "Kettlebell", 25, 30),
             };
 
             var itemDTOsTC1 = new List<ItemForRestockDTO>() { itemDTOs[1], itemDTOs[0], itemDTOs[2] };
@@ -111,7 +111,7 @@ namespace AppForSEII2526.UT.RestockController_test
             // Arrange
             List<ItemForRestockDTO> expectedItems = new List<ItemForRestockDTO>()
             {
-                new ItemForRestockDTO("Nike", "Foam Roller", 30, 25)
+                new ItemForRestockDTO(1, "Nike", "Foam Roller", 30, 25)
             };
             var mock = new Mock<ILogger<ItemsController>>();
             ILogger<ItemsController> logger = mock.Object;
