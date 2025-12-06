@@ -45,6 +45,8 @@ string? URI2API = builder.Configuration.GetValue(typeof(string), "AppForKairos_A
 //We create the service  for accessing the API from where .WEB project
 builder.Services.AddScoped<AppForKairosAPIClient>(sp => new AppForKairosAPIClient(URI2API, new HttpClient()));
 
+builder.Services.AddScoped<PurchaseStateContainer>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

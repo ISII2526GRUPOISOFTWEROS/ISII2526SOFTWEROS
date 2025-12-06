@@ -56,6 +56,7 @@
                             </thead>
                             <tbody>
                                 @foreach (var item in items) {
+                                    @if(item.QuantityAvailableForPurchase > 0){
                                     <tr id="ItemData_@item.Name">
                                         <td>@item.Name</td>
                                         <td>@item.Brand</td>
@@ -63,9 +64,10 @@
                                         <td>@item.Price €</td>
                                         <td>@item.QuantityAvailableForPurchase</td>
                                         <td>
-                                            <button class="btn btn-outline-secondary" id="itemforpurchase_@item.Name" @onclick="@(() => AddItem(item))">Add</button>
+                                            <button class="btn btn-outline-secondary" id="itemforpurchase_@item.Name" @onclick="@(() => AddItem(item))">Add to cart (@item.Price €)</button>
                                         </td>
                                     </tr>
+                                    }
                                   }
                             </tbody>
                         </table>
@@ -77,15 +79,29 @@
                 <div class="row">
                     <h3> Shopping Cart</h3>
                 </div>
-            @foreach (var item in itemToCreate.PurchaseItems)
+            @foreach (var item in purchaseState.Purchase.PurchaseItems)
             {
-                <div class="row">
-                    <button type="button" class="btn btn-light" id="removeItem_@item.ItemId" @onclick="@(() => RemoveItem(item.ItemId))">x @item.ItemId - @item.Quantity€</button>
+                <div class="row mb-1">
+                    <button type="button" class="btn btn-light" 
+                    id="removeItem_@item.ItemId"
+                    @onclick="@(() => RemoveItem(item.ItemId))">x @item.Quantity u @(item.Price *item.Quantity)€</button>
                 </div>
             }
-            <div class="row">
-                <button type="button" class=" btn btn-primary" id="purchaseItemButton" @onclick="PurchaseItem">Purchase Item </button>
-            </div>
+            @if (purchaseState.Purchase.PurchaseItems.Count > 0)
+            {
+                <div class="row mt-2">
+                    <h4>Total: @purchaseState.Purchase.PurchaseItems.Sum(i => i.Price * i.Quantity)€</h4>
+                </div>
+                <div class="row mt-2">
+                    <button type="button" class=" btn btn-primary" id="purchaseItemButton" @onclick="PurchaseItem">Purchase Item </button>
+                </div>
+            }
+            else
+            {
+                <div class="row">
+                    <p>Your cart is empty</p>
+                </div>
+            }
         </div>
 
     </div>
@@ -108,28 +124,46 @@
     private bool hiddenPurchaseCart = true;
 
     private void AddItem(ItemForPurchaseDTO item)
-    
-    {
 
-            purchaseState.AddPurchaseItem(item);
+    {
+        var itemInCart = purchaseState.Purchase.PurchaseItems.FirstOrDefault(i => i.ItemId == item.Id);
+        int currentQuantityInCart = itemInCart != null ? itemInCart.Quantity : 0;
+
+        if (item.QuantityAvailableForPurchase < currentQuantityInCart + 1)
+        {
+            errors = $"There are not more stock for the item {item.Name}";
+            return;
+        }
+        errors = "";
+        purchaseState.AddPurchaseItem(item);
     }
 
     private void RemoveItem(int item)
     {
-         purchaseState.RemovePurchaseItem(item);
+        purchaseState.RemovePurchaseItem(item);
     }
-        private void PurchaseItem()
-        {
-            navigation.NavigateTo("/item/createrental");
-        }
+    private void PurchaseItem()
+    {
+        navigation.NavigateTo("/purchase/create");
+    }
 
-    public async void SearchItem()
+    public async Task SearchItem()
     {
         try
         {
             items = await apiclient.GetItemsForPurchaseAsync(itemName, itemBrand);
 
+            if(items == null || items.Count == 0 || items.All(i=> i.QuantityAvailableForPurchase <= 0))
+            {
+                errors = "No items available";
+           
+                StateHasChanged();
+                await Task.Delay(3000);
+                navigation.NavigateTo("/");
 
+                return;
+            }
+          
         }catch(ApiException ex)
         {
             logger.LogError($"{DateTime.Now} Error: {ex}");
@@ -137,7 +171,7 @@
         }
         StateHasChanged();
     }
-    protected override Task OnInitializedAsync()
+    protected override async Task OnInitializedAsync()
     {
         //the type of PurchaseDateFrom is DateTimeOffset, it is required a conversion
         //https://learn.microsoft.com/es-es/dotnet/standard/datetime/converting-between-datetime-and-offset
@@ -152,8 +186,8 @@
             DateTime.SpecifyKind(DateTime.Today.AddDays(2), DateTimeKind.Utc)
             : _to;
 
-        SearchItem();
+        await SearchItem();
 
-        return base.OnInitializedAsync();
+        await base.OnInitializedAsync();
     }
 }
