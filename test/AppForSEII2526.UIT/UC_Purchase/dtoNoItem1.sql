@@ -1,0 +1,1 @@
+﻿UPDATE[dbo].[Items] set QuantityAvailableForPurchase = 0 where Id = 1;	
