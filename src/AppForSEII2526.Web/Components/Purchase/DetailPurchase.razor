@@ -38,35 +38,35 @@ else
             <td id="PaymentMethod">@purchaseDetail.PaymentMethod</td>
         </tr>
     </table>
-    <h4>Purchased Items</h4>
+        <h4>Purchased Items</h4>
 
-    <table class="table" id="PurchaseItems">
-        <thead>
-            <tr>
-                <th scope="col">Name</th>
-                <th scope="col">Brand</th>
-                <th scope="col">Quantity</th>
-                <th scope="col">Price</th>
-            </tr>
-        </thead>
-
-        <tbody>
-            @foreach (PurchasedItemDTO item in purchaseDetail.PurchaseItems)
-            {
-                <tr id="PurchaseItem_@item.Name">
-                    <td>@item.Name</td>
-                    <td>@item.Brand</td>
-                    <td>@item.Quantity</td>
-                    <td>@item.Price €</td>
+        <table class="table" id="PurchaseItems">
+            <thead>
+                <tr>
+                    <th scope="col">Name</th>
+                    <th scope="col">Brand</th>
+                    <th scope="col">Quantity</th>
+                    <th scope="col">Price</th>
                 </tr>
-            }
-        </tbody>
-        <tfoot>
-            <tr>
-                <th scope="row" colspan="3" class="text-end">Total Price</th>
-                <td id="TotalPriceFooter">@purchaseDetail.TotalPrice €</td>
+            </thead>
+        
+            <tbody>
+                @foreach (PurchasedItemDTO item in purchaseDetail.PurchaseItems)
+                {
+                    <tr id="PurchaseItem_@item.Name">
+                        <td>@item.Name</td>
+                        <td>@item.Brand</td>
+                        <td>@item.Quantity</td>
+                        <td>@item.Price €</td>
+                    </tr>
+                }
+            </tbody>
+            <tfoot>
+               <tr>
+                    <th scope="row" colspan="3" class="text-end">Total Price</th>
+                    <td id="TotalPriceFooter">@purchaseDetail.TotalPrice €</td>
             </tr>
-        </tfoot>
+            </tfoot>    
     </table>
 }
 
@@ -83,6 +83,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
+        string userName = "";
         if (authenticationState is not null)
         {
             var authState = await authenticationState;
@@ -112,11 +113,11 @@ else
         } 
         else {
             if ((string.IsNullOrEmpty(currentUserName)) || (purchaseDetail.Username != currentUserName))
-            {
+        {
                 purchaseDetail = null;
-                errorMessage = $"Error! You are not authorized to see this purchase or there is not a purchase with id {PurchaseId}.";
-            }
+            errorMessage = $"Error! You are not authorized to see this purchase or there is not a purchase with id {PurchaseId}."; 
         }
+    }
     }
 
 }

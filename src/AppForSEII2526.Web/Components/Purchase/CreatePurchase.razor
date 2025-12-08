@@ -97,21 +97,21 @@
     }
     else
     {
-        <div class="mh-100 table-responsive">
-            <table class="table table-condensed table-hover" id="TableOfPurchaseItems">
-                <thead>
-                    <tr>
-                        <th>Item id</th>
-                        <th>Quantity</th>
-                        <th>Unit price</th>
-                        <th>Subtotal</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var item in purchase.PurchaseItems)
-                    {
-                        <tr id="ItemData_@item.ItemId">
-                            <td>@item.ItemId</td>
+   <div class="mh-100 table-responsive">
+       <table class="table table-condensed table-hover" id="TableOfPurchaseItems">
+            <thead>
+                <tr>
+                    <th>Item id</th>
+                    <th>Quantity</th>
+                    <th>Unit price</th>
+                    <th>Subtotal</th>
+                </tr>
+            </thead>
+            <tbody>
+                 @foreach (var item in purchase.PurchaseItems)
+                {
+                    <tr id="ItemData_@item.ItemId">
+                        <td>@item.ItemId</td>
                             <td class="text-center">
                                 <InputNumber @bind-Value="item.Quantity" class="form-control" min="1" style="width: 80px;background-color: #fff9db" />
                             <ValidationMessage For="@(() => item.Quantity)" />
@@ -119,11 +119,11 @@
 @*                             <td>@item.Quantity</td>
  *@                            <td>@item.Price €</td>
                             <td>@(item.Price* item.Quantity) €</td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
+                    </tr>
+                } 
+            </tbody>
+       </table>
+   </div>
     }
  
 </EditForm>
