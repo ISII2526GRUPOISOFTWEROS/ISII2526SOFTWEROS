@@ -71,17 +71,32 @@
                 </div>
             </div>
         </div>
-        <div class="col-md">
-            <div class="form-floating">
-                <button class="btn btn-primary" type="submit" id="Submit">
+        <div class="row mt-4">
+            <div class="col d-flex gap-2 justify-content-end">
+                <button type="button" class="btn btn-secondary" @onclick="@(() => navigation.NavigateTo("/"))">
+                    Cancel
+                </button>
+
+                <button type="button" class="btn btn-warning" @onclick="ModifyPurchaseItem">
+                Modify Items
+                </button>
+                <button class="btn btn-primary" type="submit" id="Submit" disabled ="@(!purchase.PurchaseItems.Any())">
                     Purchase your items
                 </button>
             </div>
         </div>
    </div>
    <p>
-       <b>Total price:</b>@purchaseStateContainer.TotalPrice €
+       <b>Total price:</b>@purchaseStateContainer.TotalPrice.ToString("N2") €
     </p>
+    @if (!purchase.PurchaseItems.Any())
+    {
+        <dv class="alert alert-warning">
+            Your cart is empty. Please select items before purchasing
+        </dv>
+    }
+    else
+    {
    <div class="mh-100 table-responsive">
        <table class="table table-condensed table-hover" id="TableOfPurchaseItems">
             <thead>
@@ -97,14 +112,20 @@
                 {
                     <tr id="ItemData_@item.ItemId">
                         <td>@item.ItemId</td>
-                        <td>@item.Quantity</td>
-                        <td>@item.Price €</td>
-                        <td>@(item.Price * item.Quantity) €</td>
+                            <td class="text-center">
+                                <InputNumber @bind-Value="item.Quantity" class="form-control" min="1" style="width: 80px;background-color: #fff9db" />
+                            <ValidationMessage For="@(() => item.Quantity)" />
+                            </td>
+@*                             <td>@item.Quantity</td>
+ *@                            <td>@item.Price €</td>
+                            <td>@(item.Price* item.Quantity) €</td>
                     </tr>
                 } 
             </tbody>
        </table>
    </div>
+    }
+ 
 </EditForm>
 
 @if (DialogIsOpen)

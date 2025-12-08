@@ -4,12 +4,13 @@
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
 @inject AppForKairosAPIClient apiclient
+@inject PurchaseStateContainer purchaseStateContainer
 
 <h3>Purchase Detail</h3>
 
 @attribute [Authorize]
 
-@if(purchaseDetail == null)
+@if (purchaseDetail == null)
 {
     <p>@errorMessage</p>
 }
@@ -74,7 +75,8 @@ else
     [SupplyParameterFromQuery]
     public int PurchaseId { get; set; }
     private PurchaseDetailDTO purchaseDetail;
-    private string errorMessage = "";
+    private string errorMessage = "Loading ...";
+    private string currentUserName ;
 
     [CascadingParameter]
     private Task<AuthenticationState>? authenticationState { get; set; }
@@ -91,7 +93,7 @@ else
             {
                 if (user.Identity is not null && user.Identity.IsAuthenticated && user.IsInRole("User"))
                 {
-                    userName = user.Identity.Name;
+                    currentUserName = user.Identity.Name;
                 }
 
             }
@@ -99,16 +101,23 @@ else
         try
         {
             var purchases = await apiclient.GetPurchaseDetailsAsync(PurchaseId);
-            purchaseDetail = purchases.FirstOrDefault();
+            purchaseDetail = purchases?.FirstOrDefault();
         }
         catch (Exception ex)
         {
             purchaseDetail = null;
         }
-        if ((purchaseDetail == null) /* ||  (purchaseDetail.User != userName) */ )
+        if(purchaseDetail == null)
         {
+            errorMessage = $"Error! There is not a purchase with id {PurchaseId}.";
+        } 
+        else {
+            if ((string.IsNullOrEmpty(currentUserName)) || (purchaseDetail.Username != currentUserName))
+        {
+                purchaseDetail = null;
             errorMessage = $"Error! You are not authorized to see this purchase or there is not a purchase with id {PurchaseId}."; 
         }
+    }
     }
 
 }
