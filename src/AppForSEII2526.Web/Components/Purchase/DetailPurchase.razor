@@ -4,12 +4,20 @@
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
 @inject AppForKairosAPIClient apiclient
+<<<<<<< HEAD
+=======
+@inject PurchaseStateContainer purchaseStateContainer
+>>>>>>> development
 
 <h3>Purchase Detail</h3>
 
 @attribute [Authorize]
 
+<<<<<<< HEAD
 @if(purchaseDetail == null)
+=======
+@if (purchaseDetail == null)
+>>>>>>> development
 {
     <p>@errorMessage</p>
 }
@@ -74,7 +82,12 @@ else
     [SupplyParameterFromQuery]
     public int PurchaseId { get; set; }
     private PurchaseDetailDTO purchaseDetail;
+<<<<<<< HEAD
     private string errorMessage = "";
+=======
+    private string errorMessage = "Loading ...";
+    private string currentUserName ;
+>>>>>>> development
 
     [CascadingParameter]
     private Task<AuthenticationState>? authenticationState { get; set; }
@@ -91,7 +104,11 @@ else
             {
                 if (user.Identity is not null && user.Identity.IsAuthenticated && user.IsInRole("User"))
                 {
+<<<<<<< HEAD
                     userName = user.Identity.Name;
+=======
+                    currentUserName = user.Identity.Name;
+>>>>>>> development
                 }
 
             }
@@ -99,16 +116,35 @@ else
         try
         {
             var purchases = await apiclient.GetPurchaseDetailsAsync(PurchaseId);
+<<<<<<< HEAD
             purchaseDetail = purchases.FirstOrDefault();
+=======
+            purchaseDetail = purchases?.FirstOrDefault();
+>>>>>>> development
         }
         catch (Exception ex)
         {
             purchaseDetail = null;
         }
+<<<<<<< HEAD
         if ((purchaseDetail == null) /* ||  (purchaseDetail.User != userName) */ )
         {
             errorMessage = $"Error! You are not authorized to see this purchase or there is not a purchase with id {PurchaseId}."; 
         }
     }
+=======
+        if(purchaseDetail == null)
+        {
+            errorMessage = $"Error! There is not a purchase with id {PurchaseId}.";
+        } 
+        else {
+            if ((string.IsNullOrEmpty(currentUserName)) || (purchaseDetail.Username != currentUserName))
+        {
+                purchaseDetail = null;
+            errorMessage = $"Error! You are not authorized to see this purchase or there is not a purchase with id {PurchaseId}."; 
+        }
+    }
+    }
+>>>>>>> development
 
 }
