@@ -1,9 +1,8 @@
-
 {
   "openapi": "3.0.1",
   "info": {
-    "title": "AppForSEII2526.API",
-    "description": "This API provides services for a gym",
+    "title": "AppForMovies.API",
+    "description": "This API provides services for renting and purchasing movies",
     "contact": {
       "name": "Software Engineering II Team",
       "email": "isii@on.uclm.es"
@@ -576,6 +575,155 @@
           }
         }
       }
+    },
+    "/api/Restock/GetRestockDetails": {
+      "get": {
+        "tags": [
+          "Restock"
+        ],
+        "operationId": "GetRestockDetails",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestockDetailDTO"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestockDetailDTO"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestockDetailDTO"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Restock/CreateRestock": {
+      "post": {
+        "tags": [
+          "Restock"
+        ],
+        "operationId": "CreateRestock",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RestockForCreateDTO"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RestockForCreateDTO"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/RestockForCreateDTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Created",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestockForCreateDTO"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestockForCreateDTO"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestockForCreateDTO"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -666,6 +814,10 @@
             "minimum": 1,
             "type": "integer",
             "format": "int32"
+          },
+          "price": {
+            "type": "number",
+            "format": "double"
           }
         },
         "additionalProperties": false
@@ -691,12 +843,18 @@
         "required": [
           "city",
           "country",
+          "customerUserName",
           "paymentMethodId",
           "purchaseItems",
           "street"
         ],
         "type": "object",
         "properties": {
+          "customerUserName": {
+            "maxLength": 50,
+            "minLength": 10,
+            "type": "string"
+          },
           "paymentMethodId": {
             "maximum": 2147483647,
             "minimum": 1,
@@ -777,10 +935,14 @@
             "format": "int32"
           },
           "name": {
+            "maxLength": 50,
+            "minLength": 0,
             "type": "string",
             "nullable": true
           },
           "brand": {
+            "maxLength": 50,
+            "minLength": 0,
             "type": "string",
             "nullable": true
           },
@@ -842,16 +1004,21 @@
       },
       "PlanForCreateDTO": {
         "required": [
-          "goals",
           "name",
           "paymentMethodId",
           "selectedClasses",
+          "userName",
           "weeks"
         ],
         "type": "object",
         "properties": {
           "name": {
             "maxLength": 60,
+            "minLength": 3,
+            "type": "string"
+          },
+          "userName": {
+            "maxLength": 50,
             "minLength": 3,
             "type": "string"
           },
@@ -887,7 +1054,8 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/GoalForClassDTO"
-            }
+            },
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -925,6 +1093,10 @@
           "id": {
             "type": "integer",
             "format": "int32"
+          },
+          "username": {
+            "type": "string",
+            "nullable": true
           },
           "paymentMethod": {
             "type": "string",
@@ -975,6 +1147,136 @@
           "quantity": {
             "type": "integer",
             "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "RestockDetailDTO": {
+        "required": [
+          "deliveryAddress",
+          "title"
+        ],
+        "type": "object",
+        "properties": {
+          "title": {
+            "maxLength": 50,
+            "minLength": 2,
+            "type": "string",
+            "format": "multiline"
+          },
+          "deliveryAddress": {
+            "maxLength": 50,
+            "minLength": 5,
+            "type": "string",
+            "format": "multiline"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "expectedDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "restockDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "totalPrice": {
+            "type": "number",
+            "format": "double"
+          },
+          "restockItems": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RestockItemDTO"
+            },
+            "nullable": true
+          },
+          "restockResponsible": {
+            "type": "string",
+            "nullable": true
+          },
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "adminSurname": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "RestockForCreateDTO": {
+        "required": [
+          "deliveryAddress",
+          "title"
+        ],
+        "type": "object",
+        "properties": {
+          "title": {
+            "maxLength": 50,
+            "minLength": 2,
+            "type": "string",
+            "format": "multiline"
+          },
+          "deliveryAddress": {
+            "maxLength": 50,
+            "minLength": 5,
+            "type": "string",
+            "format": "multiline"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "expectedDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "restockDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "totalPrice": {
+            "type": "number",
+            "format": "double"
+          },
+          "restockItems": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RestockItemDTO"
+            },
+            "nullable": true
+          },
+          "restockResponsible": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "RestockItemDTO": {
+        "type": "object",
+        "properties": {
+          "itemName": {
+            "type": "string",
+            "nullable": true
+          },
+          "itemId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "quantity": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "restockPrice": {
+            "type": "number",
+            "format": "double"
           }
         },
         "additionalProperties": false
