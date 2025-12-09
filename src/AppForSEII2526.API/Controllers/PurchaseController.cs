@@ -41,12 +41,8 @@ namespace AppForSEII2526.API.Controllers
             }
 
 
-<<<<<<< HEAD
-            var user = _context.ApplicationUser.FirstOrDefault(au => au.UserName == itemForCreate.CustomerUserName || au.Email == itemForCreate.CustomerUserName );
-=======
             var user = _context.ApplicationUser.FirstOrDefault(au => au.UserName == itemForCreate.CustomerUserName || au.Email == itemForCreate.CustomerUserName);
 
->>>>>>> development
             if (user == null)
             {
                 ModelState.AddModelError("UserNotFound", $"Error! Username or email is not registred.");

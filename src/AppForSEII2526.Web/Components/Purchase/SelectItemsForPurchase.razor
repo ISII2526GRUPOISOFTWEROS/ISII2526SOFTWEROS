@@ -84,11 +84,7 @@
                 <div class="row mb-1">
                     <button type="button" class="btn btn-light" 
                     id="removeItem_@item.ItemId"
-<<<<<<< HEAD
-                    @onclick="@(() => RemoveItem(item.ItemId))">x @item.ItemId @(item.Price *item.Quantity)€</button>
-=======
                     @onclick="@(() => RemoveItem(item.ItemId))">x @item.Quantity u @(item.Price *item.Quantity)€</button>
->>>>>>> development
                 </div>
             }
             @if (purchaseState.Purchase.PurchaseItems.Count > 0)
@@ -128,12 +124,6 @@
     private bool hiddenPurchaseCart = true;
 
     private void AddItem(ItemForPurchaseDTO item)
-<<<<<<< HEAD
-    
-    {
-
-            purchaseState.AddPurchaseItem(item);
-=======
 
     {
         var itemInCart = purchaseState.Purchase.PurchaseItems.FirstOrDefault(i => i.ItemId == item.Id);
@@ -146,21 +136,10 @@
         }
         errors = "";
         purchaseState.AddPurchaseItem(item);
->>>>>>> development
     }
 
     private void RemoveItem(int item)
     {
-<<<<<<< HEAD
-         purchaseState.RemovePurchaseItem(item);
-    }
-        private void PurchaseItem()
-        {
-            navigation.NavigateTo("/purchase/create");
-        }
-
-    public async void SearchItem()
-=======
         purchaseState.RemovePurchaseItem(item);
     }
     private void PurchaseItem()
@@ -169,15 +148,11 @@
     }
 
     public async Task SearchItem()
->>>>>>> development
     {
         try
         {
             items = await apiclient.GetItemsForPurchaseAsync(itemName, itemBrand);
 
-<<<<<<< HEAD
-
-=======
             if(items == null || items.Count == 0 || items.All(i=> i.QuantityAvailableForPurchase <= 0))
             {
                 errors = "No items available";
@@ -189,7 +164,6 @@
                 return;
             }
           
->>>>>>> development
         }catch(ApiException ex)
         {
             logger.LogError($"{DateTime.Now} Error: {ex}");
@@ -197,11 +171,7 @@
         }
         StateHasChanged();
     }
-<<<<<<< HEAD
-    protected override Task OnInitializedAsync()
-=======
     protected override async Task OnInitializedAsync()
->>>>>>> development
     {
         //the type of PurchaseDateFrom is DateTimeOffset, it is required a conversion
         //https://learn.microsoft.com/es-es/dotnet/standard/datetime/converting-between-datetime-and-offset
@@ -216,14 +186,8 @@
             DateTime.SpecifyKind(DateTime.Today.AddDays(2), DateTimeKind.Utc)
             : _to;
 
-<<<<<<< HEAD
-        SearchItem();
-
-        return base.OnInitializedAsync();
-=======
         await SearchItem();
 
         await base.OnInitializedAsync();
->>>>>>> development
     }
 }
