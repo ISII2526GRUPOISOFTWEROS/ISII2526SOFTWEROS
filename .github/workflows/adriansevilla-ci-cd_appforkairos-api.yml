@@ -6,10 +6,10 @@ name: Build and deploy ASP.Net Core app to Azure Web App - appforkairos-api
 on:
   push:
     branches:
-       - AdrianSevilla-CI-CD
-#       - development
-#  paths:
- #     - 'src/AppForSEII2526.API**'
+#       - AdrianSevilla-CI-CD
+       - development
+    paths:
+       - 'src/AppForSEII2526.API**'
   workflow_dispatch:
 
 jobs:
@@ -25,8 +25,8 @@ jobs:
     steps:
       - name: Check out repository code branch development
         uses: actions/checkout@v4
-        #with:
-           # ref: 'development'
+        with:
+            ref: 'development'
 
       - name: Set up .NET Core
         uses: actions/setup-dotnet@v4
@@ -82,6 +82,7 @@ jobs:
           package: .
 
           
+
 
 
 
