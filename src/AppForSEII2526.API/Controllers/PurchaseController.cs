@@ -151,7 +151,8 @@ namespace AppForSEII2526.API.Controllers
                 purchase.City,
                 purchase.Country,
                 purchase.Description ?? string.Empty,
-                purchase.PurchaseItems.Select(pi => {
+                purchase.PurchaseItems.Select(pi =>
+                {
                     var item = dbItems[pi.ItemId];
 
                     return new PurchasedItemDTO(
@@ -161,7 +162,10 @@ namespace AppForSEII2526.API.Controllers
                         pi.Amount_bought
                     );
                 }).ToList(),
-                purchase.Total_prices);
+                purchase.Total_prices)
+            {
+                Username = user.UserName
+            };
    
             return CreatedAtAction("GetPurchaseDetails", new { id = purchase.Id }, result);
         }
@@ -181,6 +185,7 @@ namespace AppForSEII2526.API.Controllers
             IList<PurchaseDetailDTO> purchaseDetails = await _context.Purchases
                 .Where(p => p.Id == id)
                 .Include(p => p.PaymentMethod)
+                    .ThenInclude(pm => pm.User)
                 .Include(p => p.PurchaseItems)
                 .ThenInclude(pi => pi.Item)
                 .ThenInclude(pi => pi.Brand)
@@ -196,8 +201,11 @@ namespace AppForSEII2526.API.Controllers
                         pi.Item.Brand.Name ?? string.Empty,
                         pi.Price,
                         pi.Amount_bought)).ToList(),
-                    p.Total_prices))
-                .ToListAsync();
+                    p.Total_prices)
+                {
+                    Username = p.PaymentMethod.User.UserName
+                }
+                ).ToListAsync();
 
             if (purchaseDetails == null || !purchaseDetails.Any())
             {

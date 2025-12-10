@@ -161,6 +161,15 @@
             {
                 try
                 {
+                    if (authenticationState is not null)
+                    {
+                        var authState = await authenticationState;
+                        var user = authState.User;
+                        if (user.Identity is not null && user.Identity.IsAuthenticated)
+                        {
+                            purchase.CustomerUserName = user.Identity.Name;
+                        }
+                    }
                     var purchased = await apiclient.CreateItemForPurchaseAsync(purchase);
                     navigation.NavigateTo($"/purchase/detail/?PurchaseId={purchased.Id}");
 
