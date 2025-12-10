@@ -116,8 +116,7 @@
                                 <InputNumber @bind-Value="item.Quantity" class="form-control" min="1" style="width: 80px;background-color: #fff9db" />
                             <ValidationMessage For="@(() => item.Quantity)" />
                             </td>
-@*                             <td>@item.Quantity</td>
- *@                            <td>@item.Price €</td>
+                           <td>@item.Price €</td>
                             <td>@(item.Price* item.Quantity) €</td>
                     </tr>
                 } 
@@ -163,7 +162,6 @@
                 try
                 {
                     var purchased = await apiclient.CreateItemForPurchaseAsync(purchase);
-                    purchaseStateContainer.PurchaseProcessed();
                     navigation.NavigateTo($"/purchase/detail/?PurchaseId={purchased.Id}");
 
                 }
