@@ -23,4 +23,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<ItemForExercise> ItemForExercises { get; set; }
     public DbSet<ItemType> ItemTypes { get; set; }
     public DbSet<ApplicationUser> ApplicationUser { get; set; }
-    }
+    public DbSet<PaymentMethod> PaymentMethod { get; set; }
+   
+
+}

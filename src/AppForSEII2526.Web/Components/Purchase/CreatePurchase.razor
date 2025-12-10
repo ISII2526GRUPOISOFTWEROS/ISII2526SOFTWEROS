@@ -1,0 +1,222 @@
+﻿@page "/purchase/create"
+
+@using AppForSEII2526.Web.Component
+@using AppForSEII2526.Web.Components.Shared
+@using AppForSEII2526.Web.API
+@using Microsoft.AspNetCore.Authorization
+@inject AppForKairosAPIClient apiclient
+@inject ILogger<CreatePurchase> logger
+@inject PurchaseStateContainer purchaseStateContainer
+@inject NavigationManager navigation
+
+@attribute [Authorize]
+<h3>Create Purchase</h3>
+
+
+<EditForm Model="purchase" OnValidSubmit="OpenDialog">
+   <div class="row">
+        <DataAnnotationsValidator />
+        <ValidationSummary class="row alert alert-danger"/>
+        <div>
+            <div class="row alert-danger" role="alert" hidden="@hideErrors">
+                <p id="ErrorShown">Errors: @messageError</p>
+            </div>
+            <div class="row g-4">
+                <div class="col-md">
+                    <div class="form-floating mb-4">
+                        <InputText @bind-Value="purchase.CustomerUserName" class="form-control" id="CustomerUserName" placeholder="CustomerUserName" />
+                        <label for="CustomerUserName">Email</label>
+                    </div>
+                </div>
+                <div class="col-md">
+                    <div class="form-floating mb-4">
+                        <InputText @bind-Value="purchase.Street" class="form-control" id="Street" placeholder="Street" />
+                        <label for="Street">Street</label>
+                    </div>
+                </div>
+                <div class="col-md">
+                    <div class="form-floating mb-4">
+                        <InputText @bind-Value="purchase.City" class="form-control" id="City" placeholder="City" />
+                        <label for="City">City</label>
+                    </div>
+                </div>
+                <div class="col-md">
+                    <div class="form-floating mb-4">
+                        <InputText @bind-Value="purchase.Country" class="form-control" id="Country" placeholder="Country" />
+                        <label for="Country">Country</label>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+        <div class="row g-3">
+            <div class="col-md-8">
+                <div class="form-floating mb-3">
+                    <InputText @bind-Value="purchase.Description" class="form-control" id="Description" placeholder="Description" />
+                    <label for="Description">Description</label>
+
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="form-floating mb-3">
+                    <InputSelect @bind-Value="purchase.PaymentMethodId" class="form-select" id="PaymentMethod">
+                        @foreach (var method in Enum.GetValues(typeof(PaymentMethodType)))
+                        {
+                            <option value="@((int)method)">@method.ToString()</option>
+                        }
+                    </InputSelect>
+                    <label for="PaymentMethod">Payment Method</label>
+                    <ValidationMessage For="@(() => purchase.PaymentMethodId)" />
+                </div>
+            </div>
+        </div>
+        <div class="row mt-4">
+            <div class="col d-flex gap-2 justify-content-end">
+                <button type="button" class="btn btn-secondary" @onclick="@(() => navigation.NavigateTo("/"))">
+                    Cancel
+                </button>
+
+                <button type="button" class="btn btn-warning" @onclick="ModifyPurchaseItem">
+                Modify Items
+                </button>
+                <button class="btn btn-primary" type="submit" id="Submit" disabled ="@(!purchase.PurchaseItems.Any())">
+                    Purchase your items
+                </button>
+            </div>
+        </div>
+   </div>
+   <p>
+       <b>Total price:</b>@purchaseStateContainer.TotalPrice.ToString("N2") €
+    </p>
+    @if (!purchase.PurchaseItems.Any())
+    {
+        <dv class="alert alert-warning">
+            Your cart is empty. Please select items before purchasing
+        </dv>
+    }
+    else
+    {
+   <div class="mh-100 table-responsive">
+       <table class="table table-condensed table-hover" id="TableOfPurchaseItems">
+            <thead>
+                <tr>
+                    <th>Item id</th>
+                    <th>Quantity</th>
+                    <th>Unit price</th>
+                    <th>Subtotal</th>
+                </tr>
+            </thead>
+            <tbody>
+                 @foreach (var item in purchase.PurchaseItems)
+                {
+                    <tr id="ItemData_@item.ItemId">
+                        <td>@item.ItemId</td>
+                            <td class="text-center">
+                                <InputNumber @bind-Value="item.Quantity" class="form-control" min="1" style="width: 80px;background-color: #fff9db" />
+                            <ValidationMessage For="@(() => item.Quantity)" />
+                            </td>
+@*                             <td>@item.Quantity</td>
+ *@                            <td>@item.Price €</td>
+                            <td>@(item.Price* item.Quantity) €</td>
+                    </tr>
+                } 
+            </tbody>
+       </table>
+   </div>
+    }
+ 
+</EditForm>
+
+@if (DialogIsOpen)
+{
+    <Dialog Caption ="Purchase Items"
+        Message="Do you want to proceed to purchase the selected items?"
+            OnClose="OnDialogClose" 
+            Type=Dialog.Category.SaveNot>
+    </Dialog>
+}
+
+
+
+
+@code {
+    private ItemForCreateDTO purchase => purchaseStateContainer.Purchase;
+    private bool DialogIsOpen;
+    private object? errors;
+    private string messageError = "";
+    private bool hideErrors { get { return messageError.Length == 0; } }
+    private int selectedPMid;
+
+    private void OpenDialog()
+    {
+        DialogIsOpen = true;
+
+    }
+    private async Task OnDialogClose(bool isOk)
+    {
+        DialogIsOpen = false;
+        if (isOk)
+        {
+            if(purchase.PurchaseItems.Count > 0)
+            {
+                try
+                {
+                    var purchased = await apiclient.CreateItemForPurchaseAsync(purchase);
+                    purchaseStateContainer.PurchaseProcessed();
+                    navigation.NavigateTo($"/purchase/detail/?PurchaseId={purchased.Id}");
+
+                }
+                catch(ApiException<ValidationProblemDetails> apiexceptionvalidation){
+                    if(apiexceptionvalidation?.Result.Errors != null && apiexceptionvalidation.Result.Errors.Any())
+                    {
+                        messageError = "";
+                        foreach (var errors in apiexceptionvalidation.Result.Errors.Values)
+                        {
+                            messageError = string.Join("(*) ", messageError, string.Join(" (*) ", errors));
+                        }
+                    }
+                }
+                catch (ApiException apiexception)
+                {
+                    //messageError = "Error while processing your request, please try again later!";
+                    messageError = $"Error {apiexception.StatusCode}: {apiexception.Response}";
+                }
+
+            }
+        }
+    }
+
+
+    private void ModifyPurchaseItem()
+    {
+        navigation.NavigateTo("/purchase/selectitemsforpurchase");
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        if (authenticationState is not null)
+        {
+            var authState = await authenticationState;
+            var user = authState.User;
+            if (user is not null)
+            {
+                if (user.Identity is not null && user.Identity.IsAuthenticated)
+                {
+                    purchase.CustomerUserName = user.Identity.Name ?? "";
+                }
+            }
+            purchase.Street = purchase.Street == null ? "" : purchase.Street;
+            purchase.City = purchase.City == null ? "" : purchase.City;
+            purchase.Country = purchase.Country == null ? "" : purchase.Country;
+
+            if(purchase.PaymentMethodId == 0)
+            {
+                purchase.PaymentMethodId = (int)PaymentMethodType.Bizum;
+            }
+
+
+        }
+    }
+    [CascadingParameter]
+    private Task<AuthenticationState>? authenticationState { get; set; }
+}

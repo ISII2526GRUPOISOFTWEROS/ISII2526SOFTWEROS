@@ -19,12 +19,6 @@ public class ApplicationUser : IdentityUser {
         Restocks = restocks;
     }
 
-    public ApplicationUser(string? name, string surname)
-    {
-        Name = name;
-        Surname = surname;
-    }
-
     public string? Name { get; set; }
     public string Surname { get; set; }
 

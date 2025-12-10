@@ -3,6 +3,11 @@ using System.Data.Common;
 
 var builder = WebApplication.CreateBuilder(args);
 
+//Adding the builder for rabbit
+//”RabbitMQ” coincide con el nombre del bloque de propiedades en appsettings.json 
+
+
+
 // Add services to the container.
 
 builder.Services.AddControllers()
@@ -53,9 +58,9 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options => {
     options.SwaggerDoc("v1",
     new OpenApiInfo {
-        Title = "AppForMovies.API",
+        Title = "AppForKaiross.API",
         Version = "v1",
-        Description = "This API provides services for renting and purchasing movies",
+        Description = "This API provides services for create plans",
         License = new OpenApiLicense { Name = "MIT License", Url = new Uri("https://opensource.org/license/mit/") },
         Contact = new OpenApiContact { Name = "Software Engineering II Team", Email = "isii@on.uclm.es" },
     });
