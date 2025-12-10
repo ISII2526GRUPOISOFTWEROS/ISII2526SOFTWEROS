@@ -6,10 +6,10 @@ name: Build and deploy ASP.Net Core app to Azure Web App - AppForKairos
 on:
   push:
     branches:
-      - LidiaLopez-CICD
-      # - development
-  # paths:
-      # - 'src/AppForMovies.API**'
+      #- LidiaLopez-CICD
+      - development
+    paths:
+      - 'src/AppForSEII2526.API**'
   workflow_dispatch:
 
 jobs:
@@ -82,5 +82,6 @@ jobs:
           package: .
 
           
+
 
 
