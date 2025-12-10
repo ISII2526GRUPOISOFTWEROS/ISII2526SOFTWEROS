@@ -93,14 +93,14 @@ namespace AppForSEII2526.API.Controllers
                     .ToListAsync();
 
                 if (!classes.Any())
-                    return Ok("There are no classes available.");
+                    return BadRequest("There are no classes available.");
 
                 return Ok(classes);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error getting classes for plan");
-                return Ok("There are no classes available.");
+                return BadRequest("There are no classes available.");
             }
         }
     }

@@ -125,14 +125,12 @@
 </div>
 
 @code {
-    // Client DTOs for the list from API
     private ICollection<AppForSEII2526.Web.API.ClassForPlanDTO> classes;
 
     private bool hideErrors => string.IsNullOrEmpty(errors);
     private string errors = "";
 
     private string itemTypes { get; set; } = "";
-    // Initialize dates to avoid 0001-01-01 issues with UI inputs if needed, or handle nulls
     private DateTime date { get; set; } = DateTime.Today;
 
     private DateTime _fromDate = DateTime.Today;
@@ -166,10 +164,10 @@
         errors = "";
         try
         {
-            var typesList = string.IsNullOrWhiteSpace(itemTypes) ? null : new List<string> { itemTypes };
+            var typesList = string.IsNullOrWhiteSpace(itemTypes)? null: new List<string> { itemTypes };
 
 
-            classes = await apiclient.GetClassForPlanAsync(typesList, date, fromDate, toDate);
+            var classes2 = await apiclient.GetClassForPlanAsync(typesList, date, fromDate, toDate);
         }
         catch (ApiException ex)
         {
