@@ -28,7 +28,7 @@
                 <div class="col">
                     <div class="input-group mb-3">
                         <span class="input-group-text" id="basic-addon1">Quantity</span>
-                        <input type="text" id="inputQuantity" @bind=quantity class="form-control" placeholder="Quantity" aria-label="Quantity" aria-describedby="basic-addon1">
+                        <input type="number" id="inputQuantity" @bind=quantity class="form-control" placeholder="Quantity" aria-label="Quantity" aria-describedby="basic-addon1">
                     </div>
                 </div>
 
@@ -108,8 +108,8 @@
 
     private bool hideErrors { get { return errors.Length == 0; } }
     private string errors = "";
-    private string itemName { get; set; } = "";
-    private int quantity { get; set; } = 1;
+    private string? itemName { get; set; }
+    private int? quantity { get; set; } = null;
 
     private DateTime _from;
     private DateTime _to;
@@ -119,35 +119,26 @@
 
     public async Task searchItems()
     {
-        // Limpiamos errores y lista antes de buscar
+        
         errors = "";
         items = null;   
 
         try
         {
-            // CAMBIO 2: Validamos o aseguramos que los datos no rompan la API
-            // Si tu API requiere un nombre a fuerza, descomenta esto:
-            // if (string.IsNullOrWhiteSpace(itemName)) { errors = "Please enter a name"; return; }
-
+           
             items = await apiclient.GetItemsForRestockAsync(itemName, quantity);
 
             if (items == null || items.Count == 0)
-            {
-                // Mensaje informativo, no error critico
+            {               
                 errors = "No items found with these criteria.";
             }
         }
         catch (ApiException ex) // Captura errores específicos de la API (400, 404, 500)
         {
-            Logger.LogError(ex, "API Error fetching restock items");
-            errors = $"Server Error ({ex.StatusCode}): {ex.Message}";
+            Logger.LogError($"{DateTime.Now} Error: {ex}");
+            errors = $"error while connecting to the system, API message: {ex.Message}";
         }
-        catch (Exception ex) // Captura errores generales (como NullReference)
-        {
-            Logger.LogError(ex, "General Error fetching restock items");
-            // CAMBIO 3: Mostrar el error real en pantalla para depurar
-            errors = $"System Error: {ex.Message}";
-        }
+        
 
         StateHasChanged();
     }
@@ -164,13 +155,8 @@
         restockState.RemoveRestockItem(item);
     }
 
-    // Navigates to the confirmation page
-    private void CreateRestock()
-    {
-        navigation.NavigateTo("/restock/createrestock");
-    }
-
-    protected override Task OnInitializedAsync()
+    
+    protected override async Task OnInitializedAsync()
     {
         // Date initialization logic preserved from your draft
         _from = (_from == new DateTime(1, 1, 1)) ?
@@ -181,9 +167,16 @@
             DateTime.SpecifyKind(DateTime.Today.AddDays(2), DateTimeKind.Utc)
             : _to;
 
-        // Optional: Trigger an initial search or leave empty to wait for user input
-        // searchItems();
+        
+         searchItems();
 
-        return base.OnInitializedAsync();
+        //return base.OnInitializedAsync();
+    }
+
+
+    // got to the create restock page
+    private void CreateRestock()
+    {
+        navigation.NavigateTo("/restock/createrestock");
     }
 }
