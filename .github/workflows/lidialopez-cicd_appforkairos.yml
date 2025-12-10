@@ -1,15 +1,15 @@
 # Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 
-name: Build and deploy ASP.Net Core app to Azure Web App - appforkairos-api
+name: Build and deploy ASP.Net Core app to Azure Web App - AppForKairos
 
 on:
   push:
     branches:
-       - AdrianSevilla-CI-CD
-#       - development
-#  paths:
- #     - 'src/AppForSEII2526.API**'
+      #- LidiaLopez-CICD
+      - development
+    paths:
+      - 'src/AppForSEII2526.API**'
   workflow_dispatch:
 
 jobs:
@@ -25,8 +25,8 @@ jobs:
     steps:
       - name: Check out repository code branch development
         uses: actions/checkout@v4
-        #with:
-           # ref: 'development'
+        with:
+            ref: 'development'
 
       - name: Set up .NET Core
         uses: actions/setup-dotnet@v4
@@ -69,21 +69,19 @@ jobs:
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_14F8939A6DE946EA9B82742F35E3BCCD }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_9D06482E0F544245AE622B21FD31E6A9 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_C4DBD9A7DC7A4A0AB7D79DFCAC395AE2 }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_DDB345819A0546D0B7A3BF6F039F0506 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_186C3334BC1D45168113959750583079 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_7E363E64A430499BA0ACE8956105AB41 }}
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
         with:
-          app-name: 'appforkairos-api'
+          app-name: 'AppForKairos'
           slot-name: 'Production'
           package: .
 
           
-
-
 
 
 
