@@ -176,9 +176,12 @@
                             messageError = string.Join("(*) ", messageError, string.Join(" (*) ", errors));
                         }
                     }
-                    else if(apiexceptionvalidation != null)
+                    else if (apiexceptionvalidation.Result?.AdditionalProperties != null && apiexceptionvalidation.Result.AdditionalProperties.Any())
                     {
-                        messageError = System.Text.Json.JsonSerializer.Serialize(apiexceptionvalidation.Result);
+                        foreach (var prop in apiexceptionvalidation.Result.AdditionalProperties)
+                        {
+                            messageError += $"(*) {prop.Key}: {prop.Value} ";
+                        }
                     }
                     else
                     {

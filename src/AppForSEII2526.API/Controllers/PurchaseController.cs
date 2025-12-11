@@ -48,7 +48,7 @@ namespace AppForSEII2526.API.Controllers
             if (user == null)
             {
                 ModelState.AddModelError("UserNotFound", $"Error! Username or email is not registred.");
-                return BadRequest(ValidationProblem(ModelState));
+                return BadRequest(ModelState);
             }
 
 

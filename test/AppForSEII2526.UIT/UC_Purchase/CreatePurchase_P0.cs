@@ -88,9 +88,9 @@ namespace AppForSEII2526.UIT.UC_Purchase
             WaitForBeingClickable(buttonCancel);
             _driver.FindElement(buttonCancel).Click();
         }
-        public void SetItemQuanity(int itemID, string quanity)
+        public void SetItemQuanity(int itemId, string quanity)
         {
-           string rowId = $"ItemRow_{itemID}";
+            string rowId = $"ItemData_{itemId}";
             var quantityInput = _driver.FindElement(By.CssSelector($"tr#{rowId} input"));
 
             WaitForBeingClickable(By.CssSelector($"tr#{rowId} input"));
@@ -99,6 +99,23 @@ namespace AppForSEII2526.UIT.UC_Purchase
             quantityInput.SendKeys(Keys.Tab);
 
             System.Threading.Thread.Sleep(500);
+        }
+        public bool IsItemInSummary(int itemId)
+        {
+            try
+            {
+                WebDriverWait shortWait = new WebDriverWait(_driver, TimeSpan.FromSeconds(1));
+                var row = shortWait.Until(d => d.FindElement(By.Id($"ItemData_{itemId}")));
+                return row.Displayed;
+            }
+            catch (WebDriverTimeoutException)
+            {
+                return false;
+            } 
+            catch(NoSuchElementException)
+            {
+                return false;
+            }
         }
         public string GetErrorText()
         {

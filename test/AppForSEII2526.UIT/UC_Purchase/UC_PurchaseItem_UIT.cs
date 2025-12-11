@@ -77,6 +77,7 @@ namespace AppForSEII2526.UIT.UC_Purchase
             createItemPO.FillingDetails(UserStreet, UserCity, UserCountry,"");
             createItemPO.SelectPaymentMethod("Bizum");
             createItemPO.SubmitPurchase();
+            createItemPO.ConfirmPurchase();
             System.Threading.Thread.Sleep(1000);
 
             Assert.Contains("purchase/detail", _driver.Url);
@@ -107,7 +108,7 @@ namespace AppForSEII2526.UIT.UC_Purchase
         [Fact(Skip ="first run the dto.Items")]
         //[Fact]
         [Trait("LevelTesting", "Functional Testing")]
-        public void UC_NoItemsAvailable()
+        public void UC8_Scen2_1NoItemsAvailable()
         {
             InitialStepsForPurchaseItem();
             var expectedItems = new List<string[]>
@@ -120,7 +121,27 @@ namespace AppForSEII2526.UIT.UC_Purchase
 
             Assert.True(selectItemsforpurchase_P0.CheckListOfItems(expectedItems));  
         }
+        [Fact]
+        [Trait("LevelTesting", "Functional Testing")]
+        public void UC8_Scen4_1_ModifyCart()
+        {
+            InitialStepsForPurchaseItem();
+            var selectItemPO = new SelectItemsForPurchase_P0(_driver, _output);
+            var createItemPO = new CreatePurchase_P0(_driver, _output);
 
+            selectItemPO.AddQuantityToItem(itemName1, 1);
+            selectItemPO.AddQuantityToItem(itemName3, 1);
+
+            selectItemPO.ClickPurchaseButton();
+            createItemPO.ClickModifyItems();
+
+            selectItemPO.AddQuantityToItem(itemName3, 0);
+
+            selectItemPO.ClickPurchaseButton();
+
+            Assert.True(createItemPO.IsItemInSummary(itemId1)); 
+            Assert.False(createItemPO.IsItemInSummary(itemId3));
+        }
         public static IEnumerable<object[]> GetValidationScenarios()
         {
             string validUser = "Pepe.Gomez";
@@ -131,10 +152,10 @@ namespace AppForSEII2526.UIT.UC_Purchase
             string validDescription = "My purchase for testing";
             return new List<object[]>
             {
-               new object[] { "P", validPM, validStreet, validCity, validCountry, validDescription, "length of 10" },
-                new object[] { validUser, validPM, "C", validCity, validCountry, validDescription, "Street must be" },
-                new object[] { validUser, validPM, validStreet, "A", validCountry, validDescription, "City must be" },
-                new object[] { validUser, validPM, validStreet, validCity, "S", validDescription, "Country must be" },
+               new object[] { "P", validPM, validStreet, validCity, validCountry, validDescription, "The field CustomerUserName must be a string with a minimum length of 10 and a maximum length of 50." },
+                new object[] { validUser, validPM, "C", validCity, validCountry, validDescription, "The field Street must be a string with a minimum length of 3 and a maximum length of 100." },
+                new object[] { validUser, validPM, validStreet, "A", validCountry, validDescription, "The field City must be a string with a minimum length of 3 and a maximum length of 100." },
+                new object[] { validUser, validPM, validStreet, validCity, "S", validDescription, "The field Country must be a string with a minimum length of 3 and a maximum length of 100." },
                 new object[] { validUser, "PayPal", validStreet, validCity, validCountry, validDescription, "Error! The selected payment method is not registered for this user." },
                 new object[] { validUser, validPM, validStreet, validCity, validCountry, "Buy", "Error! You must start the Description with My purchase for." },
             };
@@ -191,7 +212,8 @@ namespace AppForSEII2526.UIT.UC_Purchase
 
             string actualError = createItemPO.GetErrorText();
 
-            Assert.Contains($"There are not more stock for the item {itemName2}", actualError);
+            Assert.Contains($"InsufficientStock", actualError);
+            Assert.Contains($"Error! Item {itemName2} does not have enough stock", actualError);
         }
 
 
