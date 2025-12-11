@@ -32,13 +32,14 @@ namespace AppForSEII2526.API.Controllers
         {
             IList<ItemForRestockDTO> itemsDTOs = await _context.Items
                 .Where(Item => (itemName == null ||  Item.Name.Contains(itemName))
-                            //&& (Item.QuantityAvailableForPurchase < Item.QuantityForRestock)
+                            
                             && (quantityForRestock == null || Item.QuantityAvailableForPurchase <= quantityForRestock))
 
 
                 .OrderBy(Item => Item.Name)
 
                 .Select(Item => new ItemForRestockDTO(
+                                                    Item.Id, 
                                                     Item.Brand.Name,
                                                     Item.Name ?? string.Empty,
                                                     Item.QuantityAvailableForPurchase,

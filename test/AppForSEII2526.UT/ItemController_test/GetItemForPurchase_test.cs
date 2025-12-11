@@ -18,7 +18,6 @@ namespace AppForSEII2526.UT.ItemForPurchase_test
                 new Brand(){ Name="Domyos"},
 
             };
-
             var itemTypes = new List<ItemType>()
             {
                 new ItemType(){ Name="Strength Equipment"},

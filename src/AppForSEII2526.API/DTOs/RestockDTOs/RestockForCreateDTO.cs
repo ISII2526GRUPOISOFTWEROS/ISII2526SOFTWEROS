@@ -1,16 +1,14 @@
-﻿
-
-namespace AppForSEII2526.API.DTOs.ItemDTOs
+﻿namespace AppForSEII2526.API.DTOs.RestockDTOs
 {
-    public class ItemForCreateRestockDTO
+    public class RestockForCreateDTO
     {
         //public ItemForCreateRestockDTO()
         //{
         //}
 
-        public ItemForCreateRestockDTO(int id, string title, string deliveryAddress, string? description, DateTime? expectedDate, DateTime restockDate, decimal totalPrice, IList<RestockItemForCreateDTO> restockItems, string restockResponsible)
+        public RestockForCreateDTO(/*int id,*/ string title, string deliveryAddress, string? description, DateTime? expectedDate, DateTime restockDate, decimal totalPrice, IList<RestockItemDTO> restockItems, string restockResponsible)
         {
-            Id = id;
+           // Id = id;
             Title = title ?? throw new ArgumentNullException(nameof(title));
             DeliveryAddress = deliveryAddress ?? throw new ArgumentNullException(nameof(deliveryAddress));
             Description = description;
@@ -21,15 +19,15 @@ namespace AppForSEII2526.API.DTOs.ItemDTOs
             RestockResponsible = restockResponsible;
         }
 
-        public ItemForCreateRestockDTO()
+        public RestockForCreateDTO()
         {
-            RestockItems = new List<RestockItemForCreateDTO>();
+            RestockItems = new List<RestockItemDTO>();
             RestockResponsible = string.Empty;
         }
 
 
 
-        public int Id { get; set; }
+        //public int Id { get; set; }
 
         [DataType(System.ComponentModel.DataAnnotations.DataType.MultilineText)]
         [Display(Name = "Title")]
@@ -47,16 +45,16 @@ namespace AppForSEII2526.API.DTOs.ItemDTOs
         public DateTime? ExpectedDate { get; set; }
         public DateTime RestockDate { get; set; }
         [Precision(5, 2)]
-        public Decimal TotalPrice { get; set; }
+        public decimal TotalPrice { get; set; }
 
         //References
-        public IList<RestockItemForCreateDTO> RestockItems { get; set; } 
+        public IList<RestockItemDTO> RestockItems { get; set; } 
         public string RestockResponsible { get; set; }
 
         public override bool Equals(object? obj)
         {
-            return obj is ItemForCreateRestockDTO dTO &&
-                   Id == dTO.Id &&
+            return obj is RestockForCreateDTO dTO &&
+                  // Id == dTO.Id &&
                    Title == dTO.Title &&
                    DeliveryAddress == dTO.DeliveryAddress &&
                    Description == dTO.Description &&
