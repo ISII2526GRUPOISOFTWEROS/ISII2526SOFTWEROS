@@ -44,7 +44,7 @@ namespace AppForSEII2526.UIT.UC_Purchase
         }
         private void Precondition_performance_login()
         {
-            Perform_login("adriansevillajimenez@gmail.com", "Adrian123!");
+            Perform_login("Adrian.Sevilla@alu.uclm.es", "Password123!");
         }
         private void InitialStepsForPurchaseItem()
         {
@@ -52,22 +52,12 @@ namespace AppForSEII2526.UIT.UC_Purchase
             selectItemsforpurchase_P0.WaitForBeingVisible(By.Id("SelectPurchase"));
             _driver.FindElement(By.Id("SelectPurchase")).Click();
         }
-        [Fact]
-        [Trait("LevelTesting","Functional Testing")]
-        public void UC8_Scen3_1_Filtering()
-        {
-            InitialStepsForPurchaseItem();
-            var expectedItems = new List<string[]>
-            {
-                new string[] {itemName1, itemBrand1,itemDescription1, itemPrice1, itemQuantity1, itemAdd1}
-            };
-            selectItemsforpurchase_P0.SearchItems("Foam Roller", "");
-            Assert.False(selectItemsforpurchase_P0.CheckListOfItems(expectedItems));
-        }
+     
         [Theory]
         [Trait("LevelTesting", "Functional Testing")]
-        [InlineData(itemName1,itemBrand1,itemDescription1,itemPrice1,itemQuantity1,itemAdd1,"Foam","Adidas")]
-        public void UC8_Scen3_2_Filtering(string name, string brand, string description, string price, string quantity, string add, string searchName, string searchBrand)
+        [InlineData(itemName1,itemBrand1,itemDescription1,itemPrice1,itemQuantity1,itemAdd1,"Foam","")]
+        [InlineData(itemName1,itemBrand1,itemDescription1,itemPrice1,itemQuantity1,itemAdd1,"","Adidas")]
+        public void UC8_Scen3_1_2_Filtering(string name, string brand, string description, string price, string quantity, string add, string searchName, string searchBrand)
         {
             InitialStepsForPurchaseItem();
             var expectedItems = new List<string[]>
