@@ -195,12 +195,17 @@ namespace AppForSEII2526.UT.PurchaseController_test
 
             PurchaseController controller = new PurchaseController(_context, logger);
 
+   
+
             var result = await controller.CreateItemForPurchase(input);
 
             var badRequest = Assert.IsType<BadRequestObjectResult>(result);
-            var innerResult = Assert.IsType<ObjectResult>(badRequest.Value);
-            var problemDetails = Assert.IsType<ValidationProblemDetails>(innerResult.Value);
-            var errorActual = problemDetails.Errors.First().Value[0];
+
+            var serializableError = Assert.IsType<SerializableError>(badRequest.Value);
+
+            var firstErrorEntry = serializableError.First();
+            var errorMessages = firstErrorEntry.Value as string[]; 
+            var errorActual = errorMessages[0];
 
             Assert.StartsWith(errors, errorActual);
         }

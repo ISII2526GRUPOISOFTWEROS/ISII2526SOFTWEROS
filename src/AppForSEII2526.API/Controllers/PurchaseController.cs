@@ -37,7 +37,7 @@ namespace AppForSEII2526.API.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ValidationProblem(ModelState));
+                return BadRequest(ModelState);
             }
 
 
@@ -48,7 +48,7 @@ namespace AppForSEII2526.API.Controllers
             if (user == null)
             {
                 ModelState.AddModelError("UserNotFound", $"Error! Username or email is not registred.");
-                return BadRequest(ValidationProblem(ModelState));
+                return BadRequest(ModelState);
             }
 
 
@@ -57,7 +57,7 @@ namespace AppForSEII2526.API.Controllers
             switch (itemForCreate.PaymentMethodId)
             {
                 case 1:
-                     paymentMethod = user.PaymentMethods.OfType<Bizum>().FirstOrDefault();
+                    paymentMethod = user.PaymentMethods.OfType<Bizum>().FirstOrDefault();
                     break;
                 case 2:
                     paymentMethod = user.PaymentMethods.OfType<CreditCard>().FirstOrDefault();
@@ -65,27 +65,28 @@ namespace AppForSEII2526.API.Controllers
                 case 3:
                     paymentMethod = user.PaymentMethods.OfType<PayPal>().FirstOrDefault();
                     break;
-                    
+
             }
-                if (paymentMethod == null)
+            if (paymentMethod == null)
             {
                 ModelState.AddModelError("PaymentMethod", "Error! The selected payment method is not registered for this user.");
-                return BadRequest(ValidationProblem(ModelState));
+                return BadRequest(ModelState);
             }
-            
+
             string sentence = "My purchase for";
 
-            if (!string.IsNullOrEmpty(itemForCreate.Description) && !itemForCreate.Description.StartsWith(sentence)) {
+            if (!string.IsNullOrEmpty(itemForCreate.Description) && !itemForCreate.Description.StartsWith(sentence))
+            {
                 ModelState.AddModelError("Description", "Error! You must start the Description with My purchase for.");
-                return BadRequest(ValidationProblem(ModelState));
+                return BadRequest(ModelState);
             }
 
-            
+
             var requestedItemsIds = itemForCreate.PurchaseItems.Select(pi => pi.ItemId).ToList();
 
             var dbItems = await _context.Items
                 .Where(i => requestedItemsIds.Contains(i.Id))
-                .Include(i=>i.Brand)
+                .Include(i => i.Brand)
                 .ToDictionaryAsync(i => i.Id);
 
             decimal totalCost = 0;
@@ -123,7 +124,7 @@ namespace AppForSEII2526.API.Controllers
 
             if (ModelState.ErrorCount > 0)
             {
-                return BadRequest(ValidationProblem(ModelState));
+                return BadRequest(ModelState);
             }
 
 
@@ -175,7 +176,7 @@ namespace AppForSEII2526.API.Controllers
             {
                 Username = user.UserName
             };
-   
+
             return CreatedAtAction("GetPurchaseDetails", new { id = purchase.Id }, result);
         }
 
