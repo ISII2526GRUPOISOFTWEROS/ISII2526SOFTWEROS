@@ -41,7 +41,9 @@ namespace AppForSEII2526.API.Controllers
             }
 
 
-            var user = _context.ApplicationUser.FirstOrDefault(au => au.UserName == itemForCreate.CustomerUserName || au.Email == itemForCreate.CustomerUserName);
+            var user = _context.ApplicationUser
+                .Include(au => au.PaymentMethods)
+                .FirstOrDefault(au => au.UserName == itemForCreate.CustomerUserName || au.Email == itemForCreate.CustomerUserName);
 
             if (user == null)
             {
@@ -50,33 +52,41 @@ namespace AppForSEII2526.API.Controllers
             }
 
 
-            var paymentMethod = await _context.Set<PaymentMethod>().FirstOrDefaultAsync(pm => pm.Id == itemForCreate.PaymentMethodId );
+            //var paymentMethod = await _context.Set<PaymentMethod>().FirstOrDefaultAsync(pm => pm.Id == itemForCreate.PaymentMethodId );
+            PaymentMethod paymentMethod = null;
+            switch (itemForCreate.PaymentMethodId)
+            {
+                case 1:
+                    paymentMethod = user.PaymentMethods.OfType<Bizum>().FirstOrDefault();
+                    break;
+                case 2:
+                    paymentMethod = user.PaymentMethods.OfType<CreditCard>().FirstOrDefault();
+                    break;
+                case 3:
+                    paymentMethod = user.PaymentMethods.OfType<PayPal>().FirstOrDefault();
+                    break;
 
+            }
             if (paymentMethod == null)
             {
                 ModelState.AddModelError("PaymentMethod", "Error! The selected payment method is not registered for this user.");
                 return BadRequest(ValidationProblem(ModelState));
             }
-            //var paymentMethod = await _context.Set<PaymentMethod>().FirstOrDefaultAsync(pm => pm.Id == itemForCreate.PaymentMethodId && pm.User.Id == user.Id);
 
-            //if (paymentMethod == null || paymentMethod.User.Id != user.Id)
-            //{
-            //    ModelState.AddModelError("PaymentMethod", "Error! The selected payment method is not registered for this user.");
-            //    return BadRequest(ValidationProblem(ModelState));
-            //}
             string sentence = "My purchase for";
 
-            if (!string.IsNullOrEmpty(itemForCreate.Description) && !itemForCreate.Description.StartsWith(sentence)) {
+            if (!string.IsNullOrEmpty(itemForCreate.Description) && !itemForCreate.Description.StartsWith(sentence))
+            {
                 ModelState.AddModelError("Description", "Error! You must start the Description with My purchase for.");
                 return BadRequest(ValidationProblem(ModelState));
             }
 
-            
+
             var requestedItemsIds = itemForCreate.PurchaseItems.Select(pi => pi.ItemId).ToList();
 
             var dbItems = await _context.Items
                 .Where(i => requestedItemsIds.Contains(i.Id))
-                .Include(i=>i.Brand)
+                .Include(i => i.Brand)
                 .ToDictionaryAsync(i => i.Id);
 
             decimal totalCost = 0;
@@ -166,7 +176,7 @@ namespace AppForSEII2526.API.Controllers
             {
                 Username = user.UserName
             };
-   
+
             return CreatedAtAction("GetPurchaseDetails", new { id = purchase.Id }, result);
         }
 

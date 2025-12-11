@@ -44,6 +44,7 @@ namespace AppForSEII2526.API.DTOs.ItemDTOs
 
 
         [StringLength(100, ErrorMessage = "Description cannot exceed 100 characters")]
+        [RegularExpression(@"^My purchase for.*", ErrorMessage = "Description must start with 'My purchase for'")]
         public string? Description { get; set; }
 
         [Required(ErrorMessage = "At least one item must be included in the purchase")]

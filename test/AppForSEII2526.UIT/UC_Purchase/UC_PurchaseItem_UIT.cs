@@ -137,12 +137,31 @@ namespace AppForSEII2526.UIT.UC_Purchase
                 new object[] { validUser, validPM, validStreet, "A", validCountry, validDescription, "The field City must be a string with a minimum length of 3 and a maximum length of 100.\r\n" },
                 new object[] { validUser, validPM, validStreet, validCity, "S", validDescription, "The field Country must be a string with a minimum length of 3 and a maximum length of 100.\r\n" },
                 new object[] { validUser, validPM, validStreet, validCity, validCountry, "Buy", "Name must have at least 10 characters" },
-            }
+            };
 
         }
 
         [Theory]
         [Trait("LevelTesting", "Functional Testing")]
+        [MemberData(nameof(GetValidationScenarios))]
+        public void UC8_Scen5_ValidationErrors(string userName, string paymentMethod, string street, string city, string country, string description, string expectedErrorPart)
+        {
+            InitialStepsForPurchaseItem();
+
+            var selectItemPO = new SelectItemsForPurchase_P0(_driver, _output);
+            var createItemPO = new CreatePurchase_P0(_driver, _output);
+
+            selectItemPO.AddQuantityToItem(itemName1, 1);
+            selectItemPO.ClickPurchaseButton();
+
+            createItemPO.FillingDetails(street, city, country, description);
+            createItemPO.SelectPaymentMethod(paymentMethod);
+            createItemPO.SubmitPurchase();
+
+            string actualError = createItemPO.GetErrorText();
+            Assert.Contains(expectedErrorPart, actualError);
+
+        }
 
 
 
