@@ -128,15 +128,15 @@ namespace AppForSEII2526.UIT.UC_Purchase
             string validStreet = "Calle de la Universidad";
             string validCity = "Albacete";
             string validCountry = "Spain";
-            string validDescription = "";
+            string validDescription = "My purchase for testing";
             return new List<object[]>
             {
-                new object[] { "P", validPM, validStreet, validCity, validCountry, validDescription, "The field CustomerUserName must be a string with a minimum length of 10 and a maximum length of 50." },
-                new object[] { validUser, "Paypal", validStreet, validCity, validCountry, validDescription, "Name must have at least 10 characters" },
-                new object[] { validUser, validPM, "C", validCity, validCountry, validDescription, "The field Street must be a string with a minimum length of 3 and a maximum length of 100." },
-                new object[] { validUser, validPM, validStreet, "A", validCountry, validDescription, "The field City must be a string with a minimum length of 3 and a maximum length of 100.\r\n" },
-                new object[] { validUser, validPM, validStreet, validCity, "S", validDescription, "The field Country must be a string with a minimum length of 3 and a maximum length of 100.\r\n" },
-                new object[] { validUser, validPM, validStreet, validCity, validCountry, "Buy", "Name must have at least 10 characters" },
+               new object[] { "P", validPM, validStreet, validCity, validCountry, validDescription, "length of 10" },
+                new object[] { validUser, validPM, "C", validCity, validCountry, validDescription, "Street must be" },
+                new object[] { validUser, validPM, validStreet, "A", validCountry, validDescription, "City must be" },
+                new object[] { validUser, validPM, validStreet, validCity, "S", validDescription, "Country must be" },
+                new object[] { validUser, "PayPal", validStreet, validCity, validCountry, validDescription, "Error! The selected payment method is not registered for this user." },
+                new object[] { validUser, validPM, validStreet, validCity, validCountry, "Buy", "Error! You must start the Description with My purchase for." },
             };
 
         }
@@ -154,13 +154,44 @@ namespace AppForSEII2526.UIT.UC_Purchase
             selectItemPO.AddQuantityToItem(itemName1, 1);
             selectItemPO.ClickPurchaseButton();
 
+            if (!userName.StartsWith("Adrian") && !userName.StartsWith("Pepe"))
+            {
+                createItemPO.SetUserName(userName);
+            }
+
             createItemPO.FillingDetails(street, city, country, description);
             createItemPO.SelectPaymentMethod(paymentMethod);
             createItemPO.SubmitPurchase();
-
+            if (paymentMethod == "PayPal" || description == "Buy")
+            {
+                createItemPO.ConfirmPurchase();
+            }
             string actualError = createItemPO.GetErrorText();
             Assert.Contains(expectedErrorPart, actualError);
 
+        }
+
+        [Fact]
+        [Trait("LevelTesting", "Functional Testing")]
+        public void UC8_Scen6_1_StockError()
+        {
+            InitialStepsForPurchaseItem();
+            var selectItemPO = new SelectItemsForPurchase_P0(_driver, _output);
+            var createItemPO = new CreatePurchase_P0(_driver, _output);
+            selectItemPO.AddQuantityToItem(itemName2, 1);
+            selectItemPO.ClickPurchaseButton();
+
+            createItemPO.SetUserName(UserEmail);
+            createItemPO.FillingDetails(UserStreet, UserCity, UserCountry, "");
+            createItemPO.SelectPaymentMethod(UserPM);
+
+            createItemPO.SetItemQuanity(itemId2, "5000");
+            createItemPO.SubmitPurchase();
+            createItemPO.ConfirmPurchase();
+
+            string actualError = createItemPO.GetErrorText();
+
+            Assert.Contains($"There are not more stock for the item {itemName2}", actualError);
         }
 
 

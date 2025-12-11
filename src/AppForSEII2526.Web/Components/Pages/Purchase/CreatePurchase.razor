@@ -161,12 +161,13 @@
             {
                 try
                 {
-                    
+
                     var purchased = await apiclient.CreateItemForPurchaseAsync(purchase);
                     navigation.NavigateTo($"/purchase/detail/?PurchaseId={purchased.Id}");
 
                 }
                 catch(ApiException<ValidationProblemDetails> apiexceptionvalidation){
+
                     if(apiexceptionvalidation?.Result.Errors != null && apiexceptionvalidation.Result.Errors.Any())
                     {
                         messageError = "";
@@ -175,13 +176,26 @@
                             messageError = string.Join("(*) ", messageError, string.Join(" (*) ", errors));
                         }
                     }
+                    else if(apiexceptionvalidation != null)
+                    {
+                        messageError = System.Text.Json.JsonSerializer.Serialize(apiexceptionvalidation.Result);
+                    }
+                    else
+                    {
+                        messageError = "Validation error without details."; 
+                    }
                 }
                 catch (ApiException apiexception)
                 {
                     //messageError = "Error while processing your request, please try again later!";
-                    messageError = $"Error {apiexception.StatusCode}: {apiexception.Response}";
+                    //messageError = apiexception.Response ?? $"Error API {apiexception.StatusCode}";
+                    messageError = ExtractError(apiexception.Response);
                 }
-
+                catch(Exception ex)
+                {
+                    messageError = $"Unexpected error: {ex.Message}";
+                }
+                StateHasChanged();
             }
         }
     }
@@ -218,4 +232,27 @@
     }
     [CascadingParameter]
     private Task<AuthenticationState>? authenticationState { get; set; }
+    private string ExtractError(string response)
+    {
+        if (string.IsNullOrEmpty(response)) return "Error desconocido.";
+        try
+        {
+            // Intentamos limpiar el JSON para sacar solo el texto de los errores
+            using var doc = System.Text.Json.JsonDocument.Parse(response);
+            if (doc.RootElement.TryGetProperty("errors", out var errorsElement))
+            {
+                var sb = new System.Text.StringBuilder();
+                foreach (var prop in errorsElement.EnumerateObject())
+                {
+                    foreach (var err in prop.Value.EnumerateArray())
+                    {
+                        sb.Append($"(*) {err.GetString()} ");
+                    }
+                }
+                return sb.ToString();
+            }
+            return response; // Si no tiene formato de errores, devolvemos tal cual
+        }
+        catch { return response; }
+    }
 }

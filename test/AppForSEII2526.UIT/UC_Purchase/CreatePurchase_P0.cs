@@ -19,7 +19,7 @@ namespace AppForSEII2526.UIT.UC_Purchase
          private By buttonSave = By.Id("Button_DialogOK");
          private By tableItems = By.Id("TableOfPurchaseItems");
 
-        By buttonPurchaseItem = By.Id("purchaseItemButton");
+        By errorShown = By.Id("ErrorShown");
         By buttonCancel = By.Id("buttonCancel");
         By buttonModifyItem = By.Id("buttonModify");
 
@@ -28,8 +28,17 @@ namespace AppForSEII2526.UIT.UC_Purchase
         {
         }
 
+        public void SetUserName(string userName)
+        {
+            WaitForBeingClickable(By.Id("CustomerUserName"));
+            var userField = _driver.FindElement(By.Id("CustomerUserName"));
+            userField.Clear();
+            userField.SendKeys(userName);
+            userField.SendKeys(Keys.Tab); 
+        }
+
         public void FillingDetails(string street, string city,string country,string description)
-        { // wait for the web element to be clickable
+        { 
 
             WaitForBeingClickable(inputStreet);
            _driver.FindElement(inputStreet).SendKeys(street);
@@ -44,7 +53,6 @@ namespace AppForSEII2526.UIT.UC_Purchase
             WaitForBeingClickable(inputDescription);
             _driver.FindElement(inputDescription).SendKeys(description);
 
-            System.Threading.Thread.Sleep(500);
         }
         public void SelectPaymentMethod(string paymentMethodName)
         {
@@ -55,7 +63,6 @@ namespace AppForSEII2526.UIT.UC_Purchase
             var selectElement = new SelectElement(dropdown);
             selectElement.SelectByText(paymentMethodName);
 
-            System.Threading.Thread.Sleep(500);
 
         }
 
@@ -63,13 +70,12 @@ namespace AppForSEII2526.UIT.UC_Purchase
         {
             WaitForBeingClickable(buttonSubmit);
             _driver.FindElement(buttonSubmit).Click();
-
-            System.Threading.Thread.Sleep(500);
-
+        }
+        public void ConfirmPurchase()
+        {
             WaitForBeingClickable(buttonSave);
             _driver.FindElement(buttonSave).Click();
 
-            System.Threading.Thread.Sleep(500);
 
         }
         public void ClickModifyItems()
@@ -82,28 +88,55 @@ namespace AppForSEII2526.UIT.UC_Purchase
             WaitForBeingClickable(buttonCancel);
             _driver.FindElement(buttonCancel).Click();
         }
-        
+        public void SetItemQuanity(int itemID, string quanity)
+        {
+           string rowId = $"ItemRow_{itemID}";
+            var quantityInput = _driver.FindElement(By.CssSelector($"tr#{rowId} input"));
+
+            WaitForBeingClickable(By.CssSelector($"tr#{rowId} input"));
+            quantityInput.Clear();
+            quantityInput.SendKeys(quanity);
+            quantityInput.SendKeys(Keys.Tab);
+
+            System.Threading.Thread.Sleep(500);
+        }
         public string GetErrorText()
         {
-            try
-            {
+            WebDriverWait wait = new WebDriverWait(_driver, TimeSpan.FromSeconds(3));
 
-                var errorElement = _driver.FindElement(By.Id("ErrorShown"));
-                if(errorElement.Displayed && !string.IsNullOrEmpty(errorElement.Text)){
-                    return errorElement.Text;
-                }
-            }
-            catch (NoSuchElementException) { }
             try
             {
-                var summary = _driver.FindElement(By.CssSelector(".validation-summary-errors, .alert-danger ul"));
-                if (summary.Displayed)
+                return wait.Until(d =>
                 {
-                    return summary.Text;
-                }
+                    try
+                    {
+                        var serverError = d.FindElement(By.Id("ErrorShown"));
+                        if (serverError.Displayed && !string.IsNullOrWhiteSpace(serverError.Text))
+                        {
+                            return serverError.Text;
+                        }
+                    }
+                    catch (StaleElementReferenceException) { }
+                    catch (NoSuchElementException) { }
+
+                    try
+                    {
+                        var clientError = d.FindElement(By.CssSelector(".alert.alert-danger"));
+                        if (clientError.Displayed && !string.IsNullOrWhiteSpace(clientError.Text))
+                        {
+                            return clientError.Text;
+                        }
+                    }
+                    catch (StaleElementReferenceException) { }
+                    catch (NoSuchElementException) { }
+
+                    return null;
+                });
             }
-            catch (NoSuchElementException) { }
-            return string.Empty;
+            catch (WebDriverTimeoutException)
+            {
+                return string.Empty;
+            }
         }
     }
 }
