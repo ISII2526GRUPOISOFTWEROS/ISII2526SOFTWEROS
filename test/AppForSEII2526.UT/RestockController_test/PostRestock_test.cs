@@ -46,9 +46,10 @@ namespace AppForSEII2526.UT.RestockController_test
             };
 
 
-            _context.Items.AddRange(items);
             _context.Brands.AddRange(brands);
             _context.ItemTypes.AddRange(itemTypes);
+            _context.Items.AddRange(items);
+            
 
             _context.SaveChanges();
         }
