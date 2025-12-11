@@ -2,14 +2,14 @@
 
 namespace AppForSEII2526.API.DTOs.RestockDTOs
 {
-    public class RestockDetailDTO : ItemForCreateRestockDTO
+    public class RestockDetailDTO : RestockForCreateDTO
     {
        
         public RestockDetailDTO(int id, string title, string deliveryAddress, string? description, 
             DateTime? expectedDate, DateTime restockDate, decimal totalPrice, 
-            IList<RestockItemForCreateDTO> restockItems, string restockResponsible, string adminSurname)
+            IList<RestockItemDTO> restockItems, string restockResponsible, string adminSurname)
 
-            : base(id, 
+            : base(//id, 
                   title, 
                   deliveryAddress, 
                   description, 

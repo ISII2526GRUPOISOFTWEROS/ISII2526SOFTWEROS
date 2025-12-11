@@ -58,73 +58,73 @@ namespace AppForSEII2526.UT.RestockController_test
         // --------------------------
         public static IEnumerable<object[]> InvalidRestockInputs()
         {
-            var missingTitle = new ItemForCreateRestockDTO(
-                id: 0,
+            var missingTitle = new RestockForCreateDTO(
+                
                 title: "",
                 deliveryAddress: "Warehouse",
                 description: "Restock for",
                 expectedDate: DateTime.Now,
                 restockDate: DateTime.Now,
                 totalPrice: 0,
-                restockItems: new List<RestockItemForCreateDTO>()
+                restockItems: new List<RestockItemDTO>()
                 {
-                    new RestockItemForCreateDTO("Foam Roller", 1, 10, 2)
+                    new RestockItemDTO("Foam Roller", 1, 10, 2)
                 },
                 restockResponsible: "admin"
             );
 
-            var missingAddress = new ItemForCreateRestockDTO(
-                id: 0,
+            var missingAddress = new RestockForCreateDTO(
+                
                 title: "Restock 1",
                 deliveryAddress: "",
                 description: "Restock for",
                 expectedDate: DateTime.Now,
                 restockDate: DateTime.Now,
                 totalPrice: 0,
-                restockItems: new List<RestockItemForCreateDTO>()
+                restockItems: new List<RestockItemDTO>()
                 {
-                    new RestockItemForCreateDTO("Foam Roller", 1, 10, 5)
+                    new RestockItemDTO("Foam Roller", 1, 10, 5)
                 },
                 restockResponsible: "admin"
             );
 
-            var missingItems = new ItemForCreateRestockDTO(
-                id: 0,
+            var missingItems = new RestockForCreateDTO(
+                
                 title: "Restock 1",
                 deliveryAddress: "Warehouse",
                 description: "Restock for",
                 expectedDate: DateTime.Now,
                 restockDate: DateTime.Now,
                 totalPrice: 0,
-                restockItems: new List<RestockItemForCreateDTO>(),
+                restockItems: new List<RestockItemDTO>(),
                 restockResponsible: "admin"
             );
 
-            var invalidUser = new ItemForCreateRestockDTO(
-                id: 0,
+            var invalidUser = new RestockForCreateDTO(
+                
                 title: "Restock 1",
                 deliveryAddress: "Warehouse",
                 description: "Restock for",
                 expectedDate: DateTime.Now,
                 restockDate: DateTime.Now,
                 totalPrice: 0,
-                restockItems: new List<RestockItemForCreateDTO>()
+                restockItems: new List<RestockItemDTO>()
                 {
-                    new RestockItemForCreateDTO("Foam Roller", 1, 5, 2)
+                    new RestockItemDTO("Foam Roller", 1, 5, 2)
                 },
                 restockResponsible: "unknownUser"
             );
-            var incorrectDescription = new ItemForCreateRestockDTO(
-                id: 0,
+            var incorrectDescription = new RestockForCreateDTO(
+                
                 title: "Restock 1",
                 deliveryAddress: "Warehouse",
                 description: "Description",
                 expectedDate: DateTime.Now,
                 restockDate: DateTime.Now,
                 totalPrice: 0,
-                restockItems: new List<RestockItemForCreateDTO>()
+                restockItems: new List<RestockItemDTO>()
                 {
-                    new RestockItemForCreateDTO("Foam Roller", 1, 5, 2)
+                    new RestockItemDTO("Foam Roller", 1, 5, 2)
                 },
                 restockResponsible: "admin"
             );
@@ -142,7 +142,7 @@ namespace AppForSEII2526.UT.RestockController_test
         [Theory]
         [MemberData(nameof(InvalidRestockInputs))]
         [Trait("PostRestock", "Unit Testing")]
-        public async Task PostRestock_InvalidInput_ReturnsBadRequest(ItemForCreateRestockDTO restockDTO, string expectedError)
+        public async Task PostRestock_InvalidInput_ReturnsBadRequest(RestockForCreateDTO restockDTO, string expectedError)
         {
             //Arrange
             var mock = new Mock<ILogger<RestockController>>();
@@ -177,17 +177,17 @@ namespace AppForSEII2526.UT.RestockController_test
             var controller = new RestockController(_context, logger);
 
 
-            var input = new ItemForCreateRestockDTO(
-                id: 0,
+            var input = new RestockForCreateDTO(
+                
                 title: "Restock Test",
                 deliveryAddress: "Warehouse A",
                 description: "Restock for",
                 expectedDate: DateTime.UtcNow,
                 restockDate: DateTime.UtcNow,
                 totalPrice: 0,
-                restockItems: new List<RestockItemForCreateDTO>()
+                restockItems: new List<RestockItemDTO>()
                 {
-                    new RestockItemForCreateDTO("Foam Roller", 1, 10, 2)
+                    new RestockItemDTO("Foam Roller", 1, 10, 2)
                 },
                 restockResponsible: "admin"
             );
@@ -198,7 +198,7 @@ namespace AppForSEII2526.UT.RestockController_test
 
             //Assert
             var createdResult = Assert.IsType<CreatedAtActionResult>(result);
-            var actualCreatedRestock = Assert.IsType<ItemForCreateRestockDTO>(createdResult.Value);
+            var actualCreatedRestock = Assert.IsType<RestockForCreateDTO>(createdResult.Value);
 
             Assert.Equal(input, actualCreatedRestock);
         }

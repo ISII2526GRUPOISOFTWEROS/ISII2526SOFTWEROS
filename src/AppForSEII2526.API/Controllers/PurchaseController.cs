@@ -17,7 +17,6 @@ namespace AppForSEII2526.API.Controllers
             _context = context;
             _logger = logger;
         }
-
         private static string GetPaymentMethodName(PaymentMethod? paymentMethod)
         {
             return paymentMethod switch
@@ -42,34 +41,32 @@ namespace AppForSEII2526.API.Controllers
             }
 
 
-            var user = _context.ApplicationUser.FirstOrDefault(au => au.UserName == itemForCreate.CustomerUserName);
+            var user = _context.ApplicationUser.FirstOrDefault(au => au.UserName == itemForCreate.CustomerUserName || au.Email == itemForCreate.CustomerUserName);
 
             if (user == null)
             {
-                ModelState.AddModelError("UserNotFound", $"Error! Username is not registred");
+                ModelState.AddModelError("UserNotFound", $"Error! Username or email is not registred.");
                 return BadRequest(ValidationProblem(ModelState));
             }
-            //var checkPM = await _context.Set<PaymentMethod>()
-            //    .AnyAsync(pm => pm.Id == itemForCreate.PaymentMethodId && pm.User.Id == user.Id);
 
 
-            //if (!checkPM)
-            //{
-            //    ModelState.AddModelError("PaymentMethod", "Error! The selected payment method is not registered for this user.");
-            //    return BadRequest(ValidationProblem(ModelState));
+            var paymentMethod = await _context.Set<PaymentMethod>().FirstOrDefaultAsync(pm => pm.Id == itemForCreate.PaymentMethodId );
 
-            //}
-
-            var paymentMethod = await _context.Set<PaymentMethod>().FirstOrDefaultAsync(pm => pm.Id == itemForCreate.PaymentMethodId && pm.User.Id == user.Id);
-
-            if (paymentMethod == null || paymentMethod.User.Id != user.Id)
+            if (paymentMethod == null)
             {
                 ModelState.AddModelError("PaymentMethod", "Error! The selected payment method is not registered for this user.");
                 return BadRequest(ValidationProblem(ModelState));
             }
+            //var paymentMethod = await _context.Set<PaymentMethod>().FirstOrDefaultAsync(pm => pm.Id == itemForCreate.PaymentMethodId && pm.User.Id == user.Id);
+
+            //if (paymentMethod == null || paymentMethod.User.Id != user.Id)
+            //{
+            //    ModelState.AddModelError("PaymentMethod", "Error! The selected payment method is not registered for this user.");
+            //    return BadRequest(ValidationProblem(ModelState));
+            //}
             string sentence = "My purchase for";
 
-            if (itemForCreate.Description != "" && !itemForCreate.Description.StartsWith(sentence)) {
+            if (!string.IsNullOrEmpty(itemForCreate.Description) && !itemForCreate.Description.StartsWith(sentence)) {
                 ModelState.AddModelError("Description", "Error! You must start the Description with My purchase for.");
                 return BadRequest(ValidationProblem(ModelState));
             }
@@ -154,7 +151,8 @@ namespace AppForSEII2526.API.Controllers
                 purchase.City,
                 purchase.Country,
                 purchase.Description ?? string.Empty,
-                purchase.PurchaseItems.Select(pi => {
+                purchase.PurchaseItems.Select(pi =>
+                {
                     var item = dbItems[pi.ItemId];
 
                     return new PurchasedItemDTO(
@@ -164,7 +162,10 @@ namespace AppForSEII2526.API.Controllers
                         pi.Amount_bought
                     );
                 }).ToList(),
-                purchase.Total_prices);
+                purchase.Total_prices)
+            {
+                Username = user.UserName
+            };
    
             return CreatedAtAction("GetPurchaseDetails", new { id = purchase.Id }, result);
         }
@@ -184,6 +185,7 @@ namespace AppForSEII2526.API.Controllers
             IList<PurchaseDetailDTO> purchaseDetails = await _context.Purchases
                 .Where(p => p.Id == id)
                 .Include(p => p.PaymentMethod)
+                    .ThenInclude(pm => pm.User)
                 .Include(p => p.PurchaseItems)
                 .ThenInclude(pi => pi.Item)
                 .ThenInclude(pi => pi.Brand)
@@ -199,8 +201,11 @@ namespace AppForSEII2526.API.Controllers
                         pi.Item.Brand.Name ?? string.Empty,
                         pi.Price,
                         pi.Amount_bought)).ToList(),
-                    p.Total_prices))
-                .ToListAsync();
+                    p.Total_prices)
+                {
+                    Username = p.PaymentMethod.User.UserName
+                }
+                ).ToListAsync();
 
             if (purchaseDetails == null || !purchaseDetails.Any())
             {
