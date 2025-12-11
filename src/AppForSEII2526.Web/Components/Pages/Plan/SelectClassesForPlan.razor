@@ -123,7 +123,6 @@
         </div>
     </div>
 </div>
-
 @code {
     private ICollection<AppForSEII2526.Web.API.ClassForPlanDTO> classes;
 
@@ -131,20 +130,25 @@
     private string errors = "";
 
     private string itemTypes { get; set; } = "";
-    private DateTime date { get; set; } = DateTime.Today;
+    // CAMBIO 1: Ahora es DateTime? e inicializa a null (sin fecha por defecto)
+    private DateTime? date { get; set; } = null;
 
-    private DateTime _fromDate = DateTime.Today;
-    private DateTime fromDate
+    // CAMBIO 2: Los campos de respaldo son DateTime? e inicializan a null
+    private DateTime? _fromDate = null;
+    // CAMBIO 3: La propiedad es DateTime?
+    private DateTime? fromDate
     {
-        get { return _fromDate; }
-        set { _fromDate = value; }
+        get => _fromDate;
+        set => _fromDate = value;
     }
 
-    private DateTime _toDate = DateTime.Today.AddDays(7);
-    private DateTime toDate
+    // CAMBIO 4: Los campos de respaldo son DateTime? e inicializan a null
+    private DateTime? _toDate = null;
+    // CAMBIO 5: La propiedad es DateTime?
+    private DateTime? toDate
     {
-        get { return _toDate; }
-        set { _toDate = value; }
+        get => _toDate;
+        set => _toDate = value;
     }
 
     private AppForSEII2526.API.DTOs.ClassesDTOs.PlanForCreateDTO plan => planState.Plan;
@@ -164,22 +168,37 @@
         errors = "";
         try
         {
-            var typesList = string.IsNullOrWhiteSpace(itemTypes)? null: new List<string> { itemTypes };
+            var typesList = string.IsNullOrWhiteSpace(itemTypes)
+                ? null
+                : new List<string> { itemTypes };
 
 
-            var classes2 = await apiclient.GetClassForPlanAsync(typesList, date, fromDate, toDate);
+            DateTimeOffset? dtoDate = date.HasValue
+                ? new DateTimeOffset(date.Value.Date)
+                : null;
+
+            DateTimeOffset? dtoFrom = fromDate.HasValue
+                ? new DateTimeOffset(fromDate.Value.Date)
+                : null;
+
+            DateTimeOffset? dtoTo = toDate.HasValue
+                ? new DateTimeOffset(toDate.Value.Date)
+                : null;
+
+            classes = await apiclient.GetClassForPlanAsync(
+                typesList,
+                dtoDate,
+                dtoFrom,
+                dtoTo
+            );
         }
         catch (ApiException ex)
         {
             logger.LogError($"{DateTime.Now} Error: {ex.Message}");
             if (ex.StatusCode == 400)
-            {
                 errors = $"Bad Request (400): {ex.Message}";
-            }
             else
-            {
                 errors = $"Error connecting to system ({ex.StatusCode}): {ex.Message}";
-            }
         }
         catch (Exception ex)
         {
