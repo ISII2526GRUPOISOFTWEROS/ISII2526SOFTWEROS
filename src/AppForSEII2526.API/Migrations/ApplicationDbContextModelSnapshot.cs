@@ -265,7 +265,7 @@ namespace AppForSEII2526.API.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("ClassId")
+                    b.Property<int>("ClassId")
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
@@ -731,9 +731,13 @@ namespace AppForSEII2526.API.Migrations
 
             modelBuilder.Entity("AppForSEII2526.API.Models.ItemType", b =>
                 {
-                    b.HasOne("AppForSEII2526.API.Models.Class", null)
+                    b.HasOne("AppForSEII2526.API.Models.Class", "Class")
                         .WithMany("TypeItems")
-                        .HasForeignKey("ClassId");
+                        .HasForeignKey("ClassId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Class");
                 });
 
             modelBuilder.Entity("AppForSEII2526.API.Models.PaymentMethod", b =>
