@@ -116,8 +116,7 @@
                                 <InputNumber @bind-Value="item.Quantity" class="form-control" min="1" style="width: 80px;background-color: #fff9db" />
                             <ValidationMessage For="@(() => item.Quantity)" />
                             </td>
-@*                             <td>@item.Quantity</td>
- *@                            <td>@item.Price €</td>
+                           <td>@item.Price €</td>
                             <td>@(item.Price* item.Quantity) €</td>
                     </tr>
                 } 
@@ -162,8 +161,16 @@
             {
                 try
                 {
+                    if (authenticationState is not null)
+                    {
+                        var authState = await authenticationState;
+                        var user = authState.User;
+                        if (user.Identity is not null && user.Identity.IsAuthenticated)
+                        {
+                            purchase.CustomerUserName = user.Identity.Name;
+                        }
+                    }
                     var purchased = await apiclient.CreateItemForPurchaseAsync(purchase);
-                    purchaseStateContainer.PurchaseProcessed();
                     navigation.NavigateTo($"/purchase/detail/?PurchaseId={purchased.Id}");
 
                 }
