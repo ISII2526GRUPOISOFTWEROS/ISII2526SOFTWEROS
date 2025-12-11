@@ -15,7 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <OpenApiReference Include="OpenAPIs\swagger.json" Namespace="AppForSEII2526.Web.API" ClassName="AppForKairosAPIClient">
+    <OpenApiReference Include="OpenAPIs\swagger1.json" Namespace="AppForSEII2526.Web.API" ClassName="AppForKairosAPIClient">
       <SourceUri>https://localhost:7067/swagger/v1/swagger.json</SourceUri>
     </OpenApiReference>
   </ItemGroup>
