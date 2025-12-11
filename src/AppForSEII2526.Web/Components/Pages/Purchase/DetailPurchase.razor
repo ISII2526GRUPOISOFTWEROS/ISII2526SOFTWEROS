@@ -94,49 +94,25 @@ else
 
             if (user is not null)
             {
-                if (user.Identity is not null && user.Identity.IsAuthenticated )
+                if (user.Identity is not null && user.Identity.IsAuthenticated && user.IsInRole("User"))
                 {
-                    if (user.IsInRole("User"))
-                    {
-                        currentUserName = user.Identity.Name;
-
-                    }
+                     currentUserName = user.Identity.Name;
                 }
 
             }
-        }
-
-        if(string.IsNullOrEmpty(currentUserName))
-        {
-            errorMessage = "Error! You are not authorized to see this purchase.";
-            return;
         }
 
         try
         {
-            var purchases = await apiclient.GetPurchaseDetailsAsync(PurchaseId);
-            purchaseDetail = purchases?.FirstOrDefault();
-
-            if(purchaseDetail != null)
-            {
-                bool isAuthorized = string.Equals(purchaseDetail.Username, currentUserName, StringComparison.OrdinalIgnoreCase);
-                if(!isAuthorized)
-                {
-                    purchaseDetail = null;
-                    errorMessage = $"Error! You are not authorized to see this purchase or there is not a purchase with id {PurchaseId}.";
-
-                }
-            }
-            else
-            {
-                errorMessage = $"Error! Purchase with id {PurchaseId} not found.";
-            }
+             var result = await apiclient.GetPurchaseDetailsAsync(PurchaseId);           
+            purchaseDetail = result.FirstOrDefault();
         }
-        catch (Exception ex)
+        catch (ApiException ex)
         {
             purchaseDetail = null;
-            errorMessage = $"Error while retrieving purchase details: {ex.Message}";
-            
+        }
+        if (purchaseDetail == null || purchaseDetail.Username != currentUserName)
+            errorMessage = $"Error! You are not authorized to see this purchase or there is not a purchase with id={PurchaseId}";
         }
 
     }
