@@ -73,11 +73,11 @@
         </div>
         <div class="row mt-4">
             <div class="col d-flex gap-2 justify-content-end">
-                <button type="button" class="btn btn-secondary" @onclick="@(() => navigation.NavigateTo("/"))">
+                <button type="button" id ="buttonCancel"class="btn btn-secondary" @onclick="@(() => navigation.NavigateTo("/"))">
                     Cancel
                 </button>
 
-                <button type="button" class="btn btn-warning" @onclick="ModifyPurchaseItem">
+                <button type="button" id="buttonModify" class="btn btn-warning" @onclick="ModifyPurchaseItem">
                 Modify Items
                 </button>
                 <button class="btn btn-primary" type="submit" id="Submit" disabled ="@(!purchase.PurchaseItems.Any())">

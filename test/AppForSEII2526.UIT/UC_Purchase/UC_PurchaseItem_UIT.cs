@@ -38,7 +38,7 @@ namespace AppForSEII2526.UIT.UC_Purchase
         private const string itemAdd2 = "Add to cart (35 €)";
 
         private const string PurchaseId = "3";
-        private const string quantityToBuy = "3";
+        private const int quantityToBuy = 3;
         private const string totalPrice = "75 €";
         private const string UserEmail = "Adrian.Sevilla@alu.uclm.es";
         private const string UserPM = "Bizum";
@@ -63,17 +63,28 @@ namespace AppForSEII2526.UIT.UC_Purchase
             selectItemsforpurchase_P0.WaitForBeingVisible(By.Id("SelectPurchase"));
             _driver.FindElement(By.Id("SelectPurchase")).Click();
         }
-        [Theory]
+        [Fact]
         [Trait("LevelTesting", "Functional Testing")]
-        [InlineData(PurchaseId,itemName1,itemBrand1, itemPrice1,quantityToBuy, totalPrice, UserEmail, UserPM, UserStreet, UserCity, UserCountry,"")]
-        public void UC8_Scen1_1_1_BasicFlow(string purchaseId,string itemName, string brand, string priceUnit, string quanityBuy, string expecectedTotalPrice, string email, string pM,string street,string city, string country,string description)
+        public void UC8_Scen1_1_1_BasicFlow()
         {
             InitialStepsForPurchaseItem();
-            var address = street + ", " + city + ", " + country;
-            var expectedPurchaseDetails = new List<string[]>
-            {
-                new string[] { purchaseId, email,address,expecectedTotalPrice,description,pM,itemName,brand,quanityBuy,priceUnit }
-            };  
+            var  selectItemPO = new SelectItemsForPurchase_P0(_driver,_output);
+            var createItemPO = new CreatePurchase_P0(_driver, _output);
+            var detailPO = new DetailPurchase_P0(_driver, _output);
+
+            selectItemPO.AddQuantityToItem(itemName1, quantityToBuy);
+            selectItemPO.ClickPurchaseButton();
+            createItemPO.FillingDetails(UserStreet, UserCity, UserCountry,"");
+            createItemPO.SelectPaymentMethod("Bizum");
+            createItemPO.SubmitPurchase();
+            System.Threading.Thread.Sleep(1000);
+
+            Assert.Contains("purchase/detail", _driver.Url);
+            Assert.Contains(UserStreet, detailPO.GetPurchaseAddress());
+            Assert.Contains("Bizum", detailPO.GetPurchasePaymentMethod());
+
+            bool itemFound = detailPO.IsItemInTable(itemName1,quantityToBuy);
+            Assert.True(itemFound);
         }
 
         [Theory]
@@ -88,7 +99,6 @@ namespace AppForSEII2526.UIT.UC_Purchase
                 new string[] {name, brand,description, price, quantity, add }
             };
             selectItemsforpurchase_P0.SearchItems(searchName, searchBrand);
-            selectItemsforpurchase_P0.Se
 
             Assert.True(selectItemsforpurchase_P0.CheckListOfItems(expectedItems));
         }
@@ -110,6 +120,31 @@ namespace AppForSEII2526.UIT.UC_Purchase
 
             Assert.True(selectItemsforpurchase_P0.CheckListOfItems(expectedItems));  
         }
+
+        public static IEnumerable<object[]> GetValidationScenarios()
+        {
+            string validUser = "Pepe.Gomez";
+            string validPM = "Bizum";
+            string validStreet = "Calle de la Universidad";
+            string validCity = "Albacete";
+            string validCountry = "Spain";
+            string validDescription = "";
+            return new List<object[]>
+            {
+                new object[] { "P", validPM, validStreet, validCity, validCountry, validDescription, "The field CustomerUserName must be a string with a minimum length of 10 and a maximum length of 50." },
+                new object[] { validUser, "Paypal", validStreet, validCity, validCountry, validDescription, "Name must have at least 10 characters" },
+                new object[] { validUser, validPM, "C", validCity, validCountry, validDescription, "The field Street must be a string with a minimum length of 3 and a maximum length of 100." },
+                new object[] { validUser, validPM, validStreet, "A", validCountry, validDescription, "The field City must be a string with a minimum length of 3 and a maximum length of 100.\r\n" },
+                new object[] { validUser, validPM, validStreet, validCity, "S", validDescription, "The field Country must be a string with a minimum length of 3 and a maximum length of 100.\r\n" },
+                new object[] { validUser, validPM, validStreet, validCity, validCountry, "Buy", "Name must have at least 10 characters" },
+            }
+
+        }
+
+        [Theory]
+        [Trait("LevelTesting", "Functional Testing")]
+
+
 
     }
 }
