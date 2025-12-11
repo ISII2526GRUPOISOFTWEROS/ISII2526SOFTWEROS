@@ -10,7 +10,7 @@ public class ApplicationUser : IdentityUser {
     {
     }
 
-    public ApplicationUser(string? name, string surname, IList<PaymentMethod> paymentMethods, IList<Incident> incidents, IList<Restock> restocks)
+    public ApplicationUser(string? name, string? surname, IList<PaymentMethod> paymentMethods, IList<Incident> incidents, IList<Restock> restocks)
     {
         Name = name;
         Surname = surname;
