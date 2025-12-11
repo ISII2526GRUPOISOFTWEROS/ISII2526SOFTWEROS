@@ -1,0 +1,160 @@
+﻿@page "/plan/detailsplan/{PlanID:int}"
+@inject AppForKairosAPIClient apiclient
+@inject ILogger<DetailsPlan> logger
+@using Microsoft.AspNetCore.Authorization
+@using AppForSEII2526.Web.API
+@using Microsoft.AspNetCore.Components.Authorization
+@attribute [Authorize]
+
+<h3>Details Plan</h3>
+
+@if (error != "")
+{
+    <div class="alert alert-danger">@error</div>
+}
+else if (plan == null)
+{
+    <p>Loading plan details...</p>
+}
+else
+{
+    <div class="card mb-3">
+        <div class="card-header">
+            <h4>@plan.PlanName</h4>
+        </div>
+        <div class="card-body">
+            <table class="table table-borderless table-sm">
+                <tr>
+                    <th style="width: 200px;">Username</th>
+                    <td>@plan.UserName</td>
+                </tr>
+                <tr>
+                    <th>Description</th>
+                    <td>@plan.Description</td>
+                </tr>
+                <tr>
+                    <th>Created Date</th>
+                    <td>@plan.DateCreated.ToString("dd/MM/yyyy HH:mm:ss")</td>
+                </tr>
+                <tr>
+                    <th>Number of Weeks</th>
+                    <td>@plan.NumberOfWeeks</td>
+                </tr>
+                <tr>
+                    <th>Health Issues</th>
+                    <td>@plan.HealthIssues</td>
+                </tr>
+                <tr>
+                    <th>Total Price</th>
+                    <td>@plan.TotalPrice.ToString("C")</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <h4>Selected Classes</h4>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">Name</th>
+                    <th scope="col">Capacity</th>
+                    <th scope="col">Price</th>
+                    <th scope="col">Date</th>
+                    <th scope="col">Types</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (plan.Classes != null)
+                {
+                    @foreach (var item in plan.Classes)
+                    {
+                        <tr>
+                            <td>@item.Name</td>
+                            <td>@item.Capacity</td>
+                            <td>@item.Price.ToString("C")</td>
+                            <td>@item.Date.ToString("g")</td> 
+                            <td>
+                                @if (item.ItemType != null)
+                                {
+                                    @string.Join(", ", item.ItemType)
+                                }
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+            <tfoot>
+                <tr class="table-primary">
+                    <th scope="row" colspan="2" class="text-end">Total Price</th>
+                    <td colspan="3">@plan.TotalPrice.ToString("C")</td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public int PlanID { get; set; }
+
+    private PlanDetailDTO plan;
+    private string error = "";
+
+    [CascadingParameter]
+    private Task<AuthenticationState>? authenticationState { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        error = "";
+        string currentUserName = "";
+
+        if (authenticationState is not null)
+        {
+            var authState = await authenticationState;
+            var user = authState?.User;
+
+            if (user is not null && user.Identity is not null && user.Identity.IsAuthenticated)
+            {
+                currentUserName = user.Identity.Name ?? "";
+            }
+        }
+
+        try{
+            var response = await apiclient.GetPlanDetailsAsync(PlanID);
+
+            plan = response?.FirstOrDefault();
+
+            if (plan == null)
+            {
+                error = $"Plan with ID {PlanID} not found.";
+            }
+            else if (!string.IsNullOrEmpty(currentUserName) && !plan.UserName.Equals(currentUserName, StringComparison.OrdinalIgnoreCase))
+            {
+                if (!string.Equals(plan.UserName, currentUserName, StringComparison.OrdinalIgnoreCase))
+                {
+                    error = "Error! You are not authorized to see this plan.";
+                    plan = null;
+                }
+            }
+        }
+        catch (ApiException ex)
+        {
+            logger.LogError($"API Error: {ex.Message}");
+            if (ex.StatusCode == 404)
+            {
+                error = "Plan not found.";
+            }
+            else
+            {
+                error = "Error loading plan details.";
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError($"Unexpected Error: {ex.Message}");
+            error = "An unexpected error occurred.";
+        }
+    }
+}
+

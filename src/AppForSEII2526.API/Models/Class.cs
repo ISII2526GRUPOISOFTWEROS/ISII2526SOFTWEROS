@@ -4,14 +4,15 @@ namespace AppForSEII2526.API.Models
 {
     public class Class
     {
-       
+        internal string itemTypes;
+
         public Class()
         {
             PlanItems = new List<PlanItem>();
             TypeItems = new List<ItemType>();
         }
 
-        public Class(int id, int capacity, string name, decimal price, DateTime date, IList<PlanItem> planItems, ICollection<ItemType> typeItems)
+        public Class(int id, int capacity, string name, decimal price, DateTime date, IList<PlanItem> planItems)
         {
             Id = id;
             Capacity = capacity;
@@ -19,7 +20,6 @@ namespace AppForSEII2526.API.Models
             Price = price;
             Date = date;
             PlanItems = planItems;
-            TypeItems = typeItems;
         }
 
         public int Id { get; set; }
