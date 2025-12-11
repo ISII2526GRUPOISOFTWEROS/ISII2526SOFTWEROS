@@ -417,3 +417,4 @@ FodyWeavers.xsd
 *.msm
 *.msp
 /src/AppForSEII2526.API/Models/PaymentMethod.cs
+/src/AppForSEII2526.Web/Components/Layout/NavMenu.razor
