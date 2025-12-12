@@ -1,18 +1,17 @@
 ﻿using Humanizer.Localisation;
+using Microsoft.EntityFrameworkCore;
 
 namespace AppForSEII2526.API.Models
 {
     public class Class
     {
-        internal string itemTypes;
 
         public Class()
         {
             PlanItems = new List<PlanItem>();
-            TypeItems = new List<ItemType>();
         }
 
-        public Class(int id, int capacity, string name, decimal price, DateTime date, IList<PlanItem> planItems)
+        public Class(int id, int capacity, string name, decimal price, DateTime date, IList<PlanItem> planItems, int itemTypeId)
         {
             Id = id;
             Capacity = capacity;
@@ -20,6 +19,7 @@ namespace AppForSEII2526.API.Models
             Price = price;
             Date = date;
             PlanItems = planItems;
+            ItemTypeId = itemTypeId;
         }
 
         public int Id { get; set; }
@@ -31,6 +31,7 @@ namespace AppForSEII2526.API.Models
 
         public IList<PlanItem> PlanItems { get; set; }
 
-        public ICollection<ItemType> TypeItems { get; set; } = new List<ItemType>();
+        public int ItemTypeId { get; set; }
+        public ItemType? ItemType { get; set; }
     }
 }

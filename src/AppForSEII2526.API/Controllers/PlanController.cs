@@ -84,7 +84,7 @@ namespace AppForSEII2526.API.Controllers
 
             var selectedClassIds = planForCreate.SelectedClasses.Select(c => c.Id).ToList();
             var dbClasses = await _context.Classes
-                .Include(c => c.TypeItems)
+                .Include(c => c.ItemType)
                 .Where(c => selectedClassIds.Contains(c.Id))
                 .ToDictionaryAsync(c => c.Id);
 
@@ -153,7 +153,7 @@ namespace AppForSEII2526.API.Controllers
                         Name = dbClass.Name,
                         Price = dbClass.Price,
                         Date = dbClass.Date,
-                        Types = dbClass.TypeItems.Select(t => t.Name).ToList(),
+                        Types = new List<string> { dbClass.ItemType.Name },
                         Goal = pi.Goal
                     };
                 }).ToList()
@@ -162,9 +162,9 @@ namespace AppForSEII2526.API.Controllers
             return CreatedAtAction("GetPlanDetails", new { id = plan.Id }, response);
         }
 
-            //details
+        //details
 
-            [HttpGet]
+        [HttpGet]
         [Route("[action]")]
         [ProducesResponseType(typeof(IList<PlanDetailDTO>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
@@ -181,7 +181,7 @@ namespace AppForSEII2526.API.Controllers
             .Include(p => p.User)
             .Include(p => p.PlanItems)
             .ThenInclude(pc => pc.Class)
-            .ThenInclude(c => c.TypeItems)
+            .ThenInclude(c => c.ItemType)
                    .Select(p => new PlanDetailDTO(
                     p.Id,
                     p.User.UserName,
@@ -197,7 +197,7 @@ namespace AppForSEII2526.API.Controllers
                         pc.Class.Date,
                         pc.Class.Name, // ?? string.Empty,
                         pc.Class.Capacity,
-                        pc.Class.TypeItems.Select(t => t.Name).ToList()
+                        new List<string> { pc.Class.ItemType.Name }
                     )).ToList()
                 )).FirstOrDefaultAsync();
 

@@ -20,7 +20,7 @@ namespace AppForSEII2526.UT.PlanController_test
             var user = new ApplicationUser()
             {
                 Id = "1",
-                UserName =_userName,
+                UserName = _userName,
                 Surname = _surname,
                 Email = "test@test.com",
             };
@@ -34,8 +34,8 @@ namespace AppForSEII2526.UT.PlanController_test
 
             var classes = new List<Class>()
             {
-                new Class { Id = 1, Name = "Morning Yoga", Price = 10.0m, Date = DateTime.Today.AddDays(1), TypeItems = new List<ItemType> { types[0] } },
-                new Class { Id = 2, Name = "Evening Pilates", Price = 15.0m, Date = DateTime.Today.AddDays(2), TypeItems = new List<ItemType> { types[1] } }
+                new Class { Id = 1, Name = "Morning Yoga", Price = 10.0m, Date = DateTime.Today.AddDays(1), ItemType = types[0] },
+                new Class { Id = 2, Name = "Evening Pilates", Price = 15.0m, Date = DateTime.Today.AddDays(2), ItemType = types[1] }
             };
 
             _context.AddRange(types);
@@ -89,7 +89,7 @@ namespace AppForSEII2526.UT.PlanController_test
             var controller = new PlanController(_context, logger);
             var expectedPlan = new PlanDetailDTO(
                 id: 1,
-                userName:_userName,
+                userName: _userName,
                 dateCreated: _context.Plans.First().CreatedDate,
                 totalPrice: 0m,
                 planName: "My Weekly Plan",
@@ -126,3 +126,4 @@ namespace AppForSEII2526.UT.PlanController_test
         }
     }
 }
+
