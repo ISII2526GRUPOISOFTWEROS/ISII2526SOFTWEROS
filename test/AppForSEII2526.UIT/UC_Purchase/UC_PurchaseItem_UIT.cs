@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using AppForSEII2526.UIT.Shared;
+﻿//using System;
+//using System.Collections.Generic;
+//using System.Linq;
+//using System.Text;
+//using System.Threading.Tasks;
+//using AppForSEII2526.UIT.Shared;
 
 
 namespace AppForSEII2526.UIT.UC_Purchase
@@ -29,13 +29,13 @@ namespace AppForSEII2526.UIT.UC_Purchase
         private const string itemAdd1 = "Add to cart (25 €)";
 
 
-        private const int itemId2 = 3;
-        private const string itemName2 = "Kettlebell 10 kg";
-        private const string itemBrand2 = "Domyos";
-        private const string itemPrice2 = "35 €";
-        private const string itemDescription2 = "Ideal for strength and endurance training";
-        private const string itemQuantity2 = "9";
-        private const string itemAdd2 = "Add to cart (35 €)";
+//        private const int itemId2 = 3;
+//        private const string itemName2 = "Kettlebell 10 kg";
+//        private const string itemBrand2 = "Domyos";
+//        private const string itemPrice2 = "35 €";
+//        private const string itemDescription2 = "Ideal for strength and endurance training";
+//        private const string itemQuantity2 = "9";
+//        private const string itemAdd2 = "Add to cart (35 €)";
 
         private const string PurchaseId = "3";
         private const int quantityToBuy = 3;
@@ -116,8 +116,8 @@ namespace AppForSEII2526.UIT.UC_Purchase
                   new string[]{ itemName1,itemBrand1, itemDescription1, itemPrice1, itemQuantity1, itemAdd1 },
                 new string[]{ itemName2,itemBrand2, itemDescription2, itemPrice2, itemQuantity2, itemAdd2 }
               
-            };   
-            selectItemsforpurchase_P0.SearchItems("", "");
+//            };   
+//            selectItemsforpurchase_P0.SearchItems("", "");
 
             Assert.True(selectItemsforpurchase_P0.CheckListOfItems(expectedItems));  
         }

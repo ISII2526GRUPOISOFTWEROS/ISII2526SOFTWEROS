@@ -22,9 +22,7 @@
         public string? Name { get; set; }
 
         public IList<Item> Items { get; set; }
-
-
-
+        public ICollection<Class> Classes { get; set; } = new List<Class>();
 
     }
 }
