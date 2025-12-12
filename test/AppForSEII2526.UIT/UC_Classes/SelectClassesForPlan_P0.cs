@@ -7,7 +7,7 @@ using OpenQA.Selenium.Support.UI;
 
 namespace AppForSEII2526.UIT.UC_Classes
 {
-    public class SelectClassesForPlanPO : PageObject
+    public class SelectClassesForPlan_P0 : PageObject
     {
         By inputItemType = By.Id("inputTitle");
         By inputDate = By.Id("date");
@@ -20,7 +20,7 @@ namespace AppForSEII2526.UIT.UC_Classes
         By buttonProceedToPlan = By.XPath("//a[contains(text(),'Proceed to Plan')]");
         By errorAlert = By.XPath("//div[contains(@class,'alert-danger')]");
 
-        public SelectClassesForPlanPO(IWebDriver driver, ITestOutputHelper output) : base(driver, output)
+        public SelectClassesForPlan_P0(IWebDriver driver, ITestOutputHelper output) : base(driver, output)
         {
         }
 

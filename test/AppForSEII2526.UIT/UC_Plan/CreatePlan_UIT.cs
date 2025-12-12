@@ -14,7 +14,7 @@ namespace AppForSEII2526.UIT.UC_Plan
         private void SelectClassesForPlan()
         {
             _driver.Navigate().GoToUrl(_URI + "plan/selectclassesforplan");
-            var selectPage = new SelectClassesForPlanPO(_driver, _output);
+            var selectPage = new SelectClassesForPlan_P0(_driver, _output);
             Thread.Sleep(2000);
 
             if (selectPage.GetAvailableClassesCount() == 0)
@@ -34,7 +34,7 @@ namespace AppForSEII2526.UIT.UC_Plan
             // Arrange
             Perform_login("elena.navarro@uclm.es", "Elena.1234");
             SelectClassesForPlan();
-            var page = new CreatePlanPO(_driver, _output);
+            var page = new CreatePlan_P0(_driver, _output);
 
             // Act - Step 5-6: Fill mandatory data and save
             page.FillPlanData("My Fitness Plan", "A comprehensive fitness plan", 4, 1);
@@ -60,7 +60,7 @@ namespace AppForSEII2526.UIT.UC_Plan
             // Arrange
             Perform_login("elena.navarro@uclm.es", "Elena.1234");
             SelectClassesForPlan();
-            var page = new CreatePlanPO(_driver, _output);
+            var page = new CreatePlan_P0(_driver, _output);
 
             // Act - Alternative Flow 3: User selects to modify the plan
             page.ClickModifyClasses();
@@ -77,7 +77,7 @@ namespace AppForSEII2526.UIT.UC_Plan
             // Arrange
             Perform_login("elena.navarro@uclm.es", "Elena.1234");
             SelectClassesForPlan();
-            var page = new CreatePlanPO(_driver, _output);
+            var page = new CreatePlan_P0(_driver, _output);
 
             // Remove all classes
             page.RemoveClass("Morning Yoga");
@@ -101,7 +101,7 @@ namespace AppForSEII2526.UIT.UC_Plan
             // Arrange
             Perform_login("elena.navarro@uclm.es", "Elena.1234");
             SelectClassesForPlan();
-            var page = new CreatePlanPO(_driver, _output);
+            var page = new CreatePlan_P0(_driver, _output);
 
             // Act - Alternative Flow 5: Try to create plan without mandatory fields
             page.FillPlanData("", "", 0, 0); // Empty name and invalid weeks
@@ -120,7 +120,7 @@ namespace AppForSEII2526.UIT.UC_Plan
             // Arrange
             Perform_login("elena.navarro@uclm.es", "Elena.1234");
             SelectClassesForPlan();
-            var page = new CreatePlanPO(_driver, _output);
+            var page = new CreatePlan_P0(_driver, _output);
 
             // Act - Fill with invalid weeks (0)
             page.FillPlanData("Test Plan", "", 0, 1);
@@ -139,7 +139,7 @@ namespace AppForSEII2526.UIT.UC_Plan
             // Arrange
             Perform_login("elena.navarro@uclm.es", "Elena.1234");
             SelectClassesForPlan();
-            var page = new CreatePlanPO(_driver, _output);
+            var page = new CreatePlan_P0(_driver, _output);
 
             // Act - Fill only mandatory fields (Description is optional)
             page.FillPlanData("Minimal Plan", "", 1, 1);
@@ -157,7 +157,7 @@ namespace AppForSEII2526.UIT.UC_Plan
             // Arrange
             Perform_login("elena.navarro@uclm.es", "Elena.1234");
             _driver.Navigate().GoToUrl(_URI + "plan/selectclassesforplan");
-            var selectPage = new SelectClassesForPlanPO(_driver, _output);
+            var selectPage = new SelectClassesForPlan_P0(_driver, _output);
             Thread.Sleep(2000);
 
             if (selectPage.GetAvailableClassesCount() < 2)
@@ -171,7 +171,7 @@ namespace AppForSEII2526.UIT.UC_Plan
             selectPage.ClickProceedToPlan();
             Thread.Sleep(1000);
 
-            var page = new CreatePlanPO(_driver, _output);
+            var page = new CreatePlan_P0(_driver, _output);
 
             // Assert - Total price should be sum of selected classes
             var totalPrice = page.GetTotalPrice();
@@ -186,7 +186,7 @@ namespace AppForSEII2526.UIT.UC_Plan
             // Arrange
             Perform_login("elena.navarro@uclm.es", "Elena.1234");
             _driver.Navigate().GoToUrl(_URI + "plan/selectclassesforplan");
-            var selectPage = new SelectClassesForPlanPO(_driver, _output);
+            var selectPage = new SelectClassesForPlan_P0(_driver, _output);
             Thread.Sleep(2000);
 
             if (selectPage.GetAvailableClassesCount() < 2)
@@ -200,7 +200,7 @@ namespace AppForSEII2526.UIT.UC_Plan
             selectPage.ClickProceedToPlan();
             Thread.Sleep(1000);
 
-            var page = new CreatePlanPO(_driver, _output);
+            var page = new CreatePlan_P0(_driver, _output);
             var initialCount = page.GetSelectedClassesCount();
             var initialPrice = page.GetTotalPrice();
 
@@ -218,7 +218,7 @@ namespace AppForSEII2526.UIT.UC_Plan
             // Arrange
             Perform_login("elena.navarro@uclm.es", "Elena.1234");
             SelectClassesForPlan();
-            var page = new CreatePlanPO(_driver, _output);
+            var page = new CreatePlan_P0(_driver, _output);
 
             // Act - Alternative Flow 7: Try to create plan with a class that has no capacity
             // Note: This test assumes that the backend will validate capacity when creating the plan
@@ -254,7 +254,7 @@ namespace AppForSEII2526.UIT.UC_Plan
             // Arrange
             Perform_login("elena.navarro@uclm.es", "Elena.1234");
             SelectClassesForPlan();
-            var page = new CreatePlanPO(_driver, _output);
+            var page = new CreatePlan_P0(_driver, _output);
 
             page.FillPlanData("Test Plan", "", 2, 1);
 

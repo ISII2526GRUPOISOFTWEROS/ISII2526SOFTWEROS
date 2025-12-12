@@ -16,7 +16,7 @@ namespace AppForSEII2526.UIT.UC_Classes
             // Arrange
             Perform_login("elena.navarro@uclm.es", "Elena.1234");
             _driver.Navigate().GoToUrl(_URI + "plan/selectclassesforplan");
-            var page = new SelectClassesForPlanPO(_driver, _output);
+            var page = new SelectClassesForPlan_P0(_driver, _output);
 
             // Act - Step 2: System shows list of classes available for next week
             Thread.Sleep(2000);
@@ -33,7 +33,7 @@ namespace AppForSEII2526.UIT.UC_Classes
             // Arrange
             Perform_login("elena.navarro@uclm.es", "Elena.1234");
             _driver.Navigate().GoToUrl(_URI + "plan/selectclassesforplan");
-            var page = new SelectClassesForPlanPO(_driver, _output);
+            var page = new SelectClassesForPlan_P0(_driver, _output);
             Thread.Sleep(2000);
 
             // Assert - Alternative Flow 4: Should show "No classes selected" message
@@ -52,7 +52,7 @@ namespace AppForSEII2526.UIT.UC_Classes
             // Arrange
             Perform_login("elena.navarro@uclm.es", "Elena.1234");
             _driver.Navigate().GoToUrl(_URI + "plan/selectclassesforplan");
-            var page = new SelectClassesForPlanPO(_driver, _output);
+            var page = new SelectClassesForPlan_P0(_driver, _output);
             Thread.Sleep(2000);
 
             if (page.GetAvailableClassesCount() == 0)
@@ -77,7 +77,7 @@ namespace AppForSEII2526.UIT.UC_Classes
             // Arrange
             Perform_login("elena.navarro@uclm.es", "Elena.1234");
             _driver.Navigate().GoToUrl(_URI + "plan/selectclassesforplan");
-            var page = new SelectClassesForPlanPO(_driver, _output);
+            var page = new SelectClassesForPlan_P0(_driver, _output);
             Thread.Sleep(2000);
 
             // Act - Filter with criteria that returns no results
@@ -94,7 +94,7 @@ namespace AppForSEII2526.UIT.UC_Classes
             // Arrange
             Perform_login("elena.navarro@uclm.es", "Elena.1234");
             _driver.Navigate().GoToUrl(_URI + "plan/selectclassesforplan");
-            var page = new SelectClassesForPlanPO(_driver, _output);
+            var page = new SelectClassesForPlan_P0(_driver, _output);
             Thread.Sleep(2000);
 
             // Act - Alternative Flow 1: Filter by type
@@ -112,7 +112,7 @@ namespace AppForSEII2526.UIT.UC_Classes
             // Arrange
             Perform_login("elena.navarro@uclm.es", "Elena.1234");
             _driver.Navigate().GoToUrl(_URI + "plan/selectclassesforplan");
-            var page = new SelectClassesForPlanPO(_driver, _output);
+            var page = new SelectClassesForPlan_P0(_driver, _output);
             Thread.Sleep(2000);
 
             // Act - Alternative Flow 1: Filter by date range
@@ -132,7 +132,7 @@ namespace AppForSEII2526.UIT.UC_Classes
             // Arrange
             Perform_login("elena.navarro@uclm.es", "Elena.1234");
             _driver.Navigate().GoToUrl(_URI + "plan/selectclassesforplan");
-            var page = new SelectClassesForPlanPO(_driver, _output);
+            var page = new SelectClassesForPlan_P0(_driver, _output);
             Thread.Sleep(2000);
 
             // Act - Alternative Flow 2: Select date before today

@@ -7,7 +7,7 @@ using OpenQA.Selenium.Support.UI;
 
 namespace AppForSEII2526.UIT.UC_Plan
 {
-    public class CreatePlanPO : PageObject
+    public class CreatePlan_P0 : PageObject
     {
         By inputPlanName = By.XPath("//label[contains(text(),'Plan Name')]/following-sibling::input");
         By inputDescription = By.XPath("//label[contains(text(),'Description')]/following-sibling::input");
@@ -22,7 +22,7 @@ namespace AppForSEII2526.UIT.UC_Plan
         By buttonDialogSave = By.XPath("//button[contains(text(),'Save') or @id='Button_DialogOK']");
         By buttonDialogCancel = By.XPath("//button[contains(text(),'Cancel') or contains(text(),'Not')]");
 
-        public CreatePlanPO(IWebDriver driver, ITestOutputHelper output) : base(driver, output)
+        public CreatePlan_P0(IWebDriver driver, ITestOutputHelper output) : base(driver, output)
         {
         }
 
