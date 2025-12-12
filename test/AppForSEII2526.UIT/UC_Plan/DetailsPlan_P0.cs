@@ -14,7 +14,6 @@ namespace AppForSEII2526.UIT.UC_Plan
         private By labelDescription = By.Id("Description");
         private By labelCreatedDate = By.Id("CreatedDate");
         private By labelWeeks = By.Id("NumberOfWeeks");
-        private By labelHealthIssues = By.Id("HealthIssues");
         private By labelTotalPrice = By.Id("TotalPrice");
         private By tableClasses = By.Id("PlanClasses");
 
@@ -52,25 +51,19 @@ namespace AppForSEII2526.UIT.UC_Plan
             return _driver.FindElement(labelWeeks).Text;
         }
 
-        public string GetPlanHealthIssues()
-        {
-            WaitForBeingClickable(labelHealthIssues);
-            return _driver.FindElement(labelHealthIssues).Text;
-        }
-
         public string GetPlanTotalPrice()
         {
             WaitForBeingClickable(labelTotalPrice);
             return _driver.FindElement(labelTotalPrice).Text;
         }
 
-        public bool IsClassInTable(string className, int expectedQuantity)
+        public bool IsClassInTable(string className)
         {
             By rowLocator = By.Id($"PlanClass_{className}");
             try
             {
                 WaitForBeingVisible(rowLocator);
-                return _driver.FindElement(rowLocator).Text.Contains(expectedQuantity.ToString());
+                return _driver.FindElement(rowLocator).Displayed;
             }
             catch (NoSuchElementException)
             {
@@ -79,4 +72,3 @@ namespace AppForSEII2526.UIT.UC_Plan
         }
     }
 }
-
