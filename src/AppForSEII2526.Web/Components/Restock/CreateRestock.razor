@@ -29,6 +29,7 @@
                 <label for="Title">Restock Title *</label>
             </div>
         </div>
+
         <div class="col-md-6">
             <div class="form-floating mb-3">
                 <InputText @bind-Value="restock.DeliveryAddress" class="form-control" id="DeliveryAddress" placeholder="Address" />
@@ -54,16 +55,18 @@
                 <label for="ExpectedDate">Expected Date</label>
             </div>
         </div>
-        <div class="col-md-4">
-            @* Read-only info about the responsible user *@
+
+
+        @*this button will be used to ask the user if he want to proceed to restock the items*@
+        <div class="col-md-4">         
             <div class="form-floating mb-3">
-                <input value="@restock.RestockResponsible" class="form-control" id="Responsible" disabled />
+                <input value="@restock.RestockResponsible" class="form-control" id="Responsible" />
                 <label for="Responsible">Restock Responsible</label>
             </div>
         </div>
+
         <div class="col-md-4">
-            <div class="form-floating">
-                @* this button will be used to ask the user if they want to proceed *@
+            <div class="form-floating">            
                 <button class="btn btn-primary w-100 h-100" type="submit" id="Submit" disabled="@submitButtonDisabled">
                     Confirm Restock
                 </button>
@@ -186,16 +189,20 @@
                 {
                     messageError = $"Error {apiexception.StatusCode}: {apiexception.Message}";
                 }
-                catch (Exception ex)
-                {
-                    messageError = "Error while processing your request: " + ex.Message;
-                }
+                
             }
         }
     }
 
     protected override async Task OnInitializedAsync()
     {
+
+        //if the date is the defalut, intialiazed to the current date
+        if (restock.RestockDate == default)
+        {
+            restock.RestockDate = DateTime.Now;
+        }
+
         // Authentication handling to get the Responsible User
         if (authenticationState is not null)
         {
@@ -209,9 +216,10 @@
         }
 
         // Default initializations to avoid nulls
-        restock.Title = restock.Title == null ? "" : restock.RestockResponsible;
+        restock.Title = restock.Title == null ? "" : restock.Title;
         restock.DeliveryAddress = restock.DeliveryAddress == null ? "" : restock.DeliveryAddress;
-        restock.Description = restock.Description == null ? "" : restock.Description; // Helper to pass validation
+        restock.Description = restock.Description == null ? "" : restock.Description; // necessary to pass a condition
+        restock.RestockResponsible = restock.RestockResponsible == null ? "" : restock.RestockResponsible;
 
     }
 
