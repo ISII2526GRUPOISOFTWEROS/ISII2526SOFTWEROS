@@ -1,0 +1,102 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using AppForSEII2526.UIT.Shared;
+using AppForSEII2526.UIT.UC_Restock;
+
+
+namespace AppForSEII2526.UIT.UC_Restock
+{
+    public class UC_RestockItem_UIT : UC_UIT
+    {
+        private SelectItemsForRestock_P0 selectItemsForRestock_P0;
+        private const int itemId1 = 2;
+        private const string itemName1 = "Foam Roller";
+        private const string itemBrand1 = "Adidas";
+        private const string itemPrice1 = "25 €";
+        private const string itemDescription1 = "Foam roller for muscle recovery and massage";
+        private const string itemQuantity1 = "9";
+        private const string itemAdd1 = "Add to cart (25 €)";
+
+
+        private const int itemId2 = 3;
+        private const string itemName2 = "Kettlebell 10 kg";
+        private const string itemBrand2 = "Domyos";
+        private const string itemPrice2 = "35 €";
+        private const string itemDescription2 = "Ideal for strength and endurance training";
+        private const string itemQuantity2 = "9";
+        private const string itemAdd2 = "Add to cart (35 €)";
+
+        private const int itemId3 = 1;
+        private const string itemName3 = "Resistance band set";
+        private const string itemBrand3 = "Nike";
+        private const string itemPrice3 = "22 €";
+        private const string itemDescription3 = "Set of bands";
+        private const string itemQuantity3 = "9";
+        private const string itemAdd3 = "Add to cart (22 €)";
+
+
+
+        public UC_RestockItem_UIT(ITestOutputHelper output) : base(output)
+        {
+            selectItemsForRestock_P0 = new SelectItemsForRestock_P0(_driver, _output);
+        }
+        private void Precondition_performance_login()
+        {
+            Perform_login("adriansevillajimenez@gmail.com", "Adrian123!");
+        }
+        private void InitialStepsForPurchaseItem()
+        {
+            Precondition_performance_login();
+            selectItemsForRestock_P0.WaitForBeingVisible(By.Id("SelectPurchase"));
+            _driver.FindElement(By.Id("SelectPurchase")).Click();
+        }
+        [Fact]
+        [Trait("LevelTesting", "Functional Testing")]
+        public void UC8_Scen3_1_Filtering()
+        {
+            InitialStepsForPurchaseItem();
+            var expectedItems = new List<string[]>
+            {
+                new string[] {itemName1, itemBrand1,itemDescription1, itemPrice1, itemQuantity1, itemAdd1}
+            };
+            selectItemsForRestock_P0.SearchItems("Foam Roller", "");
+            Assert.False(selectItemsForRestock_P0.CheckListOfItems(expectedItems));
+        }
+        [Theory]
+        [Trait("LevelTesting", "Functional Testing")]
+        [InlineData(itemName1, itemBrand1, itemDescription1, itemPrice1, itemQuantity1, itemAdd1, "Foam", "Adidas")]
+        public void UC8_Scen3_2_Filtering(string name, string brand, string description, string price, string quantity, string add, string searchName, string searchBrand)
+        {
+            InitialStepsForPurchaseItem();
+            var expectedItems = new List<string[]>
+            {
+                new string[] {name, brand,description, price, quantity, add }
+            };
+            selectItemsForRestock_P0.SearchItems(searchName, searchBrand);
+
+            Assert.False(selectItemsForRestock_P0.CheckListOfItems(expectedItems));
+        }
+
+        //Testear no items available in the item1 
+        [Fact(Skip = "first run the dto.Items")]
+        //[Fact]
+        [Trait("LevelTesting", "Functional Testing")]
+        public void UC_NoItemsAvailable()
+        {
+            InitialStepsForPurchaseItem();
+            var expectedItems = new List<string[]>
+            {
+                  new string[]{ itemName1,itemBrand1, itemDescription1, itemPrice1, itemQuantity1, itemAdd1 },
+                new string[]{ itemName2,itemBrand2, itemDescription2, itemPrice2, itemQuantity2, itemAdd2 }
+
+            };
+            selectItemsForRestock_P0.SearchItems("", "");
+
+            Assert.False(selectItemsForRestock_P0.CheckListOfItems(expectedItems));
+        }
+
+    }
+}
