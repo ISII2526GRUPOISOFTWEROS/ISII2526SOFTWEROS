@@ -86,7 +86,7 @@
             @foreach (RestockItemDTO item in restock.RestockItems)
             {
                 <div class="row mb-2">
-                    <button type="button" class="btn btn-light" id="removeItem_@item.ItemName" 
+                    <button type="button" class="btn btn-light" id="removeItem_@item.ItemId" 
                     @onclick="@(() => RemoveRestockItem(item))"> x @item.ItemName
                     </button>
                 </div>

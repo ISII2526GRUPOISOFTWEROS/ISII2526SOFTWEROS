@@ -1,0 +1,78 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace AppForSEII2526.UIT.UC_Restock
+{
+    public class CreateRestock_PO: PageObject
+    {
+        By inputTitle = By.Id("Title");
+        By inputDeliveryAddress = By.Id("DeliveryAddress");
+        By inputDescription = By.Id("Description");
+        By inputExpectedDate = By.Id("ExpectedDate");
+        By inputResponsible = By.Id("Responsible");
+        By buttonSubmit = By.Id("Submit");
+        By buttonModifyItems = By.Id("ModifyItems");
+        By tableRestockItems = By.Id("TableOfRestockItems");
+        By errorBox = By.Id("ErrorsShown");
+
+        public CreateRestock_PO(IWebDriver driver, ITestOutputHelper output)
+            : base(driver, output)
+        {
+        }
+
+        public void FillForm(string title, string address, string description, string restockResponsible)
+        {
+            WaitForBeingClickable(inputTitle);
+            _driver.FindElement(inputTitle).Clear();
+            _driver.FindElement(inputTitle).SendKeys(title);
+
+            WaitForBeingClickable(inputDeliveryAddress);
+            _driver.FindElement(inputDeliveryAddress).Clear();
+            _driver.FindElement(inputDeliveryAddress).SendKeys(address);
+
+            WaitForBeingClickable(inputDescription);
+            _driver.FindElement(inputDescription).Clear();
+            _driver.FindElement(inputDescription).SendKeys(description);
+
+            WaitForBeingClickable(inputResponsible);
+            _driver.FindElement(inputDescription).Clear();
+            _driver.FindElement(inputDescription).SendKeys(restockResponsible);
+        }
+
+        public void Submit()
+        {
+            WaitForBeingClickable(buttonSubmit);
+            _driver.FindElement(buttonSubmit).Click();
+            Thread.Sleep(300);
+        }
+
+        public void OpenModifyItems()
+        {
+            WaitForBeingClickable(buttonModifyItems);
+            _driver.FindElement(buttonModifyItems).Click();
+            Thread.Sleep(300);
+        }
+
+        public bool HasErrors()
+        {
+            try
+            {
+                var text = _driver.FindElement(errorBox).Text;
+                return !string.IsNullOrWhiteSpace(text);
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public bool TableHasItem(string itemName)
+        {
+            var row = By.Id($"ItemData_{itemName}");
+            return true;
+        }
+    }
+}
