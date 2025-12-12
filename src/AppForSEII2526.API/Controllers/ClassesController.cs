@@ -49,28 +49,28 @@ namespace AppForSEII2526.API.Controllers
             try
             {
                 var query = _context.Classes
-                    .Include(c => c.TypeItems)
+                    .Include(c => c.ItemType)
                     .Where(c => c.Capacity > 0)
                     .AsQueryable();
 
-               
+
                 if (itemTypes != null && itemTypes.Any())
                 {
                     var normalized = itemTypes.Select(t => t.ToLower()).ToList();
-                    query = query.Where(c => c.TypeItems.Any(t => t.Name != null && normalized.Contains(t.Name.ToLower())));
+                    query = query.Where(c => c.ItemType.Name != null && normalized.Contains(c.ItemType.Name.ToLower()));
                 }
 
                 if (date.HasValue)
                 {
                     var start = date.Value;
-                    var end = start.AddSeconds(1); 
+                    var end = start.AddSeconds(1);
                     query = query.Where(c => c.Date >= start && c.Date < end);
                 }
 
                 if (fromDate.HasValue && toDate.HasValue)
                 {
                     var start = fromDate.Value.Date;
-                    var end = toDate.Value.Date.AddDays(1); 
+                    var end = toDate.Value.Date.AddDays(1);
                     query = query.Where(c => c.Date >= start && c.Date < end);
                 }
 
@@ -89,18 +89,18 @@ namespace AppForSEII2526.API.Controllers
                         c.Date,
                         c.Name,
                         c.Capacity,
-                        c.TypeItems.Select(t => t.Name).ToList()))
+                        new List<string> { c.ItemType.Name ?? "Unknown" }))
                     .ToListAsync();
 
                 if (!classes.Any())
-                    return BadRequest("There are no classes available.");
+                    return Ok("There are no classes available.");
 
                 return Ok(classes);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error getting classes for plan");
-                return BadRequest("There are no classes available.");
+                return Ok("There are no classes available.");
             }
         }
     }

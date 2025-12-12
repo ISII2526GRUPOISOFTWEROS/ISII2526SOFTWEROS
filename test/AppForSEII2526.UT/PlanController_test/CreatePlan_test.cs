@@ -40,8 +40,8 @@ namespace AppForSEII2526.UT.PlanController_test
 
             var classes = new List<Class>()
             {
-                new Class { Id = 1, Name = "Morning Yoga", Price = 10.0m, Date = DateTime.Today.AddDays(1), TypeItems = new List<ItemType> { types[0] } },
-                new Class { Id = 2, Name = "Evening Pilates", Price = 15.0m, Date = DateTime.Today.AddDays(2), TypeItems = new List<ItemType> { types[1] } }
+                new Class { Id = 1, Name = "Morning Yoga", Price = 10.0m, Date = DateTime.Today.AddDays(1), ItemType = types[0] },
+                new Class { Id = 2, Name = "Evening Pilates", Price = 15.0m, Date = DateTime.Today.AddDays(2), ItemType = types[1] }
             };
 
             _context.AddRange(types);
@@ -82,7 +82,7 @@ namespace AppForSEII2526.UT.PlanController_test
 
             var planNoClasses = new PlanForCreateDTO
             {
-                UserName =_userName,
+                UserName = _userName,
                 Name = "Plan 2",
                 Weeks = 4,
                 PaymentMethodId = 1,
@@ -169,7 +169,7 @@ namespace AppForSEII2526.UT.PlanController_test
                 Name = class1.Name,
                 Price = class1.Price,
                 Date = class1.Date,
-                ItemType = class1.TypeItems.Select(t => t.Name).ToList()
+                ItemType = new List<string> { class1.ItemType.Name }
             },
             new ClassSelectionDTO
             {
@@ -177,7 +177,7 @@ namespace AppForSEII2526.UT.PlanController_test
                 Name = class2.Name,
                 Price = class2.Price,
                 Date = class2.Date,
-                ItemType = class2.TypeItems.Select(t => t.Name).ToList()
+                ItemType = new List<string> { class2.ItemType.Name }
             }
         }
             };
@@ -196,3 +196,4 @@ namespace AppForSEII2526.UT.PlanController_test
         }
     }
 }
+
