@@ -54,5 +54,11 @@ namespace AppForSEII2526.UIT.UC_Purchase
             }
 
         }
+        public void RemoveItemInCart(int itemId)
+        {
+            By removeItemButton = By.Id($"removeItem_{itemId}");
+            WaitForBeingClickable(removeItemButton);
+            _driver.FindElement(removeItemButton).Click();
+        }
     }
 }

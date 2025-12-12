@@ -135,13 +135,15 @@ namespace AppForSEII2526.UIT.UC_Purchase
             selectItemPO.ClickPurchaseButton();
             createItemPO.ClickModifyItems();
 
-            selectItemPO.AddQuantityToItem(itemName3, 0);
+            selectItemPO.RemoveItemInCart(itemId3);
 
             selectItemPO.ClickPurchaseButton();
 
             Assert.True(createItemPO.IsItemInSummary(itemId1)); 
             Assert.False(createItemPO.IsItemInSummary(itemId3));
         }
+
+
         public static IEnumerable<object[]> GetValidationScenarios()
         {
             string validUser = "Pepe.Gomez";
