@@ -16,7 +16,8 @@
 
   <ItemGroup>
     <OpenApiReference Include="OpenAPIs\swagger1.json" Namespace="AppForSEII2526.Web.API" ClassName="AppForKairosAPIClient">
-      <SourceUri>https://localhost:7067/swagger/v1/swagger.json</SourceUri>
+		<SourceUri>https://appforkairos-api-b8cmeefhhwcqbuah.italynorth-01.azurewebsites.net/swagger/v1/swagger.json</SourceUri>
+      <!--<SourceUri>https://localhost:7067/swagger/v1/swagger.json</SourceUri>-->
     </OpenApiReference>
   </ItemGroup>
 

@@ -37,7 +37,7 @@ namespace AppForSEII2526.API.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ValidationProblem(ModelState));
+                return BadRequest(ModelState);
             }
 
 
@@ -48,7 +48,7 @@ namespace AppForSEII2526.API.Controllers
             if (user == null)
             {
                 ModelState.AddModelError("UserNotFound", $"Error! Username or email is not registred.");
-                return BadRequest(ValidationProblem(ModelState));
+                return BadRequest(ModelState);
             }
 
 
@@ -70,7 +70,7 @@ namespace AppForSEII2526.API.Controllers
             if (paymentMethod == null)
             {
                 ModelState.AddModelError("PaymentMethod", "Error! The selected payment method is not registered for this user.");
-                return BadRequest(ValidationProblem(ModelState));
+                return BadRequest(ModelState);
             }
 
             string sentence = "My purchase for";
@@ -78,7 +78,7 @@ namespace AppForSEII2526.API.Controllers
             if (!string.IsNullOrEmpty(itemForCreate.Description) && !itemForCreate.Description.StartsWith(sentence))
             {
                 ModelState.AddModelError("Description", "Error! You must start the Description with My purchase for.");
-                return BadRequest(ValidationProblem(ModelState));
+                return BadRequest(ModelState);
             }
 
 
@@ -124,7 +124,7 @@ namespace AppForSEII2526.API.Controllers
 
             if (ModelState.ErrorCount > 0)
             {
-                return BadRequest(ValidationProblem(ModelState));
+                return BadRequest(ModelState);
             }
 
 
