@@ -20,8 +20,8 @@ namespace AppForSEII2526.UIT.UC_Classes
         private const string classType2 = "Pilates";
 
         // Test user
-        private const string UserEmail = "elena.navarro@uclm.es";
-        private const string UserPassword = "Elena.1234";
+        private const string UserEmail = "Adrian.Sevilla@alu.uclm.es";
+        private const string UserPassword = "Password123!";
 
         public UC_Classes_UIT(ITestOutputHelper output) : base(output)
         {

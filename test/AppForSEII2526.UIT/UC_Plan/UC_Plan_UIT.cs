@@ -20,8 +20,8 @@ namespace AppForSEII2526.UIT.UC_Plan
         private const string className1 = "Morning Yoga";
 
         // Test user
-        private const string UserEmail = "elena.navarro@uclm.es";
-        private const string UserPassword = "Elena.1234";
+        private const string UserEmail = "Adrian.Sevilla@alu.uclm.es";
+        private const string UserPassword = "Password123!";
 
         public UC_Plan_UIT(ITestOutputHelper output) : base(output)
         {
