@@ -63,30 +63,7 @@ namespace AppForSEII2526.UIT.UC_Purchase
             selectItemsforpurchase_P0.WaitForBeingVisible(By.Id("SelectPurchase"));
             _driver.FindElement(By.Id("SelectPurchase")).Click();
         }
-        [Fact]
-        [Trait("LevelTesting", "Functional Testing")]
-        public void UC8_Scen1_1_1_BasicFlow()
-        {
-            InitialStepsForPurchaseItem();
-            var  selectItemPO = new SelectItemsForPurchase_P0(_driver,_output);
-            var createItemPO = new CreatePurchase_P0(_driver, _output);
-            var detailPO = new DetailPurchase_P0(_driver, _output);
-
-            selectItemPO.AddQuantityToItem(itemName1, quantityToBuy);
-            selectItemPO.ClickPurchaseButton();
-            createItemPO.FillingDetails(UserStreet, UserCity, UserCountry,"");
-            createItemPO.SelectPaymentMethod("Bizum");
-            createItemPO.SubmitPurchase();
-            createItemPO.ConfirmPurchase();
-            System.Threading.Thread.Sleep(1000);
-
-            Assert.Contains("purchase/detail", _driver.Url);
-            Assert.Contains(UserStreet, detailPO.GetPurchaseAddress());
-            Assert.Contains("Bizum", detailPO.GetPurchasePaymentMethod());
-
-            bool itemFound = detailPO.IsItemInTable(itemName1,quantityToBuy);
-            Assert.True(itemFound);
-        }
+        
 
         [Theory]
         [Trait("LevelTesting", "Functional Testing")]
@@ -104,8 +81,7 @@ namespace AppForSEII2526.UIT.UC_Purchase
             Assert.True(selectItemsforpurchase_P0.CheckListOfItems(expectedItems));
         }
 
-        //Testear no items available in the item1 
-        [Fact(Skip = "first run the dto.Items")]
+        [Fact(Skip = "first run the dto.NoItem1")]
         //[Fact]
         [Trait("LevelTesting", "Functional Testing")]
         public void UC8_Scen2_1NoItemsAvailable()
@@ -219,7 +195,34 @@ namespace AppForSEII2526.UIT.UC_Purchase
             Assert.Contains($"Error! Item {itemName2} does not have enough stock", actualError);
         }
 
+        [Fact]
+        [Trait("LevelTesting", "Functional Testing")]
+        public void UC8_Scen1_1_1_BasicFlow()
+        {
+            InitialStepsForPurchaseItem();
+            var selectItemPO = new SelectItemsForPurchase_P0(_driver, _output);
+            var createItemPO = new CreatePurchase_P0(_driver, _output);
+            var detailPO = new DetailPurchase_P0(_driver, _output);
 
+            selectItemPO.AddQuantityToItem(itemName1, quantityToBuy);
+            selectItemPO.ClickPurchaseButton();
+            createItemPO.FillingDetails(UserStreet, UserCity, UserCountry, "");
+            createItemPO.SelectPaymentMethod("Bizum");
+            createItemPO.SubmitPurchase();
+            createItemPO.ConfirmPurchase();
+            System.Threading.Thread.Sleep(1000);
+
+            Assert.Contains("purchase/detail", _driver.Url);
+            Assert.False(string.IsNullOrEmpty(detailPO.GetPurchaseId()));
+            Assert.Contains(UserEmail, detailPO.GetPurchaseUser());
+            Assert.Equal(totalPrice, detailPO.GetPurchaseTotalPrice());
+            Assert.Equal("", detailPO.GetPurchaseDescription());
+            Assert.Contains(UserStreet, detailPO.GetPurchaseAddress());
+            Assert.Contains("Bizum", detailPO.GetPurchasePaymentMethod());
+
+            bool itemFound = detailPO.IsItemInTable(itemName1, quantityToBuy);
+            Assert.True(itemFound);
+        }
 
     }
 }
