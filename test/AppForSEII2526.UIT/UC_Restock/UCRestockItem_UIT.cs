@@ -81,13 +81,16 @@ namespace AppForSEII2526.UIT.UC_Restock
             selectItemPO.AddQuantityToItem(itemName1, itemQuantityRestock1);
             selectItemPO.ClickRestockButton();
 
-            createRestockOrderPO.FillForm("Restock Order 1", "Muy lejos", "Restock for testing ", "test@gmail.com");
+            createRestockOrderPO.FillForm("Restock Order 101", "Muy lejos", "Restock for testing ", "test@gmail.com");
 
             createRestockOrderPO.SetExpectedDate(DateTime.Now.AddDays(10));
 
             createRestockOrderPO.Submit();
 
             createRestockOrderPO.confirmRestockOrder();
+
+            var wait = new WebDriverWait(_driver, TimeSpan.FromSeconds(10));
+            wait.Until(d => d.Url.Contains("restock/detailrestock"));
 
             //Assert
             Assert.Contains("restock/detailrestock", _driver.Url);
@@ -165,27 +168,20 @@ namespace AppForSEII2526.UIT.UC_Restock
         {
             return new List<object[]>
     {
-        // RestockResponsible obligatorio
-        new object[]
-        {
-            "Restock Order 1", "Warehouse 1", "Restock for testing", "123",
-            "Responsible"
-        },
-
+       
         // Description no empieza por "Restock for"
         new object[]
         {
-            "Restock Order 1", "Warehouse 1", "Buy items", "afsfaafs",
+            "Restock Order 2", "Warehouse 1", "Buy items", "",
             "Errors: (*) Description: Error! You must start the Description with 'Restock for'"
         }
     };
         }
 
-
         [Theory]
         [Trait("LevelTesting", "Functional Testing")]
         [MemberData(nameof(GetRestockValidationScenarios))]
-        public void UC8_Scen5_ValidationErrors_Restock(
+        public void UC7_Scen5_ValidationErrors_Restock(
         string title,
         string deliveryAddress,
         string description,
@@ -218,6 +214,40 @@ namespace AppForSEII2526.UIT.UC_Restock
             string actualError = createRestockPO.GetErrorText();
             Assert.Contains(expectedErrorPart, actualError);
         }
+
+        [Theory]
+        [Trait("LevelTesting", "Functional Testing")]
+        [InlineData("", "Warehouse 1", "The Title field is required.")]
+        [InlineData("Restock Order 1", "", "The DeliveryAddress field is required.")]
+        public void UC7_Scen5_Validation_ConfirmErrors(
+        string title,
+        string deliveryAddress,
+        string expectedError)
+        {
+
+            InitialStepsForRestockItem();
+
+            var selectItemPO = new SelectItemsForRestock_P0(_driver, _output);
+            var createRestockPO = new CreateRestock_PO(_driver, _output);
+
+            selectItemPO.SearchItems(itemName1, itemQuantityRestock1);
+            selectItemPO.AddQuantityToItem(itemName1, itemQuantityRestock1);
+            selectItemPO.ClickRestockButton();
+
+            createRestockPO.FillForm(
+                title,
+                deliveryAddress,
+                "Restock for testing",
+                ""
+            );
+
+            createRestockPO.Submit();
+
+
+            string error = createRestockPO.GetValidationErrors();
+            Assert.Contains(expectedError, error);
+        }
+
 
 
 

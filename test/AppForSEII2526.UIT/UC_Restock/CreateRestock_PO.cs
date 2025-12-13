@@ -19,6 +19,9 @@ namespace AppForSEII2526.UIT.UC_Restock
         By tableRestockItems = By.Id("TableOfRestockItems");
         By errorBox = By.Id("ErrorsShown");
         By confirmRestockButton = By.Id("Button_DialogOK");
+        By validationMessages = By.ClassName("validation-message");
+
+
 
         public CreateRestock_PO(IWebDriver driver, ITestOutputHelper output)
             : base(driver, output)
@@ -94,5 +97,16 @@ namespace AppForSEII2526.UIT.UC_Restock
             WaitForBeingVisible(errorBox);
             return _driver.FindElement(errorBox).Text;
         }
+
+        public string GetValidationErrors()
+        {
+            WaitForBeingVisible(By.ClassName("validation-message"));
+            return string.Join(
+                " ",
+                _driver.FindElements(By.ClassName("validation-message"))
+                       .Select(e => e.Text)
+            );
+        }
+
     }
 }
