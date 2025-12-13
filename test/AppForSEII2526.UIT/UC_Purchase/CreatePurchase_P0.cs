@@ -83,11 +83,7 @@ namespace AppForSEII2526.UIT.UC_Purchase
             WaitForBeingClickable(buttonModifyItem);
             _driver.FindElement(buttonModifyItem).Click();
         }
-        public void ClickCancel()
-        {
-            WaitForBeingClickable(buttonCancel);
-            _driver.FindElement(buttonCancel).Click();
-        }
+      
         public void SetItemQuanity(int itemId, string quanity)
         {
             string rowId = $"ItemData_{itemId}";
