@@ -81,8 +81,8 @@ namespace AppForSEII2526.UIT.UC_Purchase
             Assert.True(selectItemsforpurchase_P0.CheckListOfItems(expectedItems));
         }
 
-        //[Fact(Skip = "first run the dto.NoItem1")]
-        [Fact]
+        [Fact(Skip = "first run the dto.NoItem1")]
+        //[Fact]
         [Trait("LevelTesting", "Functional Testing")]
         public void UC8_Scen2_1NoItemsAvailable()
         {
