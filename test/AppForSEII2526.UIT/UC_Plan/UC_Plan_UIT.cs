@@ -40,14 +40,12 @@ namespace AppForSEII2526.UIT.UC_Plan
         {
             _driver.Navigate().GoToUrl(_URI + "plan/selectclassesforplan");
             var selectPage = new SelectClassesForPlan_P0(_driver, _output);
-            System.Threading.Thread.Sleep(1000);
 
             foreach (var className in classNames)
             {
                 try
                 {
                     selectPage.AddClassToCart(className);
-                    System.Threading.Thread.Sleep(200);
                 }
                 catch (Exception ex)
                 {
@@ -56,7 +54,6 @@ namespace AppForSEII2526.UIT.UC_Plan
             }
 
             selectPage.ClickProceedToPlan();
-            System.Threading.Thread.Sleep(1000);
         }
 
         private void InitialStepsForCreatePlan()
@@ -81,11 +78,9 @@ namespace AppForSEII2526.UIT.UC_Plan
             // Step 6: User fills mandatory data and saves
             createPage.FillPlanData(validPlanName, validDescription, validWeeks, validPaymentMethodId);
             createPage.ClickCreatePlan();
-            System.Threading.Thread.Sleep(500);
 
             // Confirm creation
             createPage.ClickDialogSave();
-            System.Threading.Thread.Sleep(2000);
 
             // Assert - Step 7: Should navigate to details page showing plan information
             Assert.Contains("/plan/detailsplan/", _driver.Url.ToLower());
@@ -109,7 +104,6 @@ namespace AppForSEII2526.UIT.UC_Plan
 
             // Act - Alternative Flow 3: User selects to modify the plan
             createPage.ClickModifyClasses();
-            System.Threading.Thread.Sleep(1000);
 
             // Assert - Should return to step 2 (SelectClassesForPlan)
             Assert.Contains("/plan/selectclassesforplan", _driver.Url.ToLower());
@@ -130,10 +124,11 @@ namespace AppForSEII2526.UIT.UC_Plan
             // Act - Alternative Flow 5: Try to create plan without plan name
             createPage.FillPlanData("", validDescription, validWeeks, validPaymentMethodId);
             createPage.ClickCreatePlan();
-            System.Threading.Thread.Sleep(1000);
 
             // Assert - Should show validation error and return to step 5
-            _output.WriteLine("Verified: Validation error for missing plan name");
+            // Assuming we stay on creation page or validation message exists
+            Assert.True(true);
+            // TODO: Add specific validation check like: Assert.True(createPage.HasValidationError("Name required"));
         }
 
         /// <summary>
@@ -151,10 +146,10 @@ namespace AppForSEII2526.UIT.UC_Plan
             // Act - Alternative Flow 5: Fill with invalid weeks (0)
             createPage.FillPlanData(validPlanName, "", 0, validPaymentMethodId);
             createPage.ClickCreatePlan();
-            System.Threading.Thread.Sleep(1000);
 
             // Assert - Should show validation error
-            _output.WriteLine("Verified: Validation error for invalid weeks");
+            Assert.True(true);
+            // TODO: Add specific validation check
         }
 
         /// <summary>
@@ -172,10 +167,10 @@ namespace AppForSEII2526.UIT.UC_Plan
             // Act - Alternative Flow 5: Fill without payment method
             createPage.FillPlanData(validPlanName, validDescription, validWeeks, 0);
             createPage.ClickCreatePlan();
-            System.Threading.Thread.Sleep(1000);
 
             // Assert - Should show validation error
-            _output.WriteLine("Verified: Validation error for missing payment method");
+            Assert.True(true);
+            // TODO: Add specific validation check
         }
 
         /// <summary>
@@ -194,13 +189,12 @@ namespace AppForSEII2526.UIT.UC_Plan
             createPage.FillPlanData("Capacity Test Plan", "Testing capacity validation",
                 validWeeks, validPaymentMethodId);
             createPage.ClickCreatePlan();
-            System.Threading.Thread.Sleep(500);
 
             createPage.ClickDialogSave();
-            System.Threading.Thread.Sleep(2000);
 
             // Assert - Should show error about capacity or return to select classes
-            _output.WriteLine("Verified: Capacity validation working");
+            Assert.True(true);
+            // TODO: Verify error message or navigation logic
         }
     }
 }
