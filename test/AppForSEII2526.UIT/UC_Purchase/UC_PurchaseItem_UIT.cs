@@ -136,7 +136,7 @@ namespace AppForSEII2526.UIT.UC_Purchase
                 new object[] { validUser, validPM, validStreet, "A", validCountry, validDescription, "The field City must be a string with a minimum length of 3 and a maximum length of 100." },
                 new object[] { validUser, validPM, validStreet, validCity, "S", validDescription, "The field Country must be a string with a minimum length of 3 and a maximum length of 100." },
                 new object[] { validUser, "PayPal", validStreet, validCity, validCountry, validDescription, "Error! The selected payment method is not registered for this user." },
-                new object[] { validUser, validPM, validStreet, validCity, validCountry, "Buy", "Error! You must start the Description with My purchase for." },
+                new object[] { validUser, validPM, validStreet, validCity, validCountry, "Buy", "Description must start with 'My purchase for" },
             };
 
         }
