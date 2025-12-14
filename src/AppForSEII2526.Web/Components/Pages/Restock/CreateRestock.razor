@@ -172,9 +172,8 @@
                     var restocked = await apiclient.CreateRestockAsync(restock);
                     restockState.RestockProcessed();
 
-                    /* Para que el navigation funcione cambiar el .Title por .Id*/
-                    /* he intentado de todo pero si subo el navigation con .Id*/
-                    navigation.NavigateTo($"/restock/detailrestock/?RestockID={restocked.Title}"); 
+                    
+                    navigation.NavigateTo($"/restock/detailrestock/?RestockID={restocked.Id}"); 
                 }
                 catch (ApiException<ValidationProblemDetails> apiexceptionvalidation)
                 {
