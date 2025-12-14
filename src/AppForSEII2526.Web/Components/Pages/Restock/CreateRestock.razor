@@ -7,8 +7,8 @@
 @inject ILogger<CreateRestock> logger
 @inject RestockStateContainer restockState
 
-@* @attribute [Authorize]
- *@
+ @attribute [Authorize]
+ 
 <h3>Create Restock Order</h3>
 
 @* restock is the object that will be edited thanks to the form *@
@@ -25,7 +25,7 @@
     <div class="row g-3">
         <div class="col-md-6">
             <div class="form-floating mb-3">
-                <InputText @bind-Value="restock.Title" class="form-control" id="Title" placeholder="Title" /> @* posible error *@
+                <InputText @bind-Value="restock.Title" class="form-control" id="Title" placeholder="Title" />
                 <label for="Title">Restock Title *</label>
             </div>
         </div>
@@ -184,6 +184,10 @@
                             messageError = string.Join(" (*) ", messageError, $"{errorKVP.Key}: {errors}");
                         }
                     }
+                }
+                catch (ApiException<string> apiStringException)
+                {
+                    messageError = $"Error {apiStringException.StatusCode}: {apiStringException.Result}";
                 }
                 catch (ApiException apiexception)
                 {
