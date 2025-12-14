@@ -171,7 +171,10 @@
                 {
                     var restocked = await apiclient.CreateRestockAsync(restock);
                     restockState.RestockProcessed();
-                    navigation.NavigateTo($"/restock/detailrestock/?RestockID={restocked.Title}"); /* Posible error, no me sale el ID */
+
+                    /* Para que el navigation funcione cambiar el .Title por .Id*/
+                    /* he intentado de todo pero si subo el navigation con .Id da error en el github al momento de hacer build*/
+                    navigation.NavigateTo($"/restock/detailrestock/?RestockID={restocked.Title}"); /* <- Poner ahi restocked.Id y todo sale correcto */ 
                 }
                 catch (ApiException<ValidationProblemDetails> apiexceptionvalidation)
                 {

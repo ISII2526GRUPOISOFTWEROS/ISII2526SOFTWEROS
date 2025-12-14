@@ -19,7 +19,7 @@ public class ApplicationUser : IdentityUser {
     }
 
     public string? Name { get; set; }
-    public string? Surname { get; set; } = string.Empty;
+    public string? Surname { get; set; }
     public IList<PaymentMethod> PaymentMethods { get; set; }
     public IList<Incident> Incidents { get; set; }
     public IList<Restock> Restocks { get; set; }
