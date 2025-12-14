@@ -171,7 +171,7 @@
                 {
                     var restocked = await apiclient.CreateRestockAsync(restock);
                     restockState.RestockProcessed();
-                    navigation.NavigateTo($"/restock/detailrestock/?RestockID={restocked.Title}"); /* Posible error, no me sale el ID */
+                    navigation.NavigateTo($"/restock/detailrestock/?RestockID={restocked.Id}"); /* Posible error, no me sale el ID */
                 }
                 catch (ApiException<ValidationProblemDetails> apiexceptionvalidation)
                 {
