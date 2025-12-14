@@ -71,7 +71,7 @@ namespace AppForSEII2526.API.Controllers
             [Route("[action]")]
             [ProducesResponseType(typeof(ValidationProblemDetails), (int)HttpStatusCode.BadRequest)]
             [ProducesResponseType(typeof(string), (int)HttpStatusCode.Conflict)]
-            [ProducesResponseType(typeof(RestockForCreateDTO), (int)HttpStatusCode.Created)]
+            [ProducesResponseType(typeof(RestockDetailDTO), (int)HttpStatusCode.Created)]
 
             
             public async Task<ActionResult> CreateRestock(RestockForCreateDTO restockForCreate)
@@ -209,8 +209,8 @@ namespace AppForSEII2526.API.Controllers
                 //    return Conflict("An error occurred"+ ex.Message);
             }
                 
-                var restockDetail = new RestockForCreateDTO(
-                    //restock.Id,
+                var restockDetail = new RestockDetailDTO(
+                    restock.Id,
                     restock.Title,
                     restock.DeliveryAddress,
                     restock.Description,
@@ -218,11 +218,12 @@ namespace AppForSEII2526.API.Controllers
                     restock.RestockDate,
                     restock.TotalPrice,
                     restockForCreate.RestockItems,
-                    admin.UserName
+                    admin.UserName,
+                    adminSurname: admin.Surname
                     );
 
 
-                return CreatedAtAction("GetRestockDetails", new { id = restock.Id }, restockForCreate);
+                return CreatedAtAction("GetRestockDetails", new { id = restock.Id }, restockDetail);
             }
 
 
