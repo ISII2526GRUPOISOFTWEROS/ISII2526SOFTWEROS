@@ -1,0 +1,2 @@
+INSERT INTO [dbo].[Items] ([Id], [Description], [Name], [QuantityAvailableForPurchase], [QuantityForRestock], [RestockPrice], [PurchasePrice], [ItemTypeId], [BrandId]) 
+VALUES (12, N'Foam roller for muscle recovery and massage', N'Foam Roller', 18,  8, CAST(18.00 AS Decimal(10, 2)), CAST(25.00 AS Decimal(10, 2)), 3, 2);
