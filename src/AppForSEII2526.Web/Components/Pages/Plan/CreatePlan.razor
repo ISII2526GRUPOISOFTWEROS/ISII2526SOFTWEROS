@@ -1,0 +1,172 @@
+﻿@page "/plan/createplan"
+@inject NavigationManager navigation
+@using AppForSEII2526.Web.Components.Shared
+@inject ILogger<CreatePlan> logger
+@inject PlanStateContainer planState
+@inject AppForKairosAPIClient apiClient
+@using Microsoft.AspNetCore.Authorization
+@using AppForSEII2526.Web.API
+@using AppForSEII2526.API.DTOs.ClassesDTOs
+
+@attribute [Authorize]
+
+<h3>Create Plan</h3>
+
+<EditForm Model="plan" OnValidSubmit="OpenDialog">
+    <DataAnnotationsValidator />
+    <ValidationSummary class="alert alert-danger" />
+
+    @if (!string.IsNullOrEmpty(messageError))
+    {
+        <div class="alert alert-danger">
+            @messageError
+        </div>
+    }
+
+    <div class="mb-3">
+        <label>Plan Name</label>
+        <InputText @bind-Value="plan.Name" class="form-control" placeholder="Enter plan name" />
+    </div>
+
+    <div class="mb-3">
+        <label>Description (optional)</label>
+        <InputText @bind-Value="plan.Description" class="form-control" placeholder="Enter description" />
+    </div>
+
+    <div class="mb-3">
+        <label>Weeks</label>
+        <InputNumber @bind-Value="plan.Weeks" class="form-control" placeholder="Number of weeks" />
+    </div>
+
+    <div class="mb-3">
+        <label>Payment Method ID</label>
+        <InputNumber @bind-Value="plan.PaymentMethodId" class="form-control" placeholder="Enter payment method ID" />
+    </div>
+
+    <h4>Selected Classes</h4>
+    <button class="btn btn-outline-primary mb-2" @onclick="ModifyPlanClasses">Add / Modify Classes</button>
+
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th>Price</th>
+                    <th>Day</th>
+                    <th>Time</th>
+                    <th>Remove</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in plan.SelectedClasses)
+                {
+                    <tr>
+                        <td>@item.Name</td>
+                        <td>@(item.ItemType != null ? string.Join(", ", item.ItemType) : "")</td>
+                        <td>@item.Price</td>
+                        <td>@item.Date.ToShortDateString()</td>
+                        <td>@item.Date.ToShortTimeString()</td>
+                        <td>
+                            <button class="btn btn-sm btn-danger" @onclick="@(() => RemoveClass(item))">Remove</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <p><b>Total Price:</b> @TotalPrice €</p>
+
+    <button type="submit" class="btn btn-primary">Create Plan</button>
+</EditForm>
+
+@if (DialogIsOpen)
+{
+    <Dialog Caption="Create Plan"
+            Message="Do you want to proceed to create the plan?"
+            OnClose="@OnDialogClose"
+            Type=Dialog.Category.SaveNot>
+    </Dialog>
+}
+
+@code {
+    private AppForSEII2526.API.DTOs.ClassesDTOs.PlanForCreateDTO plan => planState.Plan;
+    private string messageError = "";
+    private bool DialogIsOpen = false;
+
+    private decimal TotalPrice => plan.SelectedClasses?.Sum(pi => pi.Price) ?? 0m;
+
+    private void ModifyPlanClasses()
+    {
+        navigation.NavigateTo("/plan/selectclassesforplan");
+    }
+
+    private void RemoveClass(AppForSEII2526.API.DTOs.ClassesDTOs.ClassSelectionDTO item)
+    {
+        planState.RemovePlanItem(item);
+    }
+
+    private void OpenDialog()
+    {
+        if (!plan.SelectedClasses.Any())
+        {
+            messageError = "You must select at least one class.";
+            return;
+        }
+        DialogIsOpen = true;
+    }
+
+    private async Task OnDialogClose(bool isOk)
+    {
+        DialogIsOpen = false;
+        if (!isOk) return;
+
+        messageError = "";
+
+        try
+        {
+            // Map Shared DTO to Client Generated DTO
+            var planForClient = new AppForSEII2526.Web.API.PlanForCreateDTO
+            {
+                Name = plan.Name,
+                Description = plan.Description,
+                Weeks = plan.Weeks,
+                HealthIssues = plan.HealthIssues,
+                PaymentMethodId = plan.PaymentMethodId,
+                SelectedClasses = plan.SelectedClasses.Select(c => new AppForSEII2526.Web.API.ClassSelectionDTO
+                {
+                    Id = c.Id,
+                    Name = c.Name,
+                    Price = (double)c.Price,
+                    Date = c.Date,
+                    ItemType = c.ItemType?.ToList()
+                }).ToList(),
+                Goals = plan.Goals?.Select(g => new AppForSEII2526.Web.API.GoalForClassDTO
+                {
+                    ClassId = g.ClassId,
+                    Goal = g.Goal
+                }).ToList() ?? new List<AppForSEII2526.Web.API.GoalForClassDTO>()
+            };
+
+            var response = await apiClient.CreatePlanAsync(planForClient);
+
+            planState.PlanProcessed();
+
+            navigation.NavigateTo($"/plan/detailsplan/{response}");
+        }
+        catch (ApiException<ValidationProblemDetails> ex)
+        {
+            if (ex.Result?.Errors != null)
+                messageError = string.Join(" (*) ", ex.Result.Errors.SelectMany(x => x.Value));
+        }
+        catch (ApiException)
+        {
+            messageError = "Error while creating the plan, please try again later.";
+        }
+        catch (Exception ex)
+        {
+            messageError = $"Unexpected error: {ex.Message}";
+        }
+    }
+}

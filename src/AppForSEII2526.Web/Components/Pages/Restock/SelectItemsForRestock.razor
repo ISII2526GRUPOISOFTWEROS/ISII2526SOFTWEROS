@@ -1,0 +1,182 @@
+﻿@page "/restock/selectitemsforrestock"
+
+@using Microsoft.AspNetCore.Authorization
+@using AppForSEII2526.Web.API
+@inject AppForKairosAPIClient apiclient
+@inject ILogger<SelectItemsForRestock> Logger
+@inject RestockStateContainer restockState
+@inject NavigationManager navigation
+
+ @attribute [Authorize]
+ <h3>Select items for restock</h3>
+
+<div class="container-fluid">
+    <div class="row alert alert-danger" role="alert" hidden="@hideErrors">
+        <p id="ErrorsShown"> Errors: @errors</p>
+    </div>
+    <div class="row">
+        @* --- Left Column: Search & Results --- *@
+        <div class="col-8">
+            <div class="row">
+                @* Search Inputs *@
+                <div class="col">
+                    <div class="input-group mb-3">
+                        <span class="input-group-text" id="basic-addon1">Item Name</span>
+                        <input type="text" id="inputName" @bind=itemName class="form-control" placeholder="Item Name" aria-label="Item Name" aria-describedby="basic-addon1">
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="input-group mb-3">
+                        <span class="input-group-text" id="basic-addon1">Quantity</span>
+                        <input type="number" id="inputQuantity" @bind=quantity class="form-control" placeholder="Quantity" aria-label="Quantity" aria-describedby="basic-addon1">
+                    </div>
+                </div>
+
+                <div class="col">
+                    <button type="button" class="btn btn-primary" @onclick=@searchItems id="searchItems">Search Items</button>
+                </div>
+            </div>
+
+            <div class="row">
+                @if (items == null)
+                {
+                    <p>Loading items...</p>
+                }
+                else if (items.Count == 0)
+                {
+                    <p>No items found.</p>
+                }
+                else
+                {
+                    @* Results Table *@
+                    <div class="mh-100 table-responsive">
+                        <table class="table table-condensed table-hover" id="TableOfItems">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Brand</th>
+                                    <th>Restock price</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in items)
+                                {
+                                    <tr id="ItemData_@item.Name">
+                                        <td>@item.Name</td>
+                                        <td>@item.Brand</td>
+                                        <td>@item.RestockPrice</td>
+                                        <td>
+                                            <button class="btn btn-outline-secondary" id="itemToRestock_@item.Name" @onclick="@(() => AddItem(item))">Add</button>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        </div>
+
+        @* --- Right Column: Restock Cart --- *@
+        <div class="col-2" hidden="@hideRestockCart">
+            <div class="row">
+                <h3>Restock Cart</h3>
+            </div>
+            @* Iterate through items currently in the State Container *@
+            @foreach (RestockItemDTO item in restock.RestockItems)
+            {
+                <div class="row mb-2">
+                    <button type="button" class="btn btn-light" id="removeItem_@item.ItemId" 
+                    @onclick="@(() => RemoveRestockItem(item))"> x @item.ItemName
+                    </button>
+                </div>
+            }
+            <div class="row mt-3">
+                <button type="button" class="btn btn-primary" id="createRestockButton" @onclick=@CreateRestock>Restock Items</button>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+@code {
+    private ICollection<ItemForRestockDTO> items;
+
+    // Logic to hide the cart if empty
+    private bool hideRestockCart { get { return restock.RestockItems.Count == 0; } }
+
+    private bool hideErrors { get { return errors.Length == 0; } }
+    private string errors = "";
+    private string? itemName { get; set; }
+    private int? quantity { get; set; } = null;
+
+    private DateTime _from;
+    private DateTime _to;
+
+    
+    private RestockForCreateDTO restock => restockState.Restock;
+
+    public async Task searchItems()
+    {
+        
+        errors = "";
+        items = null;   
+
+        try
+        {
+           
+            items = await apiclient.GetItemsForRestockAsync(itemName, quantity);
+
+            if (items == null || items.Count == 0)
+            {               
+                errors = "No items found with these criteria.";
+            }
+        }
+        catch (ApiException ex) // Captura errores específicos de la API (400, 404, 500)
+        {
+            Logger.LogError($"{DateTime.Now} Error: {ex}");
+            errors = $"error while connecting to the system, API message: {ex.Message}";
+        }
+        
+
+        StateHasChanged();
+    }
+
+    // Adds item to the global state container
+    private void AddItem(ItemForRestockDTO item)
+    {
+        restockState.AddItemToRestock(item);
+    }
+
+    // Removes item from the global state container
+    private void RemoveRestockItem(RestockItemDTO item)
+    {
+        restockState.RemoveRestockItem(item);
+    }
+
+    
+    protected override async Task OnInitializedAsync()
+    {
+        // Date initialization logic preserved from your draft
+        _from = (_from == new DateTime(1, 1, 1)) ?
+            DateTime.SpecifyKind(DateTime.Today.AddDays(1), DateTimeKind.Utc)
+            : _from;
+
+        _to = (_to == new DateTime(1, 1, 1)) ?
+            DateTime.SpecifyKind(DateTime.Today.AddDays(2), DateTimeKind.Utc)
+            : _to;
+
+        
+         searchItems();
+
+        //return base.OnInitializedAsync();
+    }
+
+
+    // got to the create restock page
+    private void CreateRestock()
+    {
+        navigation.NavigateTo("/restock/createrestock");
+    }
+}

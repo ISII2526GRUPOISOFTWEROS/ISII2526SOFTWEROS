@@ -22,6 +22,10 @@ else
             <td id="PurchaseId">@purchaseDetail.Id</td>
         </tr>
         <tr>
+            <th>Username</th>
+            <td id="UserName">@purchaseDetail.Username</td>
+        </tr>
+        <tr>
             <th>Delivery Address</th>
             <td id="DeliveryAddress">@purchaseDetail.DeliveryAddress</td>
         </tr>
@@ -83,7 +87,6 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        string userName = "";
         if (authenticationState is not null)
         {
             var authState = await authenticationState;
@@ -93,31 +96,25 @@ else
             {
                 if (user.Identity is not null && user.Identity.IsAuthenticated && user.IsInRole("User"))
                 {
-                    currentUserName = user.Identity.Name;
+                     currentUserName = user.Identity.Name;
                 }
 
             }
         }
+
         try
         {
-            var purchases = await apiclient.GetPurchaseDetailsAsync(PurchaseId);
-            purchaseDetail = purchases?.FirstOrDefault();
+             var result = await apiclient.GetPurchaseDetailsAsync(PurchaseId);           
+            purchaseDetail = result.FirstOrDefault();
         }
-        catch (Exception ex)
+        catch (ApiException ex)
         {
             purchaseDetail = null;
         }
-        if(purchaseDetail == null)
-        {
-            errorMessage = $"Error! There is not a purchase with id {PurchaseId}.";
-        } 
-        else {
-            if ((string.IsNullOrEmpty(currentUserName)) || (purchaseDetail.Username != currentUserName))
-        {
-                purchaseDetail = null;
-            errorMessage = $"Error! You are not authorized to see this purchase or there is not a purchase with id {PurchaseId}."; 
-        }
-    }
+        if (purchaseDetail == null || purchaseDetail.Username != currentUserName)
+            errorMessage = $"Error! You are not authorized to see this purchase or there is not a purchase with id={PurchaseId}";
+        
+
     }
 
 }

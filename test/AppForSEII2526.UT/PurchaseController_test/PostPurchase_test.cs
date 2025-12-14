@@ -173,6 +173,7 @@ namespace AppForSEII2526.UT.PurchaseController_test
                 new object[] { purchaseInvalidItem,         "Error! Item with Id 999 not found." },
                 new object[] { purchaseInsufficientStock,   "Error! Item Foam Roller does not have enough stock. Available: 100, Requested: 200" },
                 new object[] { purchaseInvalidUser,         "Error! Username or email is not registred." },
+                //new object[] { purchasewrongPM,         "Error! The selected payment method is not registered for this user." }
                 //new object[] { purchasewrongPM,         "Error! The selected payment method is not registered for this user." },
                 new object[] { purchasewrongDescription,         "Error! You must start the Description with My purchase for." },
                 new object[] { purchaseinvalidquantity,    "Error! Item Foam Roller has invalid quantity -1. Quantity must be greater than zero."
@@ -197,9 +198,11 @@ namespace AppForSEII2526.UT.PurchaseController_test
             var result = await controller.CreateItemForPurchase(input);
 
             var badRequest = Assert.IsType<BadRequestObjectResult>(result);
-            var innerResult = Assert.IsType<ObjectResult>(badRequest.Value);
-            var problemDetails = Assert.IsType<ValidationProblemDetails>(innerResult.Value);
-            var errorActual = problemDetails.Errors.First().Value[0];
+            var serializableError = Assert.IsType<SerializableError>(badRequest.Value);
+
+            var firstErrorEntry = serializableError.First();
+            var errorMessages = firstErrorEntry.Value as string[]; 
+            var errorActual = errorMessages[0];
 
             Assert.StartsWith(errors, errorActual);
         }

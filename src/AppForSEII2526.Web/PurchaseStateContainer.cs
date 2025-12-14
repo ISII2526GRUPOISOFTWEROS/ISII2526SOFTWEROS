@@ -8,6 +8,7 @@ namespace AppForSEII2526.Web
         {
             PurchaseItems = new List<CreatePurchaseItemDTO>()
         };
+        public Dictionary<int, string> ItemNames { get; private set; } = new Dictionary<int, string>();
         public decimal TotalPrice
         {
             get
@@ -21,6 +22,9 @@ namespace AppForSEII2526.Web
         public void AddPurchaseItem(ItemForPurchaseDTO item)
         {
             var existing = Purchase.PurchaseItems.FirstOrDefault(i => i.ItemId == item.Id);
+            if (!ItemNames.ContainsKey(item.Id)){
+                ItemNames[item.Id] = item.Name;
+            }
 
             if (existing is null)
             {
@@ -36,6 +40,7 @@ namespace AppForSEII2526.Web
             {
                 existing.Quantity++;
             }
+            NotifyStateChanged();
 
         }
         public void RemovePurchaseItem(int itemId)
@@ -44,12 +49,17 @@ namespace AppForSEII2526.Web
             if (itemToRemove != null)
             {
                 Purchase.PurchaseItems.Remove(itemToRemove);
+                if(ItemNames.ContainsKey(itemId))
+                {
+                    ItemNames.Remove(itemId);
+                }
                 NotifyStateChanged();
             }
         }
         public void ClearPurchase()
         {
             Purchase.PurchaseItems.Clear();
+            ItemNames.Clear();
             NotifyStateChanged();
         }
         public void PurchaseProcessed()
@@ -58,6 +68,7 @@ namespace AppForSEII2526.Web
             {
                 PurchaseItems = new List<CreatePurchaseItemDTO>()
             };
+            ItemNames.Clear();
             NotifyStateChanged();
         }
     }

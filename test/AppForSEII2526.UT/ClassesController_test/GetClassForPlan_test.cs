@@ -26,7 +26,7 @@ namespace AppForSEII2526.UT.ClassesController_test
                     Date = DateTime.Today.AddDays(1),
                     Price = 10.0m,
                     Capacity = 5,
-                    TypeItems = new List<ItemType>{ types[0] }
+                    ItemType = types[0]
                 },
                 new Class
                 {
@@ -34,7 +34,7 @@ namespace AppForSEII2526.UT.ClassesController_test
                     Date = DateTime.Today.AddDays(2),
                     Price = 15.0m,
                     Capacity = 10,
-                    TypeItems = new List<ItemType>{ types[1] }
+                    ItemType = types[1]
                 }
             };
 
@@ -88,9 +88,10 @@ namespace AppForSEII2526.UT.ClassesController_test
                 Assert.Equal(expectedClasses[i].date, actualClasses[i].date);
                 Assert.Equal(expectedClasses[i].price, actualClasses[i].price);
                 Assert.Equal(expectedClasses[i].capacity, actualClasses[i].capacity);
-                Assert.True(expectedClasses[i].itemType.SequenceEqual( actualClasses[i].itemType));
+                Assert.True(expectedClasses[i].itemType.SequenceEqual(actualClasses[i].itemType));
             }
 
         }
     }
 }
+

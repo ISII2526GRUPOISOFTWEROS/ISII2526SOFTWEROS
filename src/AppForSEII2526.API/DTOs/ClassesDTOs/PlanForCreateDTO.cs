@@ -31,6 +31,8 @@ namespace AppForSEII2526.API.DTOs.ClassesDTOs
 
         [StringLength(100, ErrorMessage = "Health issues cannot exceed 100 characters")]
         public string? HealthIssues { get; set; }
+        [Required]
+        public IList<PlanItemDTO> PlanItems { get; set; } = new List<PlanItemDTO>();
 
         [Required]
         public IList<ClassSelectionDTO> SelectedClasses { get; set; } = new List<ClassSelectionDTO>();
@@ -98,6 +100,5 @@ namespace AppForSEII2526.API.DTOs.ClassesDTOs
         public List<string> Types { get; set; } = new();
         public string? Goal { get; set; }
     }
-
 
 }

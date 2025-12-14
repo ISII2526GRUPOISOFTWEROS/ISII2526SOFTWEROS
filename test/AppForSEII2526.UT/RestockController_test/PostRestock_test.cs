@@ -177,19 +177,20 @@ namespace AppForSEII2526.UT.RestockController_test
             var controller = new RestockController(_context, logger);
 
 
-            var input = new RestockForCreateDTO(
-                
+            var input = new RestockDetailDTO(
+                id: 1,
                 title: "Restock Test",
                 deliveryAddress: "Warehouse A",
                 description: "Restock for",
-                expectedDate: DateTime.UtcNow,
+                expectedDate: DateTime.Now,
                 restockDate: DateTime.UtcNow,
-                totalPrice: 0,
+                totalPrice: 20,
                 restockItems: new List<RestockItemDTO>()
                 {
                     new RestockItemDTO("Foam Roller", 1, 10, 2)
                 },
-                restockResponsible: "admin"
+                restockResponsible: "admin",
+                adminSurname: "responsable"
             );
 
             //Act
@@ -198,7 +199,7 @@ namespace AppForSEII2526.UT.RestockController_test
 
             //Assert
             var createdResult = Assert.IsType<CreatedAtActionResult>(result);
-            var actualCreatedRestock = Assert.IsType<RestockForCreateDTO>(createdResult.Value);
+            var actualCreatedRestock = Assert.IsType<RestockDetailDTO>(createdResult.Value);
 
             Assert.Equal(input, actualCreatedRestock);
         }

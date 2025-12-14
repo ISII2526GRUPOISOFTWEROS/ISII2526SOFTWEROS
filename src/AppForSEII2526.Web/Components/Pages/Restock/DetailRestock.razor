@@ -1,0 +1,134 @@
+﻿@page "/restock/detailrestock"
+
+@using AppForSEII2526.Web.API
+@using Microsoft.AspNetCore.Authorization
+@inject AppForKairosAPIClient apiclient
+
+<h3>Restock Detail</h3>
+
+@attribute [Authorize]
+
+@if (restock == null)
+{
+    <div class="alert alert-warning">
+        <p>@error</p>
+    </div>
+}
+else
+{
+    @* --- General Information Table --- *@
+    <div class="card mb-4">
+        <div class="card-header">
+            General Information
+        </div>
+        <div class="card-body">
+            <table class="table table-borderless table-sm">
+                <tr>
+                    <th style="width: 20%">Restock Title</th>
+                    <td id="RestockTitle"> @restock.Title</td>
+                </tr>
+                <tr>
+                    <th>Responsible</th>
+                    <td id="RestockResponsible"> @restock.RestockResponsible </td>
+                </tr>
+                <tr>
+                    <th>Delivery Address</th>
+                    <td id="DeliveryAddress"> @restock.DeliveryAddress</td>
+                </tr>
+                <tr>
+                    <th>Description</th>
+                    <td id="Description"> @restock.Description</td>
+                </tr>
+                <tr>
+                    <th>Dates</th>
+                    <td id="RestockDates">
+                        Created: <b>@restock.RestockDate.ToString("dd/MM/yyyy")</b>
+                        @if (restock.ExpectedDate.HasValue)
+                        {
+                            <span> | Expected: <b>@restock.ExpectedDate.Value.ToString("dd/MM/yyyy")</b></span>
+                        }
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    @* --- Items Table --- *@
+    <h4>Items Requested</h4>
+    <div class="table-responsive">
+        <table class="table table-striped" id="RestockItems">
+            <thead class="table-dark">
+                <tr>
+                    <th scope="col">Item Name</th>
+                    <th scope="col" class="text-center">Quantity</th>
+                    <th scope="col" class="text-end">Unit Price</th>
+                    <th scope="col" class="text-end">Subtotal</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in restock.RestockItems)
+                {
+                    <tr id="RestockItem_@item.ItemName">
+                        <td>@item.ItemName</td>
+                        <td class="text-center">@item.Quantity</td>
+                        <td class="text-end">@item.RestockPrice €</td>
+                        <td class="text-end">@(item.Quantity* item.RestockPrice) €</td>
+                    </tr>
+                }
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th scope="row" colspan="3" class="text-end fs-5">Total Price:</th>
+                    <td id="TotalPrice" class="text-end fs-5 fw-bold">@restock.TotalPrice €</td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+}
+
+@code {
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public int RestockID { get; set; }
+
+    // Usamos el DTO de detail para devolver el resultado   
+    private RestockDetailDTO restock;
+    private string error = "Loading details...";
+
+    [CascadingParameter]
+    private Task<AuthenticationState>? authenticationState { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        string userName = "";
+
+        // 1. Obtener el usuario logueado actual
+        if (authenticationState is not null)
+        {
+            var authState = await authenticationState;
+            var user = authState?.User;
+
+            if (user.Identity is not null && user.Identity.IsAuthenticated && user.IsInRole("User"))
+            {
+                userName = user.Identity.Name;
+            }
+        }
+
+        try
+        {
+            // 2. Llamar a la API (Método GetRestockDetails que definiste en el Controller)
+            // verificar que GetRestockDetailAsync este en AppForKairosAPIClient <-
+            restock = await apiclient.GetRestockDetailsAsync(RestockID);
+
+        }
+        catch (ApiException ex)
+        {
+            restock = null;
+            
+        }
+        if ((restock == null) )
+        {
+            error = $"Error! You are not authorized to see this rental or there is not a rental with id={RestockID}";
+        }
+    }
+}

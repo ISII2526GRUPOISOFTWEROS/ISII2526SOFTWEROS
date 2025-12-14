@@ -13,7 +13,7 @@
             DeliveryAddress = deliveryAddress ?? throw new ArgumentNullException(nameof(deliveryAddress));
             Description = description;
             ExpectedDate = expectedDate;
-            RestockDate = restockDate;
+            RestockDate = DateTime.Today;
             TotalPrice = totalPrice;
             RestockItems = restockItems;
             RestockResponsible = restockResponsible;

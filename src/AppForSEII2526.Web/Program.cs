@@ -19,6 +19,7 @@ builder.Services.AddScoped<IdentityRedirectManager>();
 builder.Services.AddScoped<AuthenticationStateProvider, IdentityRevalidatingAuthenticationStateProvider>();
 
 builder.Services.AddScoped<PurchaseStateContainer>();
+builder.Services.AddScoped<RestockStateContainer>();
 
 builder.Services.AddAuthentication(options =>
     {
@@ -44,6 +45,7 @@ string? URI2API = builder.Configuration.GetValue(typeof(string), "AppForKairos_A
 
 //We create the service  for accessing the API from where .WEB project
 builder.Services.AddScoped<AppForKairosAPIClient>(sp => new AppForKairosAPIClient(URI2API, new HttpClient()));
+builder.Services.AddScoped<PlanStateContainer>();
 
 builder.Services.AddScoped<PurchaseStateContainer>();
 

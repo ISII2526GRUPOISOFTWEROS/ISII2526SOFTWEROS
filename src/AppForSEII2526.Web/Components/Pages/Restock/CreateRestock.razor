@@ -1,0 +1,232 @@
+﻿@page "/restock/createrestock"
+@inject NavigationManager navigation
+@using AppForSEII2526.Web.Components.Shared
+@using AppForSEII2526.Web.API
+@using Microsoft.AspNetCore.Authorization
+@inject AppForKairosAPIClient apiclient
+@inject ILogger<CreateRestock> logger
+@inject RestockStateContainer restockState
+
+ @attribute [Authorize]
+ 
+<h3>Create Restock Order</h3>
+
+@* restock is the object that will be edited thanks to the form *@
+<EditForm Model="restock" OnValidSubmit="OpenDialog">
+    <div class="row">
+        <DataAnnotationsValidator />
+        <ValidationSummary class="row alert alert-danger" />
+    </div>
+    <div class="row alert alert-danger" role="alert" hidden="@hideErrors">
+        <p id="ErrorsShown">Errors: @messageError</p>
+    </div>
+
+    @* --- General Restock Information --- *@
+    <div class="row g-3">
+        <div class="col-md-6">
+            <div class="form-floating mb-3">
+                <InputText @bind-Value="restock.Title" class="form-control" id="Title" placeholder="Title" />
+                <label for="Title">Restock Title *</label>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="form-floating mb-3">
+                <InputText @bind-Value="restock.DeliveryAddress" class="form-control" id="DeliveryAddress" placeholder="Address" />
+                <label for="DeliveryAddress">Delivery Address *</label>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-md-12">
+            <div class="form-floating mb-3">
+                @* Controller requires description to start with "Restock for" *@
+                <InputTextArea @bind-Value="restock.Description" class="form-control" id="Description" placeholder="Description" style="height: 100px" />
+                <label for="Description">Description (Must start with 'Restock for')</label>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-md-4">
+            <div class="form-floating mb-3">
+                <InputDate @bind-Value="restock.ExpectedDate" class="form-control" id="ExpectedDate" />
+                <label for="ExpectedDate">Expected Date</label>
+            </div>
+        </div>
+
+
+        @*this button will be used to ask the user if he want to proceed to restock the items*@
+        <div class="col-md-4">         
+            <div class="form-floating mb-3">
+                <input value="@restock.RestockResponsible" class="form-control" id="Responsible" />
+                <label for="Responsible">Restock Responsible</label>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="form-floating">            
+                <button class="btn btn-primary w-100 h-100" type="submit" id="Submit" disabled="@submitButtonDisabled">
+                    Confirm Restock
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <hr />
+
+    @* --- Items Summary --- *@
+    <h4>Restock Detail</h4>
+    <p>
+        <b>Date:</b> @restock.RestockDate.ToString("dd/MM/yyyy")
+    </p>
+    <p>
+        <b>Total Estimated Price:</b> @TotalCost €
+        <button class="btn btn-outline-primary ms-3" type="button" @onclick="ModifyRestockItems" id="ModifyItems">
+            Modify Items
+        </button>
+    </p>
+
+    @* --- Items Table --- *@
+    <div class="mh-100 table-responsive">
+        <table class="table table-condensed table-hover" id="TableOfRestockItems">
+            <thead>
+                <tr>
+                    <th>Item Name</th>
+                    <th>Restock Price</th>
+                    <th>Quantity</th>
+                    <th>Subtotal</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in restock.RestockItems)
+                {
+                    <tr id="ItemData_@item.ItemName">
+                        <td>@item.ItemName</td>
+                        <td>@item.RestockPrice €</td>
+                        <td>
+                            @item.Quantity
+                        </td>
+                        <td>@(item.Quantity* item.RestockPrice) €</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</EditForm>
+
+@* --- Confirmation Dialog --- *@
+@if (DialogIsOpen)
+{
+    <Dialog Caption="Restock Items"
+            Message="Do you want to proceed to restock the selected items?"
+            OnClose="@OnDialogClose"
+            Type=Dialog.Category.SaveNot>
+    </Dialog>
+}
+
+@code {
+    private string messageError = "";
+    private bool hideErrors { get { return messageError.Length == 0; } }
+
+    // Button disabled if no items in cart
+    private bool submitButtonDisabled { get { return (restock.RestockItems == null || restock.RestockItems.Count == 0); } }
+
+    private bool DialogIsOpen;
+
+    // Computed property for display
+    private double TotalCost
+    {
+        get
+        {           
+            return restock.RestockItems.Sum(ri => ri.RestockPrice * ri.Quantity);
+        }
+    }
+
+    private void ModifyRestockItems()
+    {
+        navigation.NavigateTo("/restock/selectitemsforrestock");
+    }
+
+    // Access the State Container
+    private RestockForCreateDTO restock => restockState.Restock;
+
+    private void OpenDialog()
+    {
+        DialogIsOpen = true;
+    }
+
+    private async Task OnDialogClose(bool isOk)
+    {
+        DialogIsOpen = false;
+        if (isOk)
+        {
+            if (restock.RestockItems.Count > 0)
+            {
+                // Update TotalPrice in the DTO before sending
+                restock.TotalPrice = TotalCost;
+
+                try
+                {
+                    var restocked = await apiclient.CreateRestockAsync(restock);
+                    restockState.RestockProcessed();
+                    navigation.NavigateTo($"/restock/detailrestock/?RestockID={restocked.Title}"); /* Posible error, no me sale el ID */
+                }
+                catch (ApiException<ValidationProblemDetails> apiexceptionvalidation)
+                {
+                    if (apiexceptionvalidation.Result.Errors.Values != null)
+                    {
+                        messageError = "";
+                        foreach (var errorKVP in apiexceptionvalidation.Result.Errors)
+                        {
+                            var errors = string.Join(", ", errorKVP.Value);
+                            messageError = string.Join(" (*) ", messageError, $"{errorKVP.Key}: {errors}");
+                        }
+                    }
+                }
+                catch (ApiException<string> apiStringException)
+                {
+                    messageError = $"Error {apiStringException.StatusCode}: {apiStringException.Result}";
+                }
+                catch (ApiException apiexception)
+                {
+                    messageError = $"Error {apiexception.StatusCode}: {apiexception.Message}";
+                }
+                
+            }
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        //if the date is the defalut, intialiazed to the current date
+        if (restock.RestockDate == default)
+        {
+            restock.RestockDate = DateTime.Now;
+        }
+
+        // Authentication handling to get the Responsible User
+        if (authenticationState is not null)
+        {
+            var authState = await authenticationState;
+            var user = authState?.User;
+
+            if (user is not null &&  user.Identity.IsAuthenticated)
+            {
+                restock.RestockResponsible = user.Identity.Name;
+            }
+        }
+
+        // Default initializations to avoid nulls
+        restock.Title = restock.Title == null ? "" : restock.Title;
+        restock.DeliveryAddress = restock.DeliveryAddress == null ? "" : restock.DeliveryAddress;
+        restock.Description = restock.Description == null ? "" : restock.Description; // necessary to pass a condition
+        restock.RestockResponsible = restock.RestockResponsible == null ? "" : restock.RestockResponsible;
+
+    }
+
+    [CascadingParameter]
+    private Task<AuthenticationState>? authenticationState { get; set; }
+}

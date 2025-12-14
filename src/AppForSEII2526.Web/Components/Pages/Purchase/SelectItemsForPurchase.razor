@@ -7,7 +7,6 @@
 @inject PurchaseStateContainer purchaseState
 @inject NavigationManager navigation
 
- @attribute [Authorize]
  <h3>Items For Purchase</h3>
 
 <div class="container-fluid">
@@ -75,34 +74,46 @@
                     }
             </div>
         </div>
-        <div class="col-2" hidden="@hideRentingCart">
-                <div class="row">
-                    <h3> Shopping Cart</h3>
-                </div>
-            @foreach (var item in purchaseState.Purchase.PurchaseItems)
-            {
-                <div class="row mb-1">
-                    <button type="button" class="btn btn-light" 
+      <div class="col-2" hidden="@hideRentingCart">
+    <div class="row">
+        <h3> Shopping Cart</h3>
+    </div>
+    @foreach (var item in purchaseState.Purchase.PurchaseItems)
+    {
+        
+            string nameToShow = purchaseState.ItemNames.ContainsKey(item.ItemId) 
+                                ? purchaseState.ItemNames[item.ItemId] 
+                                : "Item";
+        
+
+        <div class="row mb-1">
+            <button type="button" class="btn btn-light" 
                     id="removeItem_@item.ItemId"
-                    @onclick="@(() => RemoveItem(item.ItemId))">x @item.Quantity u @(item.Price *item.Quantity)€</button>
-                </div>
-            }
-            @if (purchaseState.Purchase.PurchaseItems.Count > 0)
-            {
-                <div class="row mt-2">
-                    <h4>Total: @purchaseState.Purchase.PurchaseItems.Sum(i => i.Price * i.Quantity)€</h4>
-                </div>
-                <div class="row mt-2">
-                    <button type="button" class=" btn btn-primary" id="purchaseItemButton" @onclick="PurchaseItem">Purchase Item </button>
-                </div>
-            }
-            else
-            {
-                <div class="row">
-                    <p>Your cart is empty</p>
-                </div>
-            }
+                    @onclick="@(() => RemoveItem(item.ItemId))">
+                
+                <div class="text-start fw-bold">@nameToShow</div>
+                
+                <span>x @item.Quantity u @(item.Price * item.Quantity)€</span>
+            </button>
         </div>
+    }
+    
+    @if (purchaseState.Purchase.PurchaseItems.Count > 0)
+    {
+        <div class="row mt-2">
+            <h4>Total: @purchaseState.TotalPrice.ToString("N2") €</h4>
+        </div>
+        <div class="row mt-2">
+            <button type="button" class=" btn btn-primary" id="purchaseItemButton" @onclick="PurchaseItem">Purchase Item </button>
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            <p>Your cart is empty</p>
+        </div>
+    }
+</div>
 
     </div>
     

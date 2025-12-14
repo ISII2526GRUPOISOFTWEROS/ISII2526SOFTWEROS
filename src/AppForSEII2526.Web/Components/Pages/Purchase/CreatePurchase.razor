@@ -73,11 +73,11 @@
         </div>
         <div class="row mt-4">
             <div class="col d-flex gap-2 justify-content-end">
-                <button type="button" class="btn btn-secondary" @onclick="@(() => navigation.NavigateTo("/"))">
+                <button type="button" id ="buttonCancel"class="btn btn-secondary" @onclick="@(() => navigation.NavigateTo("/"))">
                     Cancel
                 </button>
 
-                <button type="button" class="btn btn-warning" @onclick="ModifyPurchaseItem">
+                <button type="button" id="buttonModify" class="btn btn-warning" @onclick="ModifyPurchaseItem">
                 Modify Items
                 </button>
                 <button class="btn btn-primary" type="submit" id="Submit" disabled ="@(!purchase.PurchaseItems.Any())">
@@ -116,8 +116,7 @@
                                 <InputNumber @bind-Value="item.Quantity" class="form-control" min="1" style="width: 80px;background-color: #fff9db" />
                             <ValidationMessage For="@(() => item.Quantity)" />
                             </td>
-@*                             <td>@item.Quantity</td>
- *@                            <td>@item.Price €</td>
+                           <td>@item.Price €</td>
                             <td>@(item.Price* item.Quantity) €</td>
                     </tr>
                 } 
@@ -162,12 +161,13 @@
             {
                 try
                 {
+
                     var purchased = await apiclient.CreateItemForPurchaseAsync(purchase);
-                    purchaseStateContainer.PurchaseProcessed();
                     navigation.NavigateTo($"/purchase/detail/?PurchaseId={purchased.Id}");
 
                 }
                 catch(ApiException<ValidationProblemDetails> apiexceptionvalidation){
+
                     if(apiexceptionvalidation?.Result.Errors != null && apiexceptionvalidation.Result.Errors.Any())
                     {
                         messageError = "";
@@ -176,13 +176,29 @@
                             messageError = string.Join("(*) ", messageError, string.Join(" (*) ", errors));
                         }
                     }
+                    else if (apiexceptionvalidation.Result?.AdditionalProperties != null && apiexceptionvalidation.Result.AdditionalProperties.Any())
+                    {
+                        foreach (var prop in apiexceptionvalidation.Result.AdditionalProperties)
+                        {
+                            messageError += $"(*) {prop.Key}: {prop.Value} ";
+                        }
+                    }
+                    else
+                    {
+                        messageError = "Validation error without details."; 
+                    }
                 }
                 catch (ApiException apiexception)
                 {
                     //messageError = "Error while processing your request, please try again later!";
-                    messageError = $"Error {apiexception.StatusCode}: {apiexception.Response}";
+                    //messageError = apiexception.Response ?? $"Error API {apiexception.StatusCode}";
+                    messageError = ExtractError(apiexception.Response);
                 }
-
+                catch(Exception ex)
+                {
+                    messageError = $"Unexpected error: {ex.Message}";
+                }
+                StateHasChanged();
             }
         }
     }
@@ -219,4 +235,27 @@
     }
     [CascadingParameter]
     private Task<AuthenticationState>? authenticationState { get; set; }
+    private string ExtractError(string response)
+    {
+        if (string.IsNullOrEmpty(response)) return "Error desconocido.";
+        try
+        {
+            // Intentamos limpiar el JSON para sacar solo el texto de los errores
+            using var doc = System.Text.Json.JsonDocument.Parse(response);
+            if (doc.RootElement.TryGetProperty("errors", out var errorsElement))
+            {
+                var sb = new System.Text.StringBuilder();
+                foreach (var prop in errorsElement.EnumerateObject())
+                {
+                    foreach (var err in prop.Value.EnumerateArray())
+                    {
+                        sb.Append($"(*) {err.GetString()} ");
+                    }
+                }
+                return sb.ToString();
+            }
+            return response; // Si no tiene formato de errores, devolvemos tal cual
+        }
+        catch { return response; }
+    }
 }
