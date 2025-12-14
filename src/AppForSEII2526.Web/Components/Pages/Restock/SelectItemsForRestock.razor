@@ -7,8 +7,8 @@
 @inject RestockStateContainer restockState
 @inject NavigationManager navigation
 
-@* @attribute [Authorize]
- *@<h3>Select items for restock</h3>
+ @attribute [Authorize]
+ <h3>Select items for restock</h3>
 
 <div class="container-fluid">
     <div class="row alert alert-danger" role="alert" hidden="@hideErrors">
@@ -86,7 +86,7 @@
             @foreach (RestockItemDTO item in restock.RestockItems)
             {
                 <div class="row mb-2">
-                    <button type="button" class="btn btn-light" id="removeItem_@item.ItemName" 
+                    <button type="button" class="btn btn-light" id="removeItem_@item.ItemId" 
                     @onclick="@(() => RemoveRestockItem(item))"> x @item.ItemName
                     </button>
                 </div>

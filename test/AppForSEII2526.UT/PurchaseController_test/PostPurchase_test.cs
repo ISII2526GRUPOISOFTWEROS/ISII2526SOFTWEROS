@@ -200,7 +200,6 @@ namespace AppForSEII2526.UT.PurchaseController_test
             var result = await controller.CreateItemForPurchase(input);
 
             var badRequest = Assert.IsType<BadRequestObjectResult>(result);
-
             var serializableError = Assert.IsType<SerializableError>(badRequest.Value);
 
             var firstErrorEntry = serializableError.First();
