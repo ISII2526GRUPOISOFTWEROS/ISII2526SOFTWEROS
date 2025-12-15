@@ -81,7 +81,7 @@ namespace AppForSEII2526.UIT.UC_Restock
             selectItemPO.AddQuantityToItem(itemName1, itemQuantityRestock1);
             selectItemPO.ClickRestockButton();
 
-            createRestockOrderPO.FillForm("Restock Order 101", "Muy lejos", "Restock for testing ", "test@gmail.com");
+            createRestockOrderPO.FillForm("Restock Order 1", "Muy lejos", "Restock for testing ", "test@gmail.com");
 
             createRestockOrderPO.SetExpectedDate(DateTime.Now.AddDays(10));
 
@@ -249,7 +249,31 @@ namespace AppForSEII2526.UIT.UC_Restock
         }
 
 
+        [Fact]
+        [Trait("LevelTesting", "Functional Testing")]
 
+        public void UC7_Scen6_Sprint3Exam()
+        {
+
+            var selectItemPO = new SelectItemsForRestock_P0(_driver, _output);
+            var createRestockOrderPO = new CreateRestock_PO(_driver, _output);
+
+
+            InitialStepsForRestockItem();
+            selectItemPO.AddQuantityToItem(itemName1, itemQuantityRestock1);
+
+            selectItemPO.SearchItems(itemName2, itemQuantityRestock2);
+            selectItemPO.AddQuantityToItem(itemName2, itemQuantityRestock2);
+
+            selectItemPO.RemoveItemInCart(itemId1);
+
+            selectItemPO.ClickRestockButton();
+
+            createRestockOrderPO.FillForm("Restock Order 11", "Muy lejos", "Restock for testing1 ", "test@gmail.com");
+
+            Assert.True(createRestockOrderPO.TableHasItem(itemName2));
+
+        }
 
 
 
