@@ -47,7 +47,8 @@ namespace AppForSEII2526.UIT.UC_Purchase
         private const string UserCountry = "Spain";
 
 
-
+        private const string totalPriceExam = "35 €";
+        private const int quantityBuyExam = 1;
 
         public UC_PurchaseItem_UIT(ITestOutputHelper output) : base(output)
         {
@@ -63,7 +64,45 @@ namespace AppForSEII2526.UIT.UC_Purchase
             selectItemsforpurchase_P0.WaitForBeingVisible(By.Id("SelectPurchase"));
             _driver.FindElement(By.Id("SelectPurchase")).Click();
         }
-        
+
+        [Fact]
+        [Trait("LevelTesting", "Functional Testing")]
+        public void UC8_Exam_BF_AF2_AF3()
+        {
+            InitialStepsForPurchaseItem();
+            var selectItemPO = new SelectItemsForPurchase_P0(_driver, _output);
+            var createItemPO = new CreatePurchase_P0(_driver, _output);
+            var detailPO = new DetailPurchase_P0(_driver, _output);
+            //Select item 1
+            selectItemPO.AddQuantityToItem(itemName1, quantityBuyExam);
+            //filter by name
+            selectItemPO.SearchItems(itemName2,"");
+            //add the item 
+            selectItemPO.AddQuantityToItem(itemName2, quantityBuyExam);
+            //remove item 1
+            selectItemPO.RemoveItemInCart(itemId1);
+
+
+            //continue until end
+            selectItemPO.ClickPurchaseButton();
+            createItemPO.FillingDetails(UserStreet, UserCity, UserCountry, "");
+            createItemPO.SelectPaymentMethod("Bizum");
+            createItemPO.SubmitPurchase();
+            createItemPO.ConfirmPurchase();
+            System.Threading.Thread.Sleep(1000);
+
+            Assert.Contains("purchase/detail", _driver.Url);
+            Assert.False(string.IsNullOrEmpty(detailPO.GetPurchaseId()));
+            Assert.Contains(UserEmail, detailPO.GetPurchaseUser());
+            Assert.Equal(totalPriceExam, detailPO.GetPurchaseTotalPrice());
+            Assert.Equal("", detailPO.GetPurchaseDescription());
+            Assert.Contains(UserStreet, detailPO.GetPurchaseAddress());
+            Assert.Contains("Bizum", detailPO.GetPurchasePaymentMethod());
+
+            bool itemFound = detailPO.IsItemInTable(itemName2, quantityBuyExam);
+            Assert.True(itemFound);
+
+        }
 
         [Theory]
         [Trait("LevelTesting", "Functional Testing")]
