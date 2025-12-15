@@ -12,6 +12,7 @@ namespace AppForSEII2526.Web
 
         // We compute the TotalPrice of the movies we have selected for restocking
         // Assuming RestockItemDTO has a Quantity and PurchasePrice
+        public Dictionary<int, string> ItemNames { get; private set; } = new Dictionary<int, string>();
         public decimal TotalPrice
         {
             get
