@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 
 namespace AppForSEII2526.UIT.UC_Plan
@@ -23,37 +24,37 @@ namespace AppForSEII2526.UIT.UC_Plan
 
         public string GetPlanName()
         {
-            WaitForBeingClickable(labelPlanName);
+            WaitForBeingVisible(labelPlanName); // Asegurar que Blazor ha pintado el texto
             return _driver.FindElement(labelPlanName).Text;
         }
 
         public string GetPlanUsername()
         {
-            WaitForBeingClickable(labelUsername);
+            WaitForBeingVisible(labelUsername);
             return _driver.FindElement(labelUsername).Text;
         }
 
         public string GetPlanDescription()
         {
-            WaitForBeingClickable(labelDescription);
+            WaitForBeingVisible(labelDescription);
             return _driver.FindElement(labelDescription).Text;
         }
 
         public string GetPlanCreatedDate()
         {
-            WaitForBeingClickable(labelCreatedDate);
+            WaitForBeingVisible(labelCreatedDate);
             return _driver.FindElement(labelCreatedDate).Text;
         }
 
         public string GetPlanWeeks()
         {
-            WaitForBeingClickable(labelWeeks);
+            WaitForBeingVisible(labelWeeks);
             return _driver.FindElement(labelWeeks).Text;
         }
 
         public string GetPlanTotalPrice()
         {
-            WaitForBeingClickable(labelTotalPrice);
+            WaitForBeingVisible(labelTotalPrice);
             return _driver.FindElement(labelTotalPrice).Text;
         }
 
@@ -65,7 +66,7 @@ namespace AppForSEII2526.UIT.UC_Plan
                 WaitForBeingVisible(rowLocator);
                 return _driver.FindElement(rowLocator).Displayed;
             }
-            catch (NoSuchElementException)
+            catch (Exception) // Captura general para evitar fallos por desincronización
             {
                 return false;
             }
