@@ -182,8 +182,8 @@ namespace AppForSEII2526.API.Controllers
                 return NotFound();
             }
 
-            
-            return Ok(new List<PlanDetailDTO> { planDetails });
+
+            return Ok(planDetails);
         }
     }
 }

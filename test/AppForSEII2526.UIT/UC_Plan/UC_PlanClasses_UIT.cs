@@ -181,7 +181,7 @@ namespace AppForSEII2526.UIT.UC_Plan
         //    _driver.Navigate().GoToUrl("https://localhost:7081/plan/detailsplan/11");
 
         //    Thread.Sleep(1000);
-
+        //
         //    // 3. ASSERT
         //    var detailPO = new DetailsPlan_P0(_driver, _output);
 
