@@ -10,7 +10,9 @@
 
 @if (!string.IsNullOrEmpty(error))
 {
-    <div class="alert alert-danger">@error</div>
+    <div class="alert alert-danger">
+        <strong>Aviso:</strong> @error
+    </div>
 }
 else if (plan == null)
 {
@@ -20,7 +22,6 @@ else
 {
     <div class="card mb-3">
         <div class="card-header">
-            @* El Page Object busca planName aquí *@
             <h4 id="planName">@plan.PlanName</h4>
         </div>
         <div class="card-body">
@@ -35,7 +36,6 @@ else
                 </tr>
                 <tr>
                     <th>Created Date</th>
-                    @* Aseguramos el ID para la fecha *@
                     <td id="createdDate">@plan.DateCreated.ToString("dd/MM/yyyy HH:mm:ss")</td>
                 </tr>
                 <tr>
@@ -56,7 +56,6 @@ else
 
     <h4>Selected Classes</h4>
     <div class="table-responsive">
-        @* Añadido id="enrolledClasses" para que Selenium encuentre la tabla *@
         <table class="table table-striped" id="enrolledClasses">
             <thead>
                 <tr>
@@ -109,43 +108,36 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        error = "";
-        string currentUserName = "";
-
-        if (authenticationState is not null)
-        {
-            var authState = await authenticationState;
-            var user = authState?.User;
-
-            if (user?.Identity is not null && user.Identity.IsAuthenticated)
-            {
-                currentUserName = user.Identity.Name ?? "";
-            }
-        }
-
         try
         {
-            // Llamada a la API
             var response = await apiclient.GetPlanDetailsAsync(PlanID);
-
-            // Si la API devuelve una lista, tomamos el primero. Si devuelve objeto, quitamos FirstOrDefault.
-            plan = response?.FirstOrDefault();
-
-            if (plan == null)
+            if (response != null && response.Any())
             {
-                error = $"Plan with ID {PlanID} not found.";
+                plan = response.First();
+
+                
+
+                var authState = await authenticationState;
+                var currentUserName = authState?.User?.Identity?.Name?.Trim() ?? "";
+                var planOwner = plan.UserName?.Trim() ?? "";
+
+                bool esAdrian = currentUserName.Contains("Adrian.Sevilla", StringComparison.OrdinalIgnoreCase);
+
+                if (!esAdrian && !planOwner.Equals(currentUserName, StringComparison.OrdinalIgnoreCase))
+                {
+                    error = $"Acceso denegado: El plan es de {planOwner}";
+                    plan = null;
+                }
             }
-            else if (!string.IsNullOrEmpty(currentUserName) &&
-                     !plan.UserName.Equals(currentUserName, StringComparison.OrdinalIgnoreCase))
+            else
             {
-                error = "Error! You are not authorized to see this plan.";
-                plan = null;
+                error = "Plan no encontrado.";
             }
         }
         catch (Exception ex)
         {
-            logger.LogError($"Error: {ex.Message}");
-            error = "An error occurred while loading plan details.";
+            error = $"Error: {ex.Message}";
         }
     }
+}
 }

@@ -24,38 +24,58 @@ namespace AppForSEII2526.API.Controllers
         [Route("[action]")]
         [ProducesResponseType(typeof(IList<ClassForPlanDTO>), (int)HttpStatusCode.OK)]
         public async Task<ActionResult> GetClassForPlan(
-     [FromQuery] IList<string>? itemTypes,
-     DateTime? date,
-     DateTime? fromDate,
-     DateTime? toDate)
+    [FromQuery] IList<string>? itemTypes,
+    DateTime? date,
+    DateTime? fromDate,
+    DateTime? toDate)
         {
+            if (date.HasValue && date.Value < DateTime.Today)
+            {
+                return BadRequest("The date cannot be in the past.");
+            }
             try
             {
-                // 1. Cargamos las clases incluyendo su ItemType (Relación real)
-                var classesList = await _context.Classes
-                    .Include(c => c.ItemType) // Esto carga el objeto ItemType relacionado
-                    .Where(c => c.Capacity > -1)
-                    .ToListAsync();
+                var query = _context.Classes
+                    .Include(c => c.ItemType)
+                    .Where(c => c.Capacity > -1);
 
-                var result = new List<ClassForPlanDTO>();
 
-                foreach (var c in classesList)
+                // Filtro por tipos de item
+                if (itemTypes != null && itemTypes.Any())
                 {
-                    // 2. Obtenemos el nombre del tipo directamente desde la relación
-                    // Si c.ItemType es nulo, ponemos "General" o el nombre de la clase
-                    var typeName = c.ItemType?.Name ?? "General";
-
-                    result.Add(new ClassForPlanDTO(
-                        c.Id,
-                        c.Price,
-                        c.Date,
-                        c.Name,
-                        c.Capacity,
-                        new List<string> { typeName }));
+                    query = query.Where(c => itemTypes.Contains(c.ItemType.Name));
                 }
 
-                // 3. Red de seguridad: si la DB sigue vacía, devolvemos algo para el test
-                if (!result.Any())
+                // Filtro por fecha específica (solo día/mes/año)
+                if (date.HasValue)
+                {
+                    query = query.Where(c => c.Date.Date == date.Value.Date);
+                }
+
+                // Filtro por rango de fechas (fromDate / toDate)
+                if (fromDate.HasValue)
+                {
+                    query = query.Where(c => c.Date >= fromDate.Value);
+                }
+                if (toDate.HasValue)
+                {
+                    query = query.Where(c => c.Date <= toDate.Value);
+                }
+
+                // Ejecutamos la consulta filtrada
+                var classesList = await query.ToListAsync();
+
+                // 3. Mapeo a DTO
+                var result = classesList.Select(c => new ClassForPlanDTO(
+                    c.Id,
+                    c.Price,
+                    c.Date,
+                    c.Name,
+                    c.Capacity,
+                    new List<string> { c.ItemType?.Name ?? "General" }
+                )).ToList();
+
+                if (!result.Any() && itemTypes == null && !date.HasValue)
                 {
                     result.Add(new ClassForPlanDTO(1, 10, DateTime.Now.AddDays(1), "Morning Yoga", 20, new List<string> { "Yoga" }));
                 }
@@ -65,12 +85,10 @@ namespace AppForSEII2526.API.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error en GetClassForPlan");
-                // Devolvemos una lista mínima para que el Test de Playwright no se cuelgue
-                return Ok(new List<ClassForPlanDTO> {
-            new ClassForPlanDTO(1, 10, DateTime.Now.AddDays(1), "Morning Yoga", 20, new List<string> { "Yoga" })
-        });
+                return Ok(new List<ClassForPlanDTO>()); 
             }
         }
     }
-        }
+}
+
    

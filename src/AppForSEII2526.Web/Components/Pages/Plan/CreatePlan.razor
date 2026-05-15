@@ -126,32 +126,24 @@
         if (!isOk) return;
 
         messageError = "";
-
         try
         {
-            // Dentro de OnDialogClose en el .razor
+            string currentUserName = "Adrian.Sevilla@alu.uclm.es";
+
             var planForClient = new AppForSEII2526.Web.API.PlanForCreateDTO
             {
-                Name = (plan.Name?.Length < 3) ? "Plan de Entrenamiento" : plan.Name,
-
-                UserName = "AdminTest",
-                Description = plan.Description ?? "Descripción por defecto",
-
-                // Si Weeks es 0, la API da error 400 por el [Range(1, 52)]
+                Name = string.IsNullOrWhiteSpace(plan.Name) || plan.Name.Length < 3 ? "Plan Entrenamiento" : plan.Name,
+                UserName = currentUserName,
+                Description = plan.Description ?? "Sin descripción",
                 Weeks = plan.Weeks > 0 ? plan.Weeks : 1,
-
-                HealthIssues = plan.HealthIssues ?? "Ninguna",
-
-                // USA EL ID 1 QUE ACABAS DE INSERTAR EN SQL
-                PaymentMethodId = 1,
+                PaymentMethodId = plan.PaymentMethodId > 0 ? plan.PaymentMethodId : 1,
 
                 SelectedClasses = plan.SelectedClasses.Select(c => new AppForSEII2526.Web.API.ClassSelectionDTO
                 {
                     Id = c.Id,
                     Name = c.Name,
-                    Price = (double) c.Price, 
-                    Date = c.Date,
-                    ItemType = c.ItemType?.ToList()
+                    Price = (double)c.Price,
+                    Date = c.Date
                 }).ToList(),
 
                 Goals = plan.Goals?.Select(g => new AppForSEII2526.Web.API.GoalForClassDTO
@@ -165,20 +157,15 @@
             planState.PlanProcessed();
             navigation.NavigateTo($"/plan/detailsplan/{response}");
         }
+        catch (ApiException apiEx)
+        {
+            messageError = $"Error 400: {apiEx.Response}";
+            logger.LogError(apiEx.Response);
+        }
         catch (Exception ex)
         {
-            // Pon un breakpoint aquí
-            var message = ex.Message;
-
-            // Si ex es de tipo ApiException (que es lo normal con NSwag/HttpClient generado)
-            // intenta buscar una propiedad llamada 'Response' o 'Content'
-            if (ex is AppForSEII2526.Web.API.ApiException apiEx)
-            {
-                var cuerpoDelError = apiEx.Response; // <--- AQUÍ ESTÁ EL SECRETO
-                Console.WriteLine(cuerpoDelError);
-            }
-
             messageError = $"Error: {ex.Message}";
         }
+    }
     }
 }

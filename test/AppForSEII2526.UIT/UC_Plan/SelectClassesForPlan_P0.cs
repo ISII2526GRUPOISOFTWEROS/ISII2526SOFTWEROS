@@ -124,7 +124,7 @@ namespace AppForSEII2526.UIT.UC_Plan
                 IJavaScriptExecutor js = (IJavaScriptExecutor)_driver;
                 js.ExecuteScript("arguments[0].scrollIntoView(true);", element);
                 js.ExecuteScript("arguments[0].click();", element);
-                _output.WriteLine("¡Botón Proceed pulsado con éxito!");
+                _output.WriteLine("Botón Proceed pulsado ");
             }
             else
             {

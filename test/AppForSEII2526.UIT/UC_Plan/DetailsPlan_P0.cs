@@ -12,7 +12,6 @@ namespace AppForSEII2526.UIT.UC_Plan
         By planName = By.Id("planName");
         By planDescription = By.Id("planDescription");
         By weeks = By.Id("weeks");
-        By healthIssues = By.Id("healthIssues");
         By tableofClassesBy = By.Id("enrolledClasses");
 
         public DetailsPlan_P0(IWebDriver driver, ITestOutputHelper output) : base(driver, output)
@@ -20,14 +19,13 @@ namespace AppForSEII2526.UIT.UC_Plan
         }
 
         public bool CheckPlanDetail(string nameSurnameText, string createdDateText, string planNameText,
-            string planDescriptionText, string weeksText, string healthIssuesText)
+            string planDescriptionText, string weeksText)
         {
             WaitForBeingVisible(nameSurname);
             WaitForBeingVisible(createdDate);
             WaitForBeingVisible(planName);
             WaitForBeingVisible(planDescription);
             WaitForBeingVisible(weeks);
-            WaitForBeingVisible(healthIssues);
 
             bool result = true;
 
@@ -36,7 +34,6 @@ namespace AppForSEII2526.UIT.UC_Plan
             result = result && _driver.FindElement(planName).Text.Contains(planNameText);
             result = result && _driver.FindElement(planDescription).Text.Contains(planDescriptionText);
             result = result && _driver.FindElement(weeks).Text.Contains(weeksText);
-            result = result && _driver.FindElement(healthIssues).Text.Contains(healthIssuesText);
 
             return result;
         }

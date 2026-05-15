@@ -24,10 +24,10 @@ namespace AppForSEII2526.UIT.UC_Plan
         {
         }
 
-        public void FillPlanData(string name, string description, int weeks, string healthIssues)
+        public void FillPlanData(string name, string description, int weeks)
         {
-            _output.WriteLine("Robot: Iniciando carga de datos del plan...");
-            
+            _output.WriteLine("Iniciando carga de datos del plan...");
+
             System.Threading.Thread.Sleep(2000);
 
             Action<By, string, string> BlazorSendKeys = (locator, value, fieldName) =>
@@ -41,7 +41,7 @@ namespace AppForSEII2526.UIT.UC_Plan
 
                     IJavaScriptExecutor js = (IJavaScriptExecutor)_driver;
                     js.ExecuteScript("arguments[0].scrollIntoView({block: 'center'});", element);
-                    System.Threading.Thread.Sleep(500); 
+                    System.Threading.Thread.Sleep(500);
                     js.ExecuteScript("arguments[0].click();", element);
                     js.ExecuteScript("arguments[0].focus();", element);
 
@@ -73,22 +73,6 @@ namespace AppForSEII2526.UIT.UC_Plan
             }
 
             BlazorSendKeys(By.Id("planWeeks"), weeks.ToString(), "Semanas");
-            if (!string.IsNullOrWhiteSpace(healthIssues))
-            {
-                try
-                {
-                    // Solo entra aquí si realmente hay texto que escribir
-                    BlazorSendKeys(By.Id("planHealthIssues"), healthIssues, "Salud");
-                }
-                catch (Exception ex)
-                {
-                    _output.WriteLine($"Aviso: No se encontró el campo opcional de salud: {ex.Message}");
-                }
-            }
-            else
-            {
-                _output.WriteLine("Salud es null o vacío, saltando campo...");
-            }
         }
 
         public void SubmitPlan()
@@ -119,16 +103,12 @@ namespace AppForSEII2526.UIT.UC_Plan
 
        public void ConfirmPlanSubmission()
 {
-    _output.WriteLine("🤖 Robot: Buscando el botón de confirmación por texto exacto...");
+    _output.WriteLine("Buscando el botón de confirmación por texto exacto...");
 
-    // 1. Espera necesaria para que el diálogo termine de dibujarse
     System.Threading.Thread.Sleep(2500); 
 
     try 
     {
-        // 2. Buscamos un botón que diga EXACTAMENTE "Save" (o el texto de tu botón)
-        // El punto (.) indica que buscamos el texto dentro del botón.
-        // Solo buscamos dentro de la clase modal para no irnos a la Home.
         By confirmBtnXPath = By.XPath("//div[contains(@class, 'modal-content')]//button[normalize-space(.)='Save' or normalize-space(.)='Ok' or normalize-space(.)='Proceed']");
 
         var wait = new OpenQA.Selenium.Support.UI.WebDriverWait(_driver, TimeSpan.FromSeconds(10));
@@ -137,21 +117,18 @@ namespace AppForSEII2526.UIT.UC_Plan
             return (el.Displayed && el.Enabled) ? el : null;
         });
 
-        _output.WriteLine($"   > ¡Botón '{element.Text}' localizado! Clicando...");
+        _output.WriteLine($"   > Botón '{element.Text}' localizado Clicando...");
 
-        // 3. Click con JavaScript (el más fiable para evitar redirecciones raras)
         IJavaScriptExecutor js = (IJavaScriptExecutor)_driver;
         js.ExecuteScript("arguments[0].click();", element);
         
-        _output.WriteLine("✅ ¡Click en confirmación realizado!");
+        _output.WriteLine("Click en confirmación realizado");
         
-        // 4. Pausa para que la API responda antes de que el Test mire la URL
         System.Threading.Thread.Sleep(4000); 
     }
     catch (Exception ex)
     {
-        _output.WriteLine($"❌ Error: No se pudo clicar el botón. {ex.Message}");
-        // Si falla, intentamos pulsar Enter, que en los diálogos suele ser el botón por defecto
+        _output.WriteLine($"Error: No se pudo clicar el botón {ex.Message}");
         new OpenQA.Selenium.Interactions.Actions(_driver).SendKeys(OpenQA.Selenium.Keys.Enter).Perform();
     }
 }

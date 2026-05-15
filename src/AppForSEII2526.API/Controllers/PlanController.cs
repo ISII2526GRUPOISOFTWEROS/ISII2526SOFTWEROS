@@ -24,58 +24,21 @@ namespace AppForSEII2526.API.Controllers
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.Conflict)]
         public async Task<ActionResult> CreatePlan(PlanForCreateDTO planForCreate)
         {
-            if (planForCreate == null)
-            {
-                return BadRequest("No plan data provided.");
-            }
+            if (planForCreate == null) return BadRequest("No plan data provided.");
 
-            var user = _context.ApplicationUser.FirstOrDefault(au => au.UserName == planForCreate.UserName);
+            var user = await _context.ApplicationUser.FirstOrDefaultAsync(au => au.UserName == planForCreate.UserName);
 
             if (user == null)
             {
+                _logger.LogWarning($"User {planForCreate.UserName} not found");
                 return BadRequest("Error! Username is not registered");
             }
-
-            var checkPM = await _context.Set<PaymentMethod>()
-                .AnyAsync(pm => pm.Id == planForCreate.PaymentMethodId && pm.User.Id == user.Id);
-
-
-            if (!checkPM)
-            {
-                ModelState.AddModelError("PaymentMethod", "Error! The selected payment method is not registered for this user.");
-                return BadRequest(ValidationProblem(ModelState));
-
-            }
-
-
-
-            if (string.IsNullOrWhiteSpace(planForCreate.Name))
-            {
-                ModelState.AddModelError("Name", "Plan name is mandatory.");
-            }
-
-            if (planForCreate.Weeks <= 0)
-            {
-                return BadRequest("Weeks must be greater than 0.");
-            }
-
-            if (planForCreate.PaymentMethodId <= 0)
-            {
-                ModelState.AddModelError("PaymentMethod", "A valid payment method must be selected.");
-            }
-
-          
-            if (ModelState.ErrorCount > 0)
-            {
-                return BadRequest(ValidationProblem(ModelState));
-            }
-
             var paymentMethod = await _context.Set<PaymentMethod>()
                 .FirstOrDefaultAsync(pm => pm.Id == planForCreate.PaymentMethodId);
 
             if (paymentMethod == null)
             {
-                ModelState.AddModelError("PaymentMethod", "The selected payment method is invalid or not found.");
+                ModelState.AddModelError("PaymentMethod", "Error! The selected payment method does not exist.");
                 return BadRequest(ValidationProblem(ModelState));
             }
 
@@ -108,7 +71,7 @@ namespace AppForSEII2526.API.Controllers
                 if (dbClass.Capacity <= 0)
                 {
                     ModelState.AddModelError("Capacity", $"The class {dbClass.Name} has no available capacity.");
-                    continue; 
+                    continue;
                 }
                 plan.PlanItems.Add(new PlanItem(dbClass.Price)
                 {
@@ -122,7 +85,7 @@ namespace AppForSEII2526.API.Controllers
             plan.Totalprice = totalCost;
             _context.Plans.Add(plan);
 
-            
+
             if (ModelState.ErrorCount > 0)
             {
                 return BadRequest(ValidationProblem(ModelState));
@@ -165,12 +128,11 @@ namespace AppForSEII2526.API.Controllers
         }
 
         //details
-
         [HttpGet]
-        [Route("[action]/{id?}")] // El '?' permite que el ID sea opcional
-        [ProducesResponseType(typeof(PlanDetailDTO), (int)HttpStatusCode.OK)] // Cambiado a Single DTO, no IList
+        [Route("[action]/{id?}")]
+        [ProducesResponseType(typeof(IEnumerable<PlanDetailDTO>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        public async Task<ActionResult> GetPlanDetails(int? id) // Ahora acepta 'int?'
+        public async Task<ActionResult> GetPlanDetails(int? id)
         {
             if (_context.Plans == null)
             {
@@ -178,7 +140,6 @@ namespace AppForSEII2526.API.Controllers
                 return NotFound();
             }
 
-            // LÓGICA PARA EL MENÚ: Si el ID es nulo, buscamos el plan más reciente
             if (id == null)
             {
                 var lastPlan = await _context.Plans.OrderByDescending(p => p.Id).FirstOrDefaultAsync();
@@ -189,12 +150,13 @@ namespace AppForSEII2526.API.Controllers
                 id = lastPlan.Id;
             }
 
-            PlanDetailDTO? planDetails = await _context.Plans
+            // Buscamos el plan
+            var planDetails = await _context.Plans
                 .Where(p => p.Id == id)
                 .Include(p => p.User)
                 .Include(p => p.PlanItems)
-                .ThenInclude(pc => pc.Class)
-                .ThenInclude(c => c.ItemType)
+                    .ThenInclude(pc => pc.Class)
+                        .ThenInclude(c => c.ItemType)
                 .Select(p => new PlanDetailDTO(
                     p.Id,
                     p.User.UserName,
@@ -220,9 +182,8 @@ namespace AppForSEII2526.API.Controllers
                 return NotFound();
             }
 
-            return Ok(planDetails);
-        
-
-    }
+            
+            return Ok(new List<PlanDetailDTO> { planDetails });
+        }
     }
 }
