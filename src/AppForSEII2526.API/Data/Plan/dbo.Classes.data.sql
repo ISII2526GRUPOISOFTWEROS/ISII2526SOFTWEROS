@@ -1,5 +1,23 @@
-﻿SET IDENTITY_INSERT [dbo].[Classes] ON
-INSERT INTO [dbo].[Classes] ([Id], [Capacity], [Name], [Price], [Date]) VALUES (1, 10, N'Crossfit', CAST(30.00 AS Decimal(10, 2)), N'2025-12-16 10:00:00')
-INSERT INTO [dbo].[Classes] ([Id], [Capacity], [Name], [Price], [Date]) VALUES (2, 15, N'spinning', CAST(25.00 AS Decimal(10, 2)), N'2025-11-10 11:00:00')
-INSERT INTO [dbo].[Classes] ([Id], [Capacity], [Name], [Price], [Date]) VALUES (3, 8, N'fitness', CAST(18.00 AS Decimal(10, 2)), N'2025-11-01 08:00:00')
-SET IDENTITY_INSERT [dbo].[Classes] OFF
+﻿
+DELETE FROM [dbo].[ItemTypes];
+
+SET IDENTITY_INSERT [dbo].[ItemTypes] ON;
+
+INSERT INTO [dbo].[ItemTypes] ([Id], [Name]) VALUES (1, N'Cardio');
+INSERT INTO [dbo].[ItemTypes] ([Id], [Name]) VALUES (2, N'Fuerza');
+INSERT INTO [dbo].[ItemTypes] ([Id], [Name]) VALUES (3, N'Flexibilidad');
+
+SET IDENTITY_INSERT [dbo].[ItemTypes] OFF;
+DELETE FROM [dbo].[Classes];
+SET IDENTITY_INSERT [dbo].[Classes] ON;
+
+-- 1. MORNING YOGA (La que necesita el test ESC8_AF7)
+-- Le ponemos la misma fecha que a Spinning y el mismo TypeId
+INSERT INTO [dbo].[Classes] ([Id], [Capacity], [Name], [Price], [Date], [ItemTypeId]) 
+VALUES (10, 0, N'Morning Yoga', 25.00, '2026-05-17 17:04:00', 1);
+
+-- 2. SPINNING (La que ya sabemos que la web SÍ muestra)
+INSERT INTO [dbo].[Classes] ([Id], [Capacity], [Name], [Price], [Date], [ItemTypeId]) 
+VALUES (2, 15, N'Spinning', 25.00, '2026-05-17 17:04:00', 1);
+
+SET IDENTITY_INSERT [dbo].[Classes] OFF;

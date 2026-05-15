@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AppForSEII2526.API.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251211143700_CreateIdentitySchema")]
-    partial class CreateIdentitySchema
+    [Migration("20260515140004_NuevaBaseLimpia")]
+    partial class NuevaBaseLimpia
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -74,7 +74,6 @@ namespace AppForSEII2526.API.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Surname")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("TwoFactorEnabled")
@@ -128,6 +127,9 @@ namespace AppForSEII2526.API.Migrations
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("ItemTypeId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -137,6 +139,8 @@ namespace AppForSEII2526.API.Migrations
                         .HasColumnType("decimal(10,2)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ItemTypeId");
 
                     b.ToTable("Classes");
                 });
@@ -269,15 +273,10 @@ namespace AppForSEII2526.API.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("ClassId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ClassId");
 
                     b.HasIndex("Name")
                         .IsUnique()
@@ -673,6 +672,17 @@ namespace AppForSEII2526.API.Migrations
                     b.HasDiscriminator().HasValue("PayPal");
                 });
 
+            modelBuilder.Entity("AppForSEII2526.API.Models.Class", b =>
+                {
+                    b.HasOne("AppForSEII2526.API.Models.ItemType", "ItemType")
+                        .WithMany("Classes")
+                        .HasForeignKey("ItemTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ItemType");
+                });
+
             modelBuilder.Entity("AppForSEII2526.API.Models.Incident", b =>
                 {
                     b.HasOne("AppForSEII2526.API.Models.ApplicationUser", "AplicationUsers")
@@ -731,17 +741,6 @@ namespace AppForSEII2526.API.Migrations
                         .IsRequired();
 
                     b.Navigation("Item");
-                });
-
-            modelBuilder.Entity("AppForSEII2526.API.Models.ItemType", b =>
-                {
-                    b.HasOne("AppForSEII2526.API.Models.Class", "Class")
-                        .WithMany("TypeItems")
-                        .HasForeignKey("ClassId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Class");
                 });
 
             modelBuilder.Entity("AppForSEII2526.API.Models.PaymentMethod", b =>
@@ -911,8 +910,6 @@ namespace AppForSEII2526.API.Migrations
             modelBuilder.Entity("AppForSEII2526.API.Models.Class", b =>
                 {
                     b.Navigation("PlanItems");
-
-                    b.Navigation("TypeItems");
                 });
 
             modelBuilder.Entity("AppForSEII2526.API.Models.Incident", b =>
@@ -934,6 +931,8 @@ namespace AppForSEII2526.API.Migrations
 
             modelBuilder.Entity("AppForSEII2526.API.Models.ItemType", b =>
                 {
+                    b.Navigation("Classes");
+
                     b.Navigation("Items");
                 });
 

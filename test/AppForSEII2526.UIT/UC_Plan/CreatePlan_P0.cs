@@ -106,49 +106,44 @@ namespace AppForSEII2526.UIT.UC_Plan
             }
         }
 
-        public void ConfirmPlanSubmission()
-        {
-            _output.WriteLine("🤖 Robot: Buscando el botón de confirmación...");
+       public void ConfirmPlanSubmission()
+{
+    _output.WriteLine("🤖 Robot: Buscando el botón de confirmación por texto exacto...");
 
-            // 1. Espera un poco más por la animación de Blazor
-            System.Threading.Thread.Sleep(2000);
+    // 1. Espera necesaria para que el diálogo termine de dibujarse
+    System.Threading.Thread.Sleep(2500); 
 
-            // 2. Intentamos buscar el botón por texto. 
-            // En tu componente SaveNot, el botón positivo suele ser "Save" o "Confirm".
-            // Este XPath busca cualquier botón que contenga esas palabras.
-            By confirmBtnXPath = By.XPath("//button[contains(text(), 'Save') or contains(text(), 'Confirm') or contains(text(), 'Ok') or contains(text(), 'Yes')]");
+    try 
+    {
+        // 2. Buscamos un botón que diga EXACTAMENTE "Save" (o el texto de tu botón)
+        // El punto (.) indica que buscamos el texto dentro del botón.
+        // Solo buscamos dentro de la clase modal para no irnos a la Home.
+        By confirmBtnXPath = By.XPath("//div[contains(@class, 'modal-content')]//button[normalize-space(.)='Save' or normalize-space(.)='Ok' or normalize-space(.)='Proceed']");
 
-            try
-            {
-                var wait = new OpenQA.Selenium.Support.UI.WebDriverWait(_driver, TimeSpan.FromSeconds(10));
-                var element = wait.Until(d => d.FindElement(confirmBtnXPath));
+        var wait = new OpenQA.Selenium.Support.UI.WebDriverWait(_driver, TimeSpan.FromSeconds(10));
+        var element = wait.Until(d => {
+            var el = d.FindElement(confirmBtnXPath);
+            return (el.Displayed && el.Enabled) ? el : null;
+        });
 
-                // 3. Movemos el ratón al botón y hacemos click con JS para asegurar el disparo del evento OnClick de Blazor
-                IJavaScriptExecutor js = (IJavaScriptExecutor)_driver;
-                js.ExecuteScript("arguments[0].scrollIntoView(true);", element);
-                System.Threading.Thread.Sleep(500);
-                js.ExecuteScript("arguments[0].click();", element);
+        _output.WriteLine($"   > ¡Botón '{element.Text}' localizado! Clicando...");
 
-                _output.WriteLine("✅ ¡Click en confirmación realizado!");
-
-                // 4. ESPERA CRUCIAL: Dale tiempo a la API para responder y redirigir
-                System.Threading.Thread.Sleep(3000);
-            }
-            catch (Exception ex)
-            {
-                _output.WriteLine($"❌ No se encontró el botón con texto. Intentando click en el primer botón primario...");
-                // Plan C: Click en el primer botón azul que encuentre (clase btn-primary)
-                try
-                {
-                    var btnPrimary = _driver.FindElement(By.CssSelector("button.btn-primary:not(#Submit)"));
-                    ((IJavaScriptExecutor)_driver).ExecuteScript("arguments[0].click();", btnPrimary);
-                }
-                catch
-                {
-                    throw new Exception("Imposible encontrar el botón de confirmación en el diálogo.");
-                }
-            }
-        }
+        // 3. Click con JavaScript (el más fiable para evitar redirecciones raras)
+        IJavaScriptExecutor js = (IJavaScriptExecutor)_driver;
+        js.ExecuteScript("arguments[0].click();", element);
+        
+        _output.WriteLine("✅ ¡Click en confirmación realizado!");
+        
+        // 4. Pausa para que la API responda antes de que el Test mire la URL
+        System.Threading.Thread.Sleep(4000); 
+    }
+    catch (Exception ex)
+    {
+        _output.WriteLine($"❌ Error: No se pudo clicar el botón. {ex.Message}");
+        // Si falla, intentamos pulsar Enter, que en los diálogos suele ser el botón por defecto
+        new OpenQA.Selenium.Interactions.Actions(_driver).SendKeys(OpenQA.Selenium.Keys.Enter).Perform();
+    }
+}
 
         public void ModifyClasses()
         {

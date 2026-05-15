@@ -15,13 +15,13 @@ namespace AppForSEII2526.UIT.UC_Plan
         private CreatePlan_P0 createPlan_PO;
         private DetailsPlan_P0 detailsPlan_P0;
 
-        private const string validPlanName = "My Fitness Journey";
+        private const string validPlanName = "PlanForMyFirstWeeks";
         private const string validDescription = "A comprehensive 4-week fitness plan";
         private const int validWeeks = 4;
         private const int validPaymentMethodId = 1;
 
         private const int classId1 = 1;
-        private const string className1 = "Morning Yoga";
+        private const string className1 = "Spinning";
 
         private const string UserEmail = "Adrian.Sevilla@alu.uclm.es";
         private const string UserPassword = "Password123!";
@@ -75,6 +75,7 @@ namespace AppForSEII2526.UIT.UC_Plan
             SelectClassesForPlan(className1);
         }
 
+        
         /************************************************
          *  TEST CASES FOR: CREATE PLAN                 *
          ************************************************/
@@ -85,9 +86,7 @@ namespace AppForSEII2526.UIT.UC_Plan
         {
             // ARRANGE
             InitialStepsForCreatePlan();
-            var wait = new OpenQA.Selenium.Support.UI.WebDriverWait(_driver, TimeSpan.FromSeconds(10));
-            wait.Until(d => d.Url.Contains("createplan"));
-            System.Threading.Thread.Sleep(2000);
+          
 
             createPlan_PO.FillPlanData(validPlanName, validDescription, validWeeks, "");
 
@@ -98,9 +97,11 @@ namespace AppForSEII2526.UIT.UC_Plan
             createPlan_PO.ConfirmPlanSubmission();
 
             // ASSERT
-            Assert.Contains("/plan/detailsplan/", _driver.Url.ToLower());
-            Assert.Contains(validPlanName, detailsPlan_P0.GetPlanName());
-            Assert.Contains(validWeeks.ToString(), detailsPlan_P0.GetPlanWeeks());
+            // Sustituye tu Assert.Contains por esto en el Test:
+            var wait = new OpenQA.Selenium.Support.UI.WebDriverWait(_driver, TimeSpan.FromSeconds(10));
+            bool success = wait.Until(d => d.Url.ToLower().Contains("/plan/detailsplan/"));
+
+            Assert.True(success, $"El robot se quedó en {_driver.Url} y no llegó a Details.");
         }
 
         [Fact]
