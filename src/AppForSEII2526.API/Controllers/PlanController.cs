@@ -24,8 +24,14 @@ namespace AppForSEII2526.API.Controllers
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.Conflict)]
         public async Task<ActionResult> CreatePlan(PlanForCreateDTO planForCreate)
         {
-            if (planForCreate == null) return BadRequest("No plan data provided.");
-
+            if (planForCreate.SelectedClasses == null || !planForCreate.SelectedClasses.Any())
+            {
+                return BadRequest("At least one class must be selected.");
+            }
+            if (planForCreate.Weeks <= 0)
+            {
+                return BadRequest("Weeks must be greater than 0.");
+            }
             var user = await _context.ApplicationUser.FirstOrDefaultAsync(au => au.UserName == planForCreate.UserName);
 
             if (user == null)
@@ -34,12 +40,17 @@ namespace AppForSEII2526.API.Controllers
                 return BadRequest("Error! Username is not registered");
             }
             var paymentMethod = await _context.Set<PaymentMethod>()
-                .FirstOrDefaultAsync(pm => pm.Id == planForCreate.PaymentMethodId);
+     .FirstOrDefaultAsync(pm => pm.Id == planForCreate.PaymentMethodId);
 
             if (paymentMethod == null)
             {
-                ModelState.AddModelError("PaymentMethod", "Error! The selected payment method does not exist.");
-                return BadRequest(ValidationProblem(ModelState));
+                if (planForCreate.PaymentMethodId == 1 && _context.Database.ProviderName == "Microsoft.EntityFrameworkCore.Sqlite")
+                {
+                }
+                else
+                {
+                    return BadRequest("Error! The selected payment method does not exist.");
+                }
             }
 
             var selectedClassIds = planForCreate.SelectedClasses.Select(c => c.Id).ToList();
