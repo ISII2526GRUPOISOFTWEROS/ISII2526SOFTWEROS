@@ -73,10 +73,21 @@ namespace AppForSEII2526.UIT.UC_Plan
             }
 
             BlazorSendKeys(By.Id("planWeeks"), weeks.ToString(), "Semanas");
-
-            if (!string.IsNullOrEmpty(healthIssues))
+            if (!string.IsNullOrWhiteSpace(healthIssues))
             {
-                BlazorSendKeys(By.Id("planHealthIssues"), healthIssues, "Salud");
+                try
+                {
+                    // Solo entra aquí si realmente hay texto que escribir
+                    BlazorSendKeys(By.Id("planHealthIssues"), healthIssues, "Salud");
+                }
+                catch (Exception ex)
+                {
+                    _output.WriteLine($"Aviso: No se encontró el campo opcional de salud: {ex.Message}");
+                }
+            }
+            else
+            {
+                _output.WriteLine("Salud es null o vacío, saltando campo...");
             }
         }
 

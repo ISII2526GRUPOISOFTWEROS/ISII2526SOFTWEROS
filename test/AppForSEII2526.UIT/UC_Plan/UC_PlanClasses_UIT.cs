@@ -21,7 +21,9 @@ namespace AppForSEII2526.UIT.UC_Plan
         private const int validPaymentMethodId = 1;
 
         private const int classId1 = 1;
-        private const string className1 = "Spinning";
+        private const string className1 = "Morning Yoga";
+        private const string className2 = "Spinning";
+
 
         private const string UserEmail = "Adrian.Sevilla@alu.uclm.es";
         private const string UserPassword = "Password123!";
@@ -74,8 +76,16 @@ namespace AppForSEII2526.UIT.UC_Plan
             Precondition_performance_login();
             SelectClassesForPlan(className1);
         }
+        private void InitialStepsForCapacityTest()
 
-        
+        {
+
+            Precondition_performance_login();
+
+            SelectClassesForPlan(className2);
+
+        }
+
         /************************************************
          *  TEST CASES FOR: CREATE PLAN                 *
          ************************************************/
@@ -84,24 +94,36 @@ namespace AppForSEII2526.UIT.UC_Plan
         [Trait("LevelTesting", "Functional Testing")]
         public void UC_CreatePlan_ESC1_BF_CreatePlanSuccess()
         {
-            // ARRANGE
+            // 1. ARRANGE
             InitialStepsForCreatePlan();
-          
-
-            createPlan_PO.FillPlanData(validPlanName, validDescription, validWeeks, "");
-
-            // ACT
-            // Pasamos los 4 parámetros que acepta tu FillPlanData original: name, description, weeks, healthIssues
             
-            createPlan_PO.SubmitPlan(); // Corregido el nombre de la variable
+            createPlan_PO.FillPlanData(validPlanName, validDescription, validWeeks, null);
+
+            // 2. ACT
+            createPlan_PO.SubmitPlan();
             createPlan_PO.ConfirmPlanSubmission();
 
-            // ASSERT
-            // Sustituye tu Assert.Contains por esto en el Test:
-            var wait = new OpenQA.Selenium.Support.UI.WebDriverWait(_driver, TimeSpan.FromSeconds(10));
-            bool success = wait.Until(d => d.Url.ToLower().Contains("/plan/detailsplan/"));
+            // ESPERA DE SEGURIDAD: Dale un segundo a la DB para procesar
+            Thread.Sleep(1000);
 
-            Assert.True(success, $"El robot se quedó en {_driver.Url} y no llegó a Details.");
+            // OJO: Si el robot no se mueve solo, tienes que llevarlo tú a la ruta:
+            // Sustituye el "11" por el ID que quieras probar o automatiza la captura del ID
+            // _driver.Navigate().GoToUrl("https://localhost:7081/plan/detailsplan/11");
+
+            // 3. ASSERT
+            var detailPO = new DetailsPlan_P0(_driver, _output);
+
+            // IMPORTANTE: Asegúrate de que estos strings coincidan EXACTAMENTE con lo que sale en pantalla
+            bool detallesCorrectos = detailPO.CheckPlanDetail(
+                "admin@test.com",      // <--- Pon el usuario real que está logueado
+                "15/05/2026",          // <--- Formato DD/MM/YYYY
+                validPlanName,
+                validDescription,
+                validWeeks.ToString(),
+                "Ninguna"
+            );
+
+            Assert.True(detallesCorrectos, "Los datos del plan en la pantalla de detalles no coinciden con los introducidos.");
         }
 
         [Fact]
@@ -164,12 +186,12 @@ namespace AppForSEII2526.UIT.UC_Plan
             Assert.True(true);
         }
 
-        [Fact(Skip = "Run dtoClassNoCapacity.sql first")]
+        [Fact]
         [Trait("LevelTesting", "Functional Testing")]
         public void UC_CreatePlan_ESC8_AF7_ClassWithoutCapacity()
         {
             // ARRANGE
-            InitialStepsForCreatePlan();
+            InitialStepsForCapacityTest();
 
             // ACT
             createPlan_PO.FillPlanData("Capacity Test Plan", "Testing capacity validation", validWeeks, "");

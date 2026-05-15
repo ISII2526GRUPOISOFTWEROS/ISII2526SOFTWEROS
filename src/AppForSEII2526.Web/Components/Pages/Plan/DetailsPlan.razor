@@ -8,7 +8,7 @@
 
 <h3>Details Plan</h3>
 
-@if (error != "")
+@if (!string.IsNullOrEmpty(error))
 {
     <div class="alert alert-danger">@error</div>
 }
@@ -20,29 +20,31 @@ else
 {
     <div class="card mb-3">
         <div class="card-header">
-            <h4>@plan.PlanName</h4>
+            @* El Page Object busca planName aquí *@
+            <h4 id="planName">@plan.PlanName</h4>
         </div>
         <div class="card-body">
             <table class="table table-borderless table-sm">
                 <tr>
                     <th style="width: 200px;">Username</th>
-                    <td>@plan.UserName</td>
+                    <td id="nameSurname">@plan.UserName</td>
                 </tr>
                 <tr>
                     <th>Description</th>
-                    <td>@plan.Description</td>
+                    <td id="planDescription">@plan.Description</td>
                 </tr>
                 <tr>
                     <th>Created Date</th>
-                    <td>@plan.DateCreated.ToString("dd/MM/yyyy HH:mm:ss")</td>
+                    @* Aseguramos el ID para la fecha *@
+                    <td id="createdDate">@plan.DateCreated.ToString("dd/MM/yyyy HH:mm:ss")</td>
                 </tr>
                 <tr>
                     <th>Number of Weeks</th>
-                    <td>@plan.NumberOfWeeks</td>
+                    <td id="weeks">@plan.NumberOfWeeks</td>
                 </tr>
                 <tr>
                     <th>Health Issues</th>
-                    <td>@plan.HealthIssues</td>
+                    <td id="healthIssues">@plan.HealthIssues</td>
                 </tr>
                 <tr>
                     <th>Total Price</th>
@@ -54,7 +56,8 @@ else
 
     <h4>Selected Classes</h4>
     <div class="table-responsive">
-        <table class="table table-striped">
+        @* Añadido id="enrolledClasses" para que Selenium encuentre la tabla *@
+        <table class="table table-striped" id="enrolledClasses">
             <thead>
                 <tr>
                     <th scope="col">Name</th>
@@ -73,7 +76,7 @@ else
                             <td>@item.Name</td>
                             <td>@item.Capacity</td>
                             <td>@item.Price.ToString("C")</td>
-                            <td>@item.Date.ToString("g")</td> 
+                            <td>@item.Date.ToString("g")</td>
                             <td>
                                 @if (item.ItemType != null)
                                 {
@@ -98,7 +101,7 @@ else
     [Parameter]
     public int PlanID { get; set; }
 
-    private PlanDetailDTO plan;
+    private PlanDetailDTO? plan;
     private string error = "";
 
     [CascadingParameter]
@@ -114,47 +117,35 @@ else
             var authState = await authenticationState;
             var user = authState?.User;
 
-            if (user is not null && user.Identity is not null && user.Identity.IsAuthenticated)
+            if (user?.Identity is not null && user.Identity.IsAuthenticated)
             {
                 currentUserName = user.Identity.Name ?? "";
             }
         }
 
-        try{
+        try
+        {
+            // Llamada a la API
             var response = await apiclient.GetPlanDetailsAsync(PlanID);
 
+            // Si la API devuelve una lista, tomamos el primero. Si devuelve objeto, quitamos FirstOrDefault.
             plan = response?.FirstOrDefault();
 
             if (plan == null)
             {
                 error = $"Plan with ID {PlanID} not found.";
             }
-            else if (!string.IsNullOrEmpty(currentUserName) && !plan.UserName.Equals(currentUserName, StringComparison.OrdinalIgnoreCase))
+            else if (!string.IsNullOrEmpty(currentUserName) &&
+                     !plan.UserName.Equals(currentUserName, StringComparison.OrdinalIgnoreCase))
             {
-                if (!string.Equals(plan.UserName, currentUserName, StringComparison.OrdinalIgnoreCase))
-                {
-                    error = "Error! You are not authorized to see this plan.";
-                    plan = null;
-                }
-            }
-        }
-        catch (ApiException ex)
-        {
-            logger.LogError($"API Error: {ex.Message}");
-            if (ex.StatusCode == 404)
-            {
-                error = "Plan not found.";
-            }
-            else
-            {
-                error = "Error loading plan details.";
+                error = "Error! You are not authorized to see this plan.";
+                plan = null;
             }
         }
         catch (Exception ex)
         {
-            logger.LogError($"Unexpected Error: {ex.Message}");
-            error = "An unexpected error occurred.";
+            logger.LogError($"Error: {ex.Message}");
+            error = "An error occurred while loading plan details.";
         }
     }
 }
-

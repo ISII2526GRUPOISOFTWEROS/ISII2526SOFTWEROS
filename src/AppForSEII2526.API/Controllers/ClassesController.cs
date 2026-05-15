@@ -34,7 +34,7 @@ namespace AppForSEII2526.API.Controllers
                 // 1. Cargamos las clases incluyendo su ItemType (Relación real)
                 var classesList = await _context.Classes
                     .Include(c => c.ItemType) // Esto carga el objeto ItemType relacionado
-                    .Where(c => c.Capacity > 0)
+                    .Where(c => c.Capacity > -1)
                     .ToListAsync();
 
                 var result = new List<ClassForPlanDTO>();

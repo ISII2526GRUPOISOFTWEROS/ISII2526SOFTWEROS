@@ -14,10 +14,10 @@ SET IDENTITY_INSERT [dbo].[Classes] ON;
 -- 1. MORNING YOGA (La que necesita el test ESC8_AF7)
 -- Le ponemos la misma fecha que a Spinning y el mismo TypeId
 INSERT INTO [dbo].[Classes] ([Id], [Capacity], [Name], [Price], [Date], [ItemTypeId]) 
-VALUES (10, 0, N'Morning Yoga', 25.00, '2026-05-17 17:04:00', 1);
+VALUES (10, 15, N'Morning Yoga', 25.00, '2026-05-17 17:04:00', 1);
 
 -- 2. SPINNING (La que ya sabemos que la web SÍ muestra)
 INSERT INTO [dbo].[Classes] ([Id], [Capacity], [Name], [Price], [Date], [ItemTypeId]) 
-VALUES (2, 15, N'Spinning', 25.00, '2026-05-17 17:04:00', 1);
+VALUES (2, 0, N'Spinning', 25.00, '2026-05-17 17:04:00', 1);
 
 SET IDENTITY_INSERT [dbo].[Classes] OFF;

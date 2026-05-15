@@ -64,10 +64,7 @@ namespace AppForSEII2526.API.Controllers
                 ModelState.AddModelError("PaymentMethod", "A valid payment method must be selected.");
             }
 
-            if (planForCreate.SelectedClasses == null || !planForCreate.SelectedClasses.Any())
-            {
-                return BadRequest("At least one class must be selected.");
-            }
+          
             if (ModelState.ErrorCount > 0)
             {
                 return BadRequest(ValidationProblem(ModelState));
@@ -108,6 +105,11 @@ namespace AppForSEII2526.API.Controllers
                     ModelState.AddModelError("ClassNotFound", $"Error! Class with Id {selected.Id} not found.");
                     continue;
                 }
+                if (dbClass.Capacity <= 0)
+                {
+                    ModelState.AddModelError("Capacity", $"The class {dbClass.Name} has no available capacity.");
+                    continue; 
+                }
                 plan.PlanItems.Add(new PlanItem(dbClass.Price)
                 {
                     Class = dbClass,
@@ -120,7 +122,7 @@ namespace AppForSEII2526.API.Controllers
             plan.Totalprice = totalCost;
             _context.Plans.Add(plan);
 
-
+            
             if (ModelState.ErrorCount > 0)
             {
                 return BadRequest(ValidationProblem(ModelState));
@@ -165,10 +167,10 @@ namespace AppForSEII2526.API.Controllers
         //details
 
         [HttpGet]
-        [Route("[action]")]
-        [ProducesResponseType(typeof(IList<PlanDetailDTO>), (int)HttpStatusCode.OK)]
+        [Route("[action]/{id?}")] // El '?' permite que el ID sea opcional
+        [ProducesResponseType(typeof(PlanDetailDTO), (int)HttpStatusCode.OK)] // Cambiado a Single DTO, no IList
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        public async Task<ActionResult> GetPlanDetails(int id)
+        public async Task<ActionResult> GetPlanDetails(int? id) // Ahora acepta 'int?'
         {
             if (_context.Plans == null)
             {
@@ -176,26 +178,37 @@ namespace AppForSEII2526.API.Controllers
                 return NotFound();
             }
 
+            // LÓGICA PARA EL MENÚ: Si el ID es nulo, buscamos el plan más reciente
+            if (id == null)
+            {
+                var lastPlan = await _context.Plans.OrderByDescending(p => p.Id).FirstOrDefaultAsync();
+                if (lastPlan == null)
+                {
+                    return NotFound("No plans found in the database.");
+                }
+                id = lastPlan.Id;
+            }
+
             PlanDetailDTO? planDetails = await _context.Plans
-             .Where(p => p.Id == id)
-            .Include(p => p.User)
-            .Include(p => p.PlanItems)
-            .ThenInclude(pc => pc.Class)
-            .ThenInclude(c => c.ItemType)
-                   .Select(p => new PlanDetailDTO(
+                .Where(p => p.Id == id)
+                .Include(p => p.User)
+                .Include(p => p.PlanItems)
+                .ThenInclude(pc => pc.Class)
+                .ThenInclude(c => c.ItemType)
+                .Select(p => new PlanDetailDTO(
                     p.Id,
                     p.User.UserName,
                     p.CreatedDate,
                     p.Totalprice,
-                    p.Name, //?? string.Empty,
-                    p.Description, // ?? string.Empty,
+                    p.Name,
+                    p.Description,
                     p.Weeks,
-                    p.HealthIssues, // ?? string.Empty,
+                    p.HealthIssues,
                     p.PlanItems.Select(pc => new ClassForPlanDTO(
                         pc.Class.Id,
                         pc.Class.Price,
                         pc.Class.Date,
-                        pc.Class.Name, // ?? string.Empty,
+                        pc.Class.Name,
                         pc.Class.Capacity,
                         new List<string> { pc.Class.ItemType.Name }
                     )).ToList()
@@ -208,7 +221,8 @@ namespace AppForSEII2526.API.Controllers
             }
 
             return Ok(planDetails);
+        
 
-        }
+    }
     }
 }

@@ -1,75 +1,49 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using OpenQA.Selenium;
-using OpenQA.Selenium.Support.UI;
+using Xunit.Abstractions;
 
 namespace AppForSEII2526.UIT.UC_Plan
 {
     public class DetailsPlan_P0 : PageObject
     {
-        private By labelPlanName = By.Id("PlanName");
-        private By labelUsername = By.Id("Username");
-        private By labelDescription = By.Id("Description");
-        private By labelCreatedDate = By.Id("CreatedDate");
-        private By labelWeeks = By.Id("NumberOfWeeks");
-        private By labelTotalPrice = By.Id("TotalPrice");
-        private By tableClasses = By.Id("PlanClasses");
+        By nameSurname = By.Id("nameSurname");
+        By createdDate = By.Id("createdDate");
+        By planName = By.Id("planName");
+        By planDescription = By.Id("planDescription");
+        By weeks = By.Id("weeks");
+        By healthIssues = By.Id("healthIssues");
+        By tableofClassesBy = By.Id("enrolledClasses");
 
         public DetailsPlan_P0(IWebDriver driver, ITestOutputHelper output) : base(driver, output)
         {
         }
 
-        public string GetPlanName()
+        public bool CheckPlanDetail(string nameSurnameText, string createdDateText, string planNameText,
+            string planDescriptionText, string weeksText, string healthIssuesText)
         {
-            WaitForBeingVisible(labelPlanName); // Asegurar que Blazor ha pintado el texto
-            return _driver.FindElement(labelPlanName).Text;
+            WaitForBeingVisible(nameSurname);
+            WaitForBeingVisible(createdDate);
+            WaitForBeingVisible(planName);
+            WaitForBeingVisible(planDescription);
+            WaitForBeingVisible(weeks);
+            WaitForBeingVisible(healthIssues);
+
+            bool result = true;
+
+            result = result && _driver.FindElement(nameSurname).Text.Contains(nameSurnameText);
+            result = result && _driver.FindElement(createdDate).Text.Contains(createdDateText);
+            result = result && _driver.FindElement(planName).Text.Contains(planNameText);
+            result = result && _driver.FindElement(planDescription).Text.Contains(planDescriptionText);
+            result = result && _driver.FindElement(weeks).Text.Contains(weeksText);
+            result = result && _driver.FindElement(healthIssues).Text.Contains(healthIssuesText);
+
+            return result;
         }
 
-        public string GetPlanUsername()
+        public bool CheckListOfItems(List<string[]> expectedItems)
         {
-            WaitForBeingVisible(labelUsername);
-            return _driver.FindElement(labelUsername).Text;
-        }
-
-        public string GetPlanDescription()
-        {
-            WaitForBeingVisible(labelDescription);
-            return _driver.FindElement(labelDescription).Text;
-        }
-
-        public string GetPlanCreatedDate()
-        {
-            WaitForBeingVisible(labelCreatedDate);
-            return _driver.FindElement(labelCreatedDate).Text;
-        }
-
-        public string GetPlanWeeks()
-        {
-            WaitForBeingVisible(labelWeeks);
-            return _driver.FindElement(labelWeeks).Text;
-        }
-
-        public string GetPlanTotalPrice()
-        {
-            WaitForBeingVisible(labelTotalPrice);
-            return _driver.FindElement(labelTotalPrice).Text;
-        }
-
-        public bool IsClassInTable(string className)
-        {
-            By rowLocator = By.Id($"PlanClass_{className}");
-            try
-            {
-                WaitForBeingVisible(rowLocator);
-                return _driver.FindElement(rowLocator).Displayed;
-            }
-            catch (Exception) // Captura general para evitar fallos por desincronización
-            {
-                return false;
-            }
+            return CheckBodyTable(expectedItems, tableofClassesBy);
         }
     }
 }
