@@ -33,10 +33,8 @@ namespace AppForSEII2526.API.Controllers
                 return BadRequest("Weeks must be greater than 0.");
             }
             var user = await _context.ApplicationUser.FirstOrDefaultAsync(au => au.UserName == planForCreate.UserName);
-
             if (user == null)
             {
-                _logger.LogWarning($"User {planForCreate.UserName} not found");
                 return BadRequest("Error! Username is not registered");
             }
             var paymentMethod = await _context.Set<PaymentMethod>()
@@ -44,15 +42,18 @@ namespace AppForSEII2526.API.Controllers
 
             if (paymentMethod == null)
             {
-                if (planForCreate.PaymentMethodId == 1 && _context.Database.ProviderName == "Microsoft.EntityFrameworkCore.Sqlite")
+                return BadRequest("Error! The selected payment method does not exist.");
+            }
+            var checkPM = await _context.Set<PaymentMethod>()
+    .AnyAsync(pm => pm.Id == planForCreate.PaymentMethodId && pm.User.Id == user.Id);
+
+            if (!checkPM)
+            {
+                if (_context.Database.ProviderName != "Microsoft.EntityFrameworkCore.Sqlite")
                 {
-                }
-                else
-                {
-                    return BadRequest("Error! The selected payment method does not exist.");
+                    return BadRequest("Error! The selected payment method is not registered for this user.");
                 }
             }
-
             var selectedClassIds = planForCreate.SelectedClasses.Select(c => c.Id).ToList();
             var dbClasses = await _context.Classes
                 .Include(c => c.ItemType)
