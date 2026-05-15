@@ -39,10 +39,10 @@ namespace AppForSEII2526.UT.PlanController_test
             };
 
             var classes = new List<Class>()
-            {
-                new Class { Id = 1, Name = "Morning Yoga", Price = 10.0m, Date = DateTime.Today.AddDays(1), ItemType = types[0] },
-                new Class { Id = 2, Name = "Evening Pilates", Price = 15.0m, Date = DateTime.Today.AddDays(2), ItemType = types[1] }
-            };
+{
+    new Class { Id = 1, Name = "Morning Yoga", Price = 10.0m, Date = DateTime.Today.AddDays(1), ItemType = types[0], Capacity = 10 }, // <--- PONER 10
+    new Class { Id = 2, Name = "Evening Pilates", Price = 15.0m, Date = DateTime.Today.AddDays(2), ItemType = types[1], Capacity = 10 } // <--- PONER 10
+};
 
             _context.AddRange(types);
             _context.AddRange(classes);

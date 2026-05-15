@@ -100,7 +100,10 @@ namespace AppForSEII2526.API.Controllers
 
             if (ModelState.ErrorCount > 0)
             {
-                return BadRequest(ValidationProblem(ModelState));
+                var errors = string.Join(" | ", ModelState.Values
+                    .SelectMany(v => v.Errors)
+                    .Select(e => e.ErrorMessage));
+                return BadRequest(errors);
             }
 
             try
