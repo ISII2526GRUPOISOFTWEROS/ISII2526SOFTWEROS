@@ -77,7 +77,7 @@ namespace AppForSEII2526.UT.ClassesController_test
         public async Task GetClassForPlan_WrongDate_test()
         {
             // ARRANGE
-            var expectedDetail = "The date cannot be in the past.";
+            var expectedDetail = "LA FECHA NO ES VALIDA";
 
             var mock = new Mock<ILogger<ClassesController>>();
             ClassesController controller = new ClassesController(_context, mock.Object);

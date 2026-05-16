@@ -6,6 +6,12 @@
 @using AppForSEII2526.API.DTOs.ClassesDTOs
 
 <h3>Select Classes For Plan</h3>
+@if (!string.IsNullOrEmpty(errors))
+{
+    <div id="errorsShown" class="alert alert-danger" role="alert">
+        @errors
+    </div>
+}
 <div class="container-fluid">
     <div class="row" hidden="@hideErrors">
         <div class="alert alert-danger">
@@ -48,20 +54,24 @@
                 </div>
 
                 <div class="col-auto">
-                    <button type="button" class="btn btn-primary" @onclick="@SearchClasses">Search Classes</button>
+                    <button type="button"
+                            id="buttonSearchClasses"
+                            class="btn btn-primary"
+                            @onclick="@SearchClasses">
+                        Search Classes
+                    </button>
                 </div>
             </div>
 
             <div class="row">
                 <h4>Available Classes</h4>
-                @if (classes == null)
+                @if (classes == null || !classes.Any())
                 {
-                    <p>Loading classes...</p>
+                    <div class="alert alert-warning">
+                    <p>Warnings: No classes were found with the given filters</p>
+                       </div>
                 }
-                else if (!classes.Any())
-                {
-                    <p>No classes found.</p>
-                }
+               
                 else
                 {
                     <p>Number of classes found: @classes.Count</p>
@@ -130,21 +140,16 @@
     private string errors = "";
 
     private string itemTypes { get; set; } = "";
-    // CAMBIO 1: Ahora es DateTime? e inicializa a null (sin fecha por defecto)
     private DateTime? date { get; set; } = null;
 
-    // CAMBIO 2: Los campos de respaldo son DateTime? e inicializan a null
     private DateTime? _fromDate = null;
-    // CAMBIO 3: La propiedad es DateTime?
     private DateTime? fromDate
     {
         get => _fromDate;
         set => _fromDate = value;
     }
 
-    // CAMBIO 4: Los campos de respaldo son DateTime? e inicializan a null
     private DateTime? _toDate = null;
-    // CAMBIO 5: La propiedad es DateTime?
     private DateTime? toDate
     {
         get => _toDate;
@@ -166,8 +171,16 @@
     public async Task SearchClasses()
     {
         errors = "";
+
         try
         {
+            if (date.HasValue && date.Value < DateTime.Today)
+            {
+                errors = "Errors: INVALID DATE";
+                classes = new List<AppForSEII2526.Web.API.ClassForPlanDTO>();
+                StateHasChanged();
+                return;
+            }
             var typesList = string.IsNullOrWhiteSpace(itemTypes)
                 ? null
                 : new List<string> { itemTypes };
@@ -191,19 +204,25 @@
                 dtoFrom,
                 dtoTo
             );
+          
+            
+
+            if (classes.Count == 0)
+            {
+                errors = "Errors: NO CLASSES AVAILABLES";
+            }
         }
         catch (ApiException ex)
         {
             logger.LogError($"{DateTime.Now} Error: {ex.Message}");
             if (ex.StatusCode == 400)
-                errors = $"Bad Request (400): {ex.Message}";
+            {
+                errors = "INVALID DATE";
+            }
             else
-                errors = $"Error connecting to system ({ex.StatusCode}): {ex.Message}";
-        }
-        catch (Exception ex)
-        {
-            logger.LogError($"{DateTime.Now} Error: {ex}");
-            errors = $"Unexpected error: {ex.Message}";
+            {
+                errors = $"Error ({ex.StatusCode}): {ex.Message}";
+            }
         }
         StateHasChanged();
     }

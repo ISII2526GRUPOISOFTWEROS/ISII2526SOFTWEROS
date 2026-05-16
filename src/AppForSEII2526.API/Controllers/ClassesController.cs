@@ -2,7 +2,7 @@
 using AppForSEII2526.API.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore; // Asegúrate de tener esta línea para el ToListAsync
+using Microsoft.EntityFrameworkCore; 
 using System.Linq;
 using System.Net;
 
@@ -31,41 +31,41 @@ namespace AppForSEII2526.API.Controllers
         {
             if (date.HasValue && date.Value < DateTime.Today)
             {
-                return BadRequest("The date cannot be in the past.");
+                
+                return BadRequest("LA FECHA NO ES VALIDA");
             }
+
             try
             {
                 var query = _context.Classes
                     .Include(c => c.ItemType)
-                    .Where(c => c.Capacity > -1);
-
+                    .Where(c => c.Capacity >= 0) 
+                    .AsQueryable();
 
                 // Filtro por tipos de item
-                if (itemTypes != null && itemTypes.Any())
+                if (itemTypes != null && itemTypes.Any(t => !string.IsNullOrEmpty(t)))
                 {
                     query = query.Where(c => itemTypes.Contains(c.ItemType.Name));
                 }
 
-                // Filtro por fecha específica (solo día/mes/año)
+                // Filtro por fecha específica
                 if (date.HasValue)
                 {
                     query = query.Where(c => c.Date.Date == date.Value.Date);
                 }
 
-                // Filtro por rango de fechas (fromDate / toDate)
+                // Filtro por rango de fechas
                 if (fromDate.HasValue)
                 {
-                    query = query.Where(c => c.Date >= fromDate.Value);
+                    query = query.Where(c => c.Date.Date >= fromDate.Value.Date);
                 }
                 if (toDate.HasValue)
                 {
-                    query = query.Where(c => c.Date <= toDate.Value);
+                    query = query.Where(c => c.Date.Date <= toDate.Value.Date);
                 }
 
-                // Ejecutamos la consulta filtrada
                 var classesList = await query.ToListAsync();
 
-                // 3. Mapeo a DTO
                 var result = classesList.Select(c => new ClassForPlanDTO(
                     c.Id,
                     c.Price,
@@ -75,17 +75,14 @@ namespace AppForSEII2526.API.Controllers
                     new List<string> { c.ItemType?.Name ?? "General" }
                 )).ToList();
 
-                if (!result.Any() && itemTypes == null && !date.HasValue)
-                {
-                    result.Add(new ClassForPlanDTO(1, 10, DateTime.Now.AddDays(1), "Morning Yoga", 20, new List<string> { "Yoga" }));
-                }
 
                 return Ok(result);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error en GetClassForPlan");
-                return Ok(new List<ClassForPlanDTO>()); 
+                // En caso de error crítico, devolvemos una lista vacía para no romper el Front
+                return Ok(new List<ClassForPlanDTO>());
             }
         }
     }

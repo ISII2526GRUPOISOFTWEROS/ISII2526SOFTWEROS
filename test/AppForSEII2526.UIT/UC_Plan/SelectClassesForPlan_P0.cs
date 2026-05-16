@@ -26,34 +26,20 @@ namespace AppForSEII2526.UIT.UC_Plan
         {
             WaitForBeingClickable(inputItemType);
             var element = _driver.FindElement(inputItemType);
+            element.Click();
             element.SendKeys(Keys.Control + "a");
             element.SendKeys(Keys.Backspace);
             element.SendKeys(itemType);
             element.SendKeys(Keys.Tab);
-
-            if (date != null)
+            if (date.HasValue)
             {
-                DateTime strictDate = (DateTime)date;
-                InputDateInDatePicker(inputDate, strictDate);
+                InputDateInDatePicker(inputDate, date.Value);
+
             }
 
-            if (fromDate != null)
-            {
-                DateTime strictFromDate = (DateTime)fromDate;
-                InputDateInDatePicker(inputFromDate, strictFromDate);
-            }
-
-            if (toDate != null)
-            {
-                DateTime strictToDate = (DateTime)toDate;
-                InputDateInDatePicker(inputToDate, strictToDate);
-            }
-
-            WaitForBeingClickable(buttonSearchClasses);
-            _driver.FindElement(buttonSearchClasses).Click();
-
-            System.Threading.Thread.Sleep(300); // Espera a que Blazor termine de refrescar la tabla de resultados
+            System.Threading.Thread.Sleep(1000);
         }
+        
 
         public bool CheckListOfClasses(List<string[]> expectedClasses)
         {
