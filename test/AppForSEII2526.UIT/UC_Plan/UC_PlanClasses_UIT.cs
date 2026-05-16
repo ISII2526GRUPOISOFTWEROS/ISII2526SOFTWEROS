@@ -71,6 +71,7 @@ namespace AppForSEII2526.UIT.UC_Plan
             }
         }
 
+
         private void InitialStepsForCreatePlan()
         {
             Precondition_performance_login();
@@ -85,9 +86,48 @@ namespace AppForSEII2526.UIT.UC_Plan
             SelectClassesForPlan(className2);
 
         }
+        private void Precondition_StayOnSelectClasses()
+        {
+            Precondition_performance_login();
+            _driver.Navigate().GoToUrl(_URI + "plan/selectclassesforplan");
+
+            System.Threading.Thread.Sleep(2000);
+        }
+        
+        [Fact]
+        [Trait("LevelTesting", "Functional Testing")]
+        public void UC_CreatePlan_ESC4_AF2_invalid_date()
+        {
+            // ARRANGE
+            Precondition_StayOnSelectClasses();
+            var expectedErrorMessage = "Errors: INVALID DATE";
+
+            DateTime pastDate = new DateTime(2020, 01, 01);
+
+            // 2. ACT
+            selectClassesForPlan_PO.SearchClasses("", pastDate, null, null);
+
+            // 3. ASSERT
+            System.Threading.Thread.Sleep(1000);
 
 
+        }
+        [Fact]
+        [Trait("LevelTesting", "Functional Testing")]
+        public void UC_CreatePlan_ESC2_AF0_no_classes_available()
+        {// ARRANGE
+            Precondition_StayOnSelectClasses();
+            var expectedErrorMessage = "Errors: NO CLASSES AVAILABLES";
 
+            DateTime pastDate = new DateTime(2026, 7, 7);
+
+            // 2. ACT
+            selectClassesForPlan_PO.SearchClasses("", pastDate, null, null);
+
+            // 3. ASSERT
+            System.Threading.Thread.Sleep(1000);
+
+        }
         [Fact]
         [Trait("LevelTesting", "Functional Testing")]
         public void UC_CreatePlan_ESC5_AF3_ModifyPlan()
