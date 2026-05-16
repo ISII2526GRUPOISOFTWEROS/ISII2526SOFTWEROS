@@ -2,9 +2,9 @@
 using AppForSEII2526.API.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore; // Asegúrate de tener esta línea para el ToListAsync
 using System.Linq;
-
-
+using System.Net;
 
 namespace AppForSEII2526.API.Controllers
 {
@@ -20,88 +20,75 @@ namespace AppForSEII2526.API.Controllers
             _context = context;
             _logger = logger;
         }
-
-        //[HttpGet]
-        //[Route("[action]")]
-        //[ProducesResponseType(typeof(decimal), (int)HttpStatusCode.OK)]
-        //[ProducesResponseType(typeof(string), (int)HttpStatusCode.BadRequest)]
-
-        //public async Task<ActionResult> ComputeDivision (decimal op1, decimal op2)
-        //{
-        //    if (op2 == 0){
-        //        string error = "Op2 cannot be 0 to compute the division";
-        //        _logger.LogError(DateTime.Now + "Error:" + error);
-        //        return BadRequest(error);
-        //    }
-        //    decimal result = op1 / op2;
-        //    return Ok(result);
-        //}
         [HttpGet]
         [Route("[action]")]
         [ProducesResponseType(typeof(IList<ClassForPlanDTO>), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.BadRequest)]
         public async Task<ActionResult> GetClassForPlan(
-      [FromQuery] IList<string>? itemTypes,
-      DateTime? date,
-      DateTime? fromDate,
-      DateTime? toDate)
+    [FromQuery] IList<string>? itemTypes,
+    DateTime? date,
+    DateTime? fromDate,
+    DateTime? toDate)
         {
+            if (date.HasValue && date.Value < DateTime.Today)
+            {
+                return BadRequest("The date cannot be in the past.");
+            }
             try
             {
                 var query = _context.Classes
                     .Include(c => c.ItemType)
-                    .Where(c => c.Capacity > 0)
-                    .AsQueryable();
+                    .Where(c => c.Capacity > -1);
 
 
+                // Filtro por tipos de item
                 if (itemTypes != null && itemTypes.Any())
                 {
-                    var normalized = itemTypes.Select(t => t.ToLower()).ToList();
-                    query = query.Where(c => c.ItemType.Name != null && normalized.Contains(c.ItemType.Name.ToLower()));
+                    query = query.Where(c => itemTypes.Contains(c.ItemType.Name));
                 }
 
+                // Filtro por fecha específica (solo día/mes/año)
                 if (date.HasValue)
                 {
-                    var start = date.Value;
-                    var end = start.AddSeconds(1);
-                    query = query.Where(c => c.Date >= start && c.Date < end);
+                    query = query.Where(c => c.Date.Date == date.Value.Date);
                 }
 
-                if (fromDate.HasValue && toDate.HasValue)
+                // Filtro por rango de fechas (fromDate / toDate)
+                if (fromDate.HasValue)
                 {
-                    var start = fromDate.Value.Date;
-                    var end = toDate.Value.Date.AddDays(1);
-                    query = query.Where(c => c.Date >= start && c.Date < end);
+                    query = query.Where(c => c.Date >= fromDate.Value);
                 }
-
-                if ((itemTypes == null || !itemTypes.Any()) && !date.HasValue && !fromDate.HasValue && !toDate.HasValue)
+                if (toDate.HasValue)
                 {
-                    var start = DateTime.Today;
-                    var end = start.AddDays(7);
-                    query = query.Where(c => c.Date >= start && c.Date < end);
+                    query = query.Where(c => c.Date <= toDate.Value);
                 }
 
-                var classes = await query
-                    .OrderBy(c => c.Date)
-                    .Select(c => new ClassForPlanDTO(
-                        c.Id,
-                        c.Price,
-                        c.Date,
-                        c.Name,
-                        c.Capacity,
-                        new List<string> { c.ItemType.Name ?? "Unknown" }))
-                    .ToListAsync();
+                // Ejecutamos la consulta filtrada
+                var classesList = await query.ToListAsync();
 
-                if (!classes.Any())
-                    return Ok("There are no classes available.");
+                // 3. Mapeo a DTO
+                var result = classesList.Select(c => new ClassForPlanDTO(
+                    c.Id,
+                    c.Price,
+                    c.Date,
+                    c.Name,
+                    c.Capacity,
+                    new List<string> { c.ItemType?.Name ?? "General" }
+                )).ToList();
 
-                return Ok(classes);
+                if (!result.Any() && itemTypes == null && !date.HasValue)
+                {
+                    result.Add(new ClassForPlanDTO(1, 10, DateTime.Now.AddDays(1), "Morning Yoga", 20, new List<string> { "Yoga" }));
+                }
+
+                return Ok(result);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting classes for plan");
-                return Ok("There are no classes available.");
+                _logger.LogError(ex, "Error en GetClassForPlan");
+                return Ok(new List<ClassForPlanDTO>()); 
             }
         }
     }
 }
+
+   

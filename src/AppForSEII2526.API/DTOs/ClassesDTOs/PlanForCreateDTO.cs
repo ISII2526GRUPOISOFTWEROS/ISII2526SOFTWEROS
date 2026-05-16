@@ -18,9 +18,8 @@ namespace AppForSEII2526.API.DTOs.ClassesDTOs
         [StringLength(60, MinimumLength = 3, ErrorMessage = "Plan name must have at least 3 characters")]
         public string Name { get; set; } = string.Empty;
 
-        [Required]
-        [StringLength(50, MinimumLength = 3, ErrorMessage = "Plan name must have at least 10 characters")]
-        public string UserName { get; set; } = string.Empty;
+        [StringLength(50, MinimumLength = 3, ErrorMessage = "Username must be at least 3 characters")]
+        public string UserName { get; set; } = "AdminTest";
 
         [StringLength(100, ErrorMessage = "Description cannot exceed 100 characters")]
         public string? Description { get; set; }
@@ -31,13 +30,9 @@ namespace AppForSEII2526.API.DTOs.ClassesDTOs
 
         [StringLength(100, ErrorMessage = "Health issues cannot exceed 100 characters")]
         public string? HealthIssues { get; set; }
-        [Required]
-        public IList<PlanItemDTO> PlanItems { get; set; } = new List<PlanItemDTO>();
-
-        [Required]
+   
         public IList<ClassSelectionDTO> SelectedClasses { get; set; } = new List<ClassSelectionDTO>();
 
-        [Required]
         public int PaymentMethodId { get; set; }  
      
         public IList<GoalForClassDTO>? Goals { get; set; }

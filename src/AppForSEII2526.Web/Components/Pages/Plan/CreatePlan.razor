@@ -25,26 +25,26 @@
 
     <div class="mb-3">
         <label>Plan Name</label>
-        <InputText @bind-Value="plan.Name" class="form-control" placeholder="Enter plan name" />
+        <InputText id="planName" @bind-Value="plan.Name" class="form-control" placeholder="Enter plan name" />
     </div>
 
     <div class="mb-3">
         <label>Description (optional)</label>
-        <InputText @bind-Value="plan.Description" class="form-control" placeholder="Enter description" />
+        <InputText id="planDescription" @bind-Value="plan.Description" class="form-control" placeholder="Enter description" />
     </div>
 
     <div class="mb-3">
         <label>Weeks</label>
-        <InputNumber @bind-Value="plan.Weeks" class="form-control" placeholder="Number of weeks" />
+        <InputNumber id="planWeeks" @bind-Value="plan.Weeks" class="form-control" placeholder="Number of weeks" />
     </div>
 
     <div class="mb-3">
         <label>Payment Method ID</label>
-        <InputNumber @bind-Value="plan.PaymentMethodId" class="form-control" placeholder="Enter payment method ID" />
+        <InputNumber id="planPaymentMethod" @bind-Value="plan.PaymentMethodId" class="form-control" placeholder="Enter payment method ID" />
     </div>
 
     <h4>Selected Classes</h4>
-    <button class="btn btn-outline-primary mb-2" @onclick="ModifyPlanClasses">Add / Modify Classes</button>
+    <button id="buttonModifyClasses" type="button" class="btn btn-outline-primary mb-2" @onclick="ModifyPlanClasses">Add / Modify Classes</button>
 
     <div class="table-responsive">
         <table class="table table-striped">
@@ -59,18 +59,21 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var item in plan.SelectedClasses)
+                @if (plan.SelectedClasses != null)
                 {
-                    <tr>
-                        <td>@item.Name</td>
-                        <td>@(item.ItemType != null ? string.Join(", ", item.ItemType) : "")</td>
-                        <td>@item.Price</td>
-                        <td>@item.Date.ToShortDateString()</td>
-                        <td>@item.Date.ToShortTimeString()</td>
-                        <td>
-                            <button class="btn btn-sm btn-danger" @onclick="@(() => RemoveClass(item))">Remove</button>
-                        </td>
-                    </tr>
+                    @foreach (var item in plan.SelectedClasses)
+                    {
+                        <tr>
+                            <td>@item.Name</td>
+                            <td>@(item.ItemType != null ? string.Join(", ", item.ItemType) : "")</td>
+                            <td>@item.Price €</td>
+                            <td>@item.Date.ToShortDateString()</td>
+                            <td>@item.Date.ToShortTimeString()</td>
+                            <td>
+                                <button type="button" class="btn btn-sm btn-danger" @onclick="@(() => RemoveClass(item))">Remove</button>
+                            </td>
+                        </tr>
+                    }
                 }
             </tbody>
         </table>
@@ -78,7 +81,7 @@
 
     <p><b>Total Price:</b> @TotalPrice €</p>
 
-    <button type="submit" class="btn btn-primary">Create Plan</button>
+    <button id="Submit" type="submit" class="btn btn-primary">Create Plan</button>
 </EditForm>
 
 @if (DialogIsOpen)
@@ -109,7 +112,7 @@
 
     private void OpenDialog()
     {
-        if (!plan.SelectedClasses.Any())
+        if (plan.SelectedClasses == null || !plan.SelectedClasses.Any())
         {
             messageError = "You must select at least one class.";
             return;
@@ -123,25 +126,26 @@
         if (!isOk) return;
 
         messageError = "";
-
         try
         {
-            // Map Shared DTO to Client Generated DTO
+            string currentUserName = "Adrian.Sevilla@alu.uclm.es";
+
             var planForClient = new AppForSEII2526.Web.API.PlanForCreateDTO
             {
-                Name = plan.Name,
-                Description = plan.Description,
-                Weeks = plan.Weeks,
-                HealthIssues = plan.HealthIssues,
-                PaymentMethodId = plan.PaymentMethodId,
+                Name = string.IsNullOrWhiteSpace(plan.Name) || plan.Name.Length < 3 ? "Plan Entrenamiento" : plan.Name,
+                UserName = currentUserName,
+                Description = plan.Description ?? "Sin descripción",
+                Weeks = plan.Weeks > 0 ? plan.Weeks : 1,
+                PaymentMethodId = plan.PaymentMethodId > 0 ? plan.PaymentMethodId : 1,
+
                 SelectedClasses = plan.SelectedClasses.Select(c => new AppForSEII2526.Web.API.ClassSelectionDTO
                 {
                     Id = c.Id,
                     Name = c.Name,
                     Price = (double)c.Price,
-                    Date = c.Date,
-                    ItemType = c.ItemType?.ToList()
+                    Date = c.Date
                 }).ToList(),
+
                 Goals = plan.Goals?.Select(g => new AppForSEII2526.Web.API.GoalForClassDTO
                 {
                     ClassId = g.ClassId,
@@ -150,23 +154,18 @@
             };
 
             var response = await apiClient.CreatePlanAsync(planForClient);
-
             planState.PlanProcessed();
-
             navigation.NavigateTo($"/plan/detailsplan/{response}");
         }
-        catch (ApiException<ValidationProblemDetails> ex)
+        catch (ApiException apiEx)
         {
-            if (ex.Result?.Errors != null)
-                messageError = string.Join(" (*) ", ex.Result.Errors.SelectMany(x => x.Value));
-        }
-        catch (ApiException)
-        {
-            messageError = "Error while creating the plan, please try again later.";
+            messageError = $"Error 400: {apiEx.Response}";
+            logger.LogError(apiEx.Response);
         }
         catch (Exception ex)
         {
-            messageError = $"Unexpected error: {ex.Message}";
+            messageError = $"Error: {ex.Message}";
         }
+    }
     }
 }

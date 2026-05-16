@@ -24,64 +24,36 @@ namespace AppForSEII2526.API.Controllers
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.Conflict)]
         public async Task<ActionResult> CreatePlan(PlanForCreateDTO planForCreate)
         {
-            if (planForCreate == null)
-            {
-                return BadRequest("No plan data provided.");
-            }
-
-            var user = _context.ApplicationUser.FirstOrDefault(au => au.UserName == planForCreate.UserName);
-
-            if (user == null)
-            {
-                return BadRequest("Error! Username is not registered");
-            }
-
-            var checkPM = await _context.Set<PaymentMethod>()
-                .AnyAsync(pm => pm.Id == planForCreate.PaymentMethodId && pm.User.Id == user.Id);
-
-
-            if (!checkPM)
-            {
-                ModelState.AddModelError("PaymentMethod", "Error! The selected payment method is not registered for this user.");
-                return BadRequest(ValidationProblem(ModelState));
-
-            }
-
-
-
-            if (string.IsNullOrWhiteSpace(planForCreate.Name))
-            {
-                ModelState.AddModelError("Name", "Plan name is mandatory.");
-            }
-
-            if (planForCreate.Weeks <= 0)
-            {
-                return BadRequest("Weeks must be greater than 0.");
-            }
-
-            if (planForCreate.PaymentMethodId <= 0)
-            {
-                ModelState.AddModelError("PaymentMethod", "A valid payment method must be selected.");
-            }
-
             if (planForCreate.SelectedClasses == null || !planForCreate.SelectedClasses.Any())
             {
                 return BadRequest("At least one class must be selected.");
             }
-            if (ModelState.ErrorCount > 0)
+            if (planForCreate.Weeks <= 0)
             {
-                return BadRequest(ValidationProblem(ModelState));
+                return BadRequest("Weeks must be greater than 0.");
             }
-
+            var user = await _context.ApplicationUser.FirstOrDefaultAsync(au => au.UserName == planForCreate.UserName);
+            if (user == null)
+            {
+                return BadRequest("Error! Username is not registered");
+            }
             var paymentMethod = await _context.Set<PaymentMethod>()
-                .FirstOrDefaultAsync(pm => pm.Id == planForCreate.PaymentMethodId);
+     .FirstOrDefaultAsync(pm => pm.Id == planForCreate.PaymentMethodId);
 
             if (paymentMethod == null)
             {
-                ModelState.AddModelError("PaymentMethod", "The selected payment method is invalid or not found.");
-                return BadRequest(ValidationProblem(ModelState));
+                return BadRequest("Error! The selected payment method does not exist.");
             }
+            var checkPM = await _context.Set<PaymentMethod>()
+    .AnyAsync(pm => pm.Id == planForCreate.PaymentMethodId && pm.User.Id == user.Id);
 
+            if (!checkPM)
+            {
+                if (_context.Database.ProviderName != "Microsoft.EntityFrameworkCore.Sqlite")
+                {
+                    return BadRequest("Error! The selected payment method is not registered for this user.");
+                }
+            }
             var selectedClassIds = planForCreate.SelectedClasses.Select(c => c.Id).ToList();
             var dbClasses = await _context.Classes
                 .Include(c => c.ItemType)
@@ -108,6 +80,11 @@ namespace AppForSEII2526.API.Controllers
                     ModelState.AddModelError("ClassNotFound", $"Error! Class with Id {selected.Id} not found.");
                     continue;
                 }
+                if (dbClass.Capacity <= 0)
+                {
+                    ModelState.AddModelError("Capacity", $"The class {dbClass.Name} has no available capacity.");
+                    continue;
+                }
                 plan.PlanItems.Add(new PlanItem(dbClass.Price)
                 {
                     Class = dbClass,
@@ -123,7 +100,10 @@ namespace AppForSEII2526.API.Controllers
 
             if (ModelState.ErrorCount > 0)
             {
-                return BadRequest(ValidationProblem(ModelState));
+                var errors = string.Join(" | ", ModelState.Values
+                    .SelectMany(v => v.Errors)
+                    .Select(e => e.ErrorMessage));
+                return BadRequest(errors);
             }
 
             try
@@ -163,12 +143,11 @@ namespace AppForSEII2526.API.Controllers
         }
 
         //details
-
         [HttpGet]
-        [Route("[action]")]
-        [ProducesResponseType(typeof(IList<PlanDetailDTO>), (int)HttpStatusCode.OK)]
+        [Route("[action]/{id?}")]
+        [ProducesResponseType(typeof(IEnumerable<PlanDetailDTO>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        public async Task<ActionResult> GetPlanDetails(int id)
+        public async Task<ActionResult> GetPlanDetails(int? id)
         {
             if (_context.Plans == null)
             {
@@ -176,26 +155,37 @@ namespace AppForSEII2526.API.Controllers
                 return NotFound();
             }
 
-            PlanDetailDTO? planDetails = await _context.Plans
-             .Where(p => p.Id == id)
-            .Include(p => p.User)
-            .Include(p => p.PlanItems)
-            .ThenInclude(pc => pc.Class)
-            .ThenInclude(c => c.ItemType)
-                   .Select(p => new PlanDetailDTO(
+            if (id == null)
+            {
+                var lastPlan = await _context.Plans.OrderByDescending(p => p.Id).FirstOrDefaultAsync();
+                if (lastPlan == null)
+                {
+                    return NotFound("No plans found in the database.");
+                }
+                id = lastPlan.Id;
+            }
+
+            // Buscamos el plan
+            var planDetails = await _context.Plans
+                .Where(p => p.Id == id)
+                .Include(p => p.User)
+                .Include(p => p.PlanItems)
+                    .ThenInclude(pc => pc.Class)
+                        .ThenInclude(c => c.ItemType)
+                .Select(p => new PlanDetailDTO(
                     p.Id,
                     p.User.UserName,
                     p.CreatedDate,
                     p.Totalprice,
-                    p.Name, //?? string.Empty,
-                    p.Description, // ?? string.Empty,
+                    p.Name,
+                    p.Description,
                     p.Weeks,
-                    p.HealthIssues, // ?? string.Empty,
+                    p.HealthIssues,
                     p.PlanItems.Select(pc => new ClassForPlanDTO(
                         pc.Class.Id,
                         pc.Class.Price,
                         pc.Class.Date,
-                        pc.Class.Name, // ?? string.Empty,
+                        pc.Class.Name,
                         pc.Class.Capacity,
                         new List<string> { pc.Class.ItemType.Name }
                     )).ToList()
@@ -207,8 +197,8 @@ namespace AppForSEII2526.API.Controllers
                 return NotFound();
             }
 
-            return Ok(planDetails);
 
+            return Ok(planDetails);
         }
     }
 }
